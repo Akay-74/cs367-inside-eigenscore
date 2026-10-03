@@ -1,54 +1,23 @@
-\documentclass[11pt,a4paper]{article}
-\usepackage[margin=1in]{geometry}
+\documentclass[conference]{IEEEtran}
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
 \usepackage{booktabs}
-\usepackage{float}
-\usepackage{hyperref}
 \usepackage{listings}
 \usepackage{xcolor}
-\usepackage{caption}
-\usepackage{fancyhdr}
-\usepackage{microtype}
-
-\lstset{basicstyle=\ttfamily\small,breaklines=true,frame=single,
-  backgroundcolor=\color{gray!8},columns=fullflexible}
-\hypersetup{colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!50!black,citecolor=blue!50!black}
-\pagestyle{fancy}
-\fancyhf{}
-\lhead{CS367 -- Reproduction of INSIDE}
-\rhead{\thepage}
-
+\usepackage{cite}
+\usepackage[hidelinks]{hyperref}
+\lstset{basicstyle=\ttfamily\scriptsize,breaklines=true,frame=single,columns=fullflexible}
 \begin{document}
-
-\begin{titlepage}
-\centering
-\vspace*{1.5cm}
-{\large Course CS367}\\[1.2cm]
-{\LARGE\bfseries Reproduction of\\[4pt] ``INSIDE: LLMs' Internal States Retain the Power of Hallucination Detection''}\\[0.8cm]
-{\large Chen et al., ICLR 2024}\\[1.8cm]
-{\Large\bfseries Project Report}\\[1.8cm]
-\begin{tabular}{lr}
-\toprule
-\textbf{Name} & \textbf{Student ID}\\
-\midrule
-Aayaan Ali Khan & 202411001\\
-Shlok Bhavsar & 202411018\\
-Prapti Chotaliya & 202411030\\
-\bottomrule
-\end{tabular}\\[2cm]
-\today
-\vfill
-\end{titlepage}
-
+\title{Reproducing INSIDE: EigenScore and Test-Time Feature Clipping for LLM Hallucination Detection\\
+\large CS367 Project Implementation Report}
+\author{\IEEEauthorblockN{Aayaan Ali Khan}\IEEEauthorblockA{ID: 202411001}
+\and\IEEEauthorblockN{Shlok Bhavsar}\IEEEauthorblockA{ID: 202411018}
+\and\IEEEauthorblockN{Prapti Chotaliya}\IEEEauthorblockA{ID: 202411030}}
+\maketitle
 \begin{abstract}
 We reproduce the method of \emph{INSIDE: LLMs' Internal States Retain the Power of Hallucination Detection} (Chen et al., ICLR 2024). The paper proposes two components: \emph{EigenScore}, a hallucination score computed from the covariance of sentence embeddings taken from the middle layer of a language model, and \emph{test-time feature clipping}, which truncates extreme activations of the penultimate layer. The authors' public repository could not be executed as released, and it does not contain the feature-clipping component at all. We repaired twelve blocking defects, implemented feature clipping from the paper's description, added support for running a 7B model on an 8~GB GPU, and wrote an automated test suite. We then evaluated on 250 CoQA questions using Llama-2-7B in 4-bit precision. The ordering of the five detection methods reported in the paper is reproduced exactly, with EigenScore best (AUROC 83.5 without and 82.5 with clipping). The effect of feature clipping could not be resolved at this sample size: a paired bootstrap gives a change of $-1.0$ points with a 95\% interval of $[-4.7,+2.6]$.
 \end{abstract}
-
-\tableofcontents
-\newpage
-
-%--------------------------------------------------------------------
+\begin{IEEEkeywords}hallucination detection, large language models, EigenScore, feature clipping, reproducibility\end{IEEEkeywords}
 \section{Introduction}
 Large language models (LLMs) frequently produce fluent but factually incorrect statements, commonly called \emph{hallucinations}. Detecting such outputs without external fact-checking is important for deployment. Existing approaches operate either on token probabilities (perplexity, entropy) or on the decoded text (agreement between several sampled answers). Both discard information that is still present inside the network.
 
@@ -93,10 +62,10 @@ We compare against the paper's four baselines: \emph{Perplexity}, \emph{Length-N
 \subsection{State of the original code}
 The released repository (\texttt{alibaba/eigenscore}, commit \texttt{ea8062a}) has empty setup and run sections and could not be executed. Table~\ref{tab:bugs} lists the blocking defects we repaired. Every original file is preserved next to the repaired one with the suffix \texttt{.orig}.
 
-\begin{table}[H]
+\begin{table*}[t]
 \centering\small
 \caption{Blocking defects in the released code and their repairs.}\label{tab:bugs}
-\begin{tabular}{@{}rp{3.2cm}p{5.2cm}p{4.6cm}@{}}
+\begin{tabular}{@{}rp{3.6cm}p{6.4cm}p{5.6cm}@{}}
 \toprule
 \# & File & Problem & Repair\\
 \midrule
@@ -114,7 +83,7 @@ The released repository (\texttt{alibaba/eigenscore}, commit \texttt{ea8062a}) h
 12 & \texttt{dataeval/load.py} & \texttt{DEFAULT\_DEVICE='cuda:7'} & Left unchanged (off the execution path)\\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 An additional defect was found at run time. When generations were split into several forward passes, the original code recomputed EigenScore inside the batch loop, so only the last batch (2 of the 10 answers) contributed. We pool the embeddings of all batches before forming the covariance matrix; a test confirms equivalence with the original function in the single-batch case.
 
@@ -133,10 +102,10 @@ The file \texttt{tests/test\_setup.py} contains eight tests, all of which pass: 
 
 %--------------------------------------------------------------------
 \section{Experimental Setup}
-\begin{table}[H]
+\begin{table}[t]
 \centering\small
 \caption{Our setup compared with the paper's.}
-\begin{tabular}{@{}lll@{}}
+\begin{tabular}{@{}p{1.6cm}p{2.9cm}p{3.0cm}@{}}
 \toprule
  & Paper & This work\\
 \midrule
@@ -164,7 +133,7 @@ python -m func.evalFunc data/output/llama2-7b-hf_coqa_10/0.pkl --correctness rou
 %--------------------------------------------------------------------
 \section{Results}
 \subsection{Comparison of detection methods}
-\begin{table}[H]
+\begin{table}[t]
 \centering
 \caption{AUROC (\%) on 250 CoQA questions, $\mathrm{AUC}_r$. The paper's column is LLaMA-7B, Table~1.}\label{tab:auroc}
 \begin{tabular}{@{}lccc@{}}
@@ -183,28 +152,28 @@ The ranking EigenScore $>$ Lexical Similarity $>$ LN-Entropy $>$ Perplexity $>$ 
 
 The paper's EigenScore figure of 80.8 already includes feature clipping (its Table~2 reports 79.3 without and 80.4 with clipping in $\mathrm{AUC}_s$), whereas its baselines are without clipping. The like-for-like comparison for 80.8 is therefore our clipped run, 82.5.
 
-\begin{figure}[H]
+\begin{figure}[t]
 \centering
-\includegraphics[width=0.62\textwidth]{figures/auroc_nofc.png}
+\includegraphics[width=0.95\columnwidth]{figures/auroc_nofc.png}
 \caption{ROC curves on CoQA, without feature clipping. The entries ``SentBertScore'' and ``EigenScoreOutput'' are placeholders at 0.5 because the sentence-similarity model was not used.}
 \end{figure}
-\begin{figure}[H]
+\begin{figure}[t]
 \centering
-\includegraphics[width=0.62\textwidth]{figures/auroc_fc.png}
+\includegraphics[width=0.95\columnwidth]{figures/auroc_fc.png}
 \caption{ROC curves on CoQA, with feature clipping.}
 \end{figure}
 
 \subsection{EigenScore against the strongest baseline}
 A paired bootstrap over questions gives
 \begin{equation*}
-\Delta\mathrm{AUROC}(\text{EigenScore}-\text{LexSim})=+0.0293,\quad 95\%\ \mathrm{CI}=[-0.0057,+0.0651],\quad P(>0)=0.95 .
+\begin{aligned}\Delta\mathrm{AUROC}&=+0.0293,\\ 95\%\ \mathrm{CI}&=[-0.0057,+0.0651],\\ P(>0)&=0.95.\end{aligned}
 \end{equation*}
 This agrees in sign and magnitude with the paper's advantage of about $+3$ points on CoQA, and falls just short of excluding zero at 250 questions.
 
 \subsection{Feature clipping}
 The paper reports that clipping improves EigenScore on CoQA by $+1.1$ points ($\mathrm{AUC}_s$). We measured a change of
 \begin{equation*}
-\Delta\mathrm{AUROC}=-0.0102,\quad 95\%\ \mathrm{CI}=[-0.0468,+0.0263],\quad P(\text{FC helps})=0.30
+\begin{aligned}\Delta\mathrm{AUROC}&=-0.0102,\\ 95\%\ \mathrm{CI}&=[-0.0468,+0.0263],\\ P(\text{FC helps})&=0.30\end{aligned}
 \end{equation*}
 (10\,000 paired bootstrap resamples, identical questions and seed). The interval contains both zero and the paper's $+0.011$, so our experiment neither confirms nor contradicts the claim; it lacks the resolution to do so. The paper used 7983 questions. Clipping was verifiably active: 13\,749\,839 activations were clipped out of $1\,159\,186\times4096$, i.e.\ 0.29\% (at most about 0.4\% is expected from $p=0.2\%$ per tail), and the thresholds are unit-tested against \texttt{numpy.percentile}. We also measured $\mathrm{AUC}_r$ where the paper reports $\mathrm{AUC}_s$, so the two quantities are not strictly the same.
 
@@ -224,8 +193,8 @@ The paper reports that clipping improves EigenScore on CoQA by $+1.1$ points ($\
 We obtained a working implementation of the INSIDE method, including the feature-clipping component that the authors' repository lacks, and reproduced the paper's central empirical finding: the relative ordering of the five hallucination detectors, with EigenScore the strongest. The additional claim that feature clipping improves EigenScore could not be tested conclusively with our compute budget; the implementation is verified by tests and shown to be active, and a full-scale run is the natural next step.
 
 %--------------------------------------------------------------------
-\appendix
-\section{Contents of the Submission}
+
+\section{Submission Contents}
 \begin{lstlisting}
 CS367_Submission/
   report/report.pdf, report.tex     this document
@@ -252,11 +221,9 @@ bash run.sh                               # generation + evaluation
 \end{lstlisting}
 A CUDA GPU is required. CoQA and SQuAD are public datasets and must be placed under \texttt{data/datasets/} (\texttt{coqa-dev-v1.0.json}, \texttt{dev-v2.0.json}); they are omitted from the submission to keep it small.
 
-\begin{thebibliography}{9}
-\bibitem{chen2024inside} C.~Chen, K.~Liu, Z.~Chen, Y.~Gu, Y.~Wu, M.~Tao, Z.~Fu, J.~Ye.
-\newblock INSIDE: LLMs' Internal States Retain the Power of Hallucination Detection.
-\newblock \emph{ICLR}, 2024. \url{https://arxiv.org/abs/2402.03744}
-\bibitem{code} Official code: \url{https://github.com/alibaba/eigenscore}
-\end{thebibliography}
 
+\begin{thebibliography}{1}
+\bibitem{chen2024inside} C.~Chen, K.~Liu, Z.~Chen, Y.~Gu, Y.~Wu, M.~Tao, Z.~Fu, and J.~Ye, ``INSIDE: LLMs' internal states retain the power of hallucination detection,'' in \emph{Proc. ICLR}, 2024. [Online]. Available: https://arxiv.org/abs/2402.03744
+\bibitem{code} ``alibaba/eigenscore.'' [Online]. Available: https://github.com/alibaba/eigenscore
+\end{thebibliography}
 \end{document}
