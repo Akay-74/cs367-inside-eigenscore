@@ -1,0 +1,28 @@
+# INSIDE / EigenScore -- pinned environment (Python 3.11, CUDA 12.x)
+# Install torch first from the cu124 index, then the rest:
+#   uv pip install torch --index-url https://download.pytorch.org/whl/cu124
+#   uv pip install -r requirements.txt
+
+torch>=2.4,<2.9
+transformers>=4.44,<5
+tokenizers>=0.19
+accelerate>=0.33
+bitsandbytes>=0.43          # 4-bit NF4 quantization, needed to fit 7B in 8GB VRAM
+sentencepiece>=0.2          # LLaMA tokenizer
+protobuf>=4.25              # sentencepiece -> slow tokenizer conversion
+
+datasets>=2.20,<4
+sentence-transformers>=3.0  # nli-roberta-large sentence embeddings
+huggingface-hub>=0.24
+
+numpy>=1.26,<3
+scipy>=1.11
+scikit-learn>=1.4
+pandas>=2.0
+matplotlib>=3.8
+
+rouge-score>=0.1.2          # ROUGE-L correctness measure / lexical similarity
+nltk>=3.8                   # rouge-score dependency
+absl-py>=2.0                # rouge-score dependency
+
+tqdm>=4.66

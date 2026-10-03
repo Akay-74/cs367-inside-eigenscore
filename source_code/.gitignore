@@ -1,0 +1,8 @@
+.venv/
+data/output/
+data/weights/
+Figure/
+__pycache__/
+*.pyc
+*.orig
+data/datasets/coqa_dataset/
