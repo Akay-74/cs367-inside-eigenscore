@@ -1,10 +1,17 @@
 """Builds the voiceover guide video: the original silent explainer with the
-script burned in as timed, speaker-coloured subtitles.
+script burned in as karaoke-style, speaker-coloured subtitles.
 
-Dialogue, line IDs and start/end times are read straight from SCRIPT.md, so the
-guide always matches the cue sheet. The original 1920x1080 frame is kept
-intact; a band is added above (speaker name) and below (subtitles) so nothing
-in the animation is covered.
+How a line looks to the reader:
+  * GET READY: the phrase appears dimmed (up to 1.5 s) before it must be spoken,
+    and the status row says "<NAME> · get ready".
+  * SPEAK NOW: the phrase fills with the speaker's colour from left to right,
+    word by word, at the pace it should be spoken.
+  * The row underneath previews the next phrase, so there is always something
+    to read ahead.
+Everything (who is speaking, whose turn, up next, the text) sits in one band
+below the untouched 1920x1080 video, so you never look up and down.
+
+Dialogue, line IDs and start/end times are read straight from SCRIPT.md.
 
     python3 make_guide.py      -> out/inside_voiceover_guide.mp4
 """
@@ -17,8 +24,10 @@ SRC = HERE / "out" / "inside_explainer.mp4"
 OUT = HERE / "out" / "inside_voiceover_guide.mp4"
 ASS = HERE / "out" / "voiceover_guide.ass"
 
-TOP, VID_H, BOTTOM, W = 110, 1080, 230, 1920
-H = TOP + VID_H + BOTTOM
+W, VID_H, BAND = 1920, 1080, 300
+H = VID_H + BAND
+Y_STATUS, Y_MAIN, Y_NEXT = VID_H + 52, VID_H + 150, VID_H + 245
+LEAD = 1.5  # max seconds a phrase is shown before it must be spoken
 
 # speaker -> (display name, ASS colour &HBBGGRR&)
 SPEAKERS = {
@@ -26,11 +35,11 @@ SPEAKERS = {
     "A": ("AAYAAN", "&H00FFC47C&"),   # blue   #7CC4FF
     "S": ("SHLOK", "&H0057C8FF&"),    # amber  #FFC857
 }
-DIM = "&H00808A99&"
+DIM = "&H00808A99&"        # grey, not yet spoken
+DIMMER = "&H00606A79&"
 
 
 def ts(s):
-    """'1:04.5' -> seconds"""
     m, sec = s.split(":")
     return int(m) * 60 + float(sec)
 
@@ -62,9 +71,8 @@ def phrases(text, limit=62):
         if len(sent) <= limit:
             out.append(sent)
             continue
-        parts = re.split(r"(?<=[,:;])\s+", sent)
         cur = ""
-        for p in parts:
+        for p in re.split(r"(?<=[,:;])\s+", sent):
             if cur and len(cur) + 1 + len(p) > limit:
                 out.append(cur)
                 cur = p
@@ -72,7 +80,6 @@ def phrases(text, limit=62):
                 cur = f"{cur} {p}".strip()
         if cur:
             out.append(cur)
-    # glue very short fragments onto the previous phrase
     merged = []
     for p in out:
         if merged and len(p) < 14 and len(merged[-1]) + len(p) < limit + 12:
@@ -86,74 +93,122 @@ def esc(s):
     return s.replace("{", "(").replace("}", ")")
 
 
-def build_ass(rows):
-    head = f"""[Script Info]
-ScriptType: v4.00+
-PlayResX: {W}
-PlayResY: {H}
-WrapStyle: 0
-ScaledBorderAndShadow: yes
+def all_phrases(rows):
+    """Every phrase with its own spoken window, timed in proportion to length."""
+    out = []
+    for r in rows:
+        ps = phrases(r["text"])
+        total = sum(len(p) for p in ps)
+        t = r["start"]
+        for k, p in enumerate(ps):
+            end = r["end"] if k == len(ps) - 1 else t + (r["end"] - r["start"]) * len(p) / total
+            out.append(dict(row=r, spk=r["spk"], text=p, start=t, end=end, first=(k == 0)))
+            t = end
+    for i, ph in enumerate(out):
+        prev_end = out[i - 1]["end"] if i else 0.0
+        ph["show"] = max(ph["start"] - LEAD, prev_end)
+    return out
 
-[V4+ Styles]
-Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Sub,Liberation Sans,58,&H00FFFFFF&,&H00FFFFFF&,&H00000000&,&H00000000&,-1,0,0,0,100,100,0,0,1,3,0,2,90,90,0,1
-Style: Tag,Liberation Sans,46,&H00FFFFFF&,&H00FFFFFF&,&H00000000&,&H00000000&,-1,0,0,0,100,100,3,0,1,0,0,5,0,0,0,1
-Style: Small,Liberation Sans,30,&H00808A99&,&H00808A99&,&H00000000&,&H00000000&,0,0,0,0,100,100,1,0,1,0,0,5,0,0,0,1
 
-[Events]
-Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-"""
-    ev = []
-    tag_y, sub_y = TOP // 2, TOP + VID_H + BOTTOM // 2
+def karaoke(ph, col):
+    """Dim text that fills with the speaker colour word by word while spoken."""
+    words = ph["text"].split(" ")
+    weights = [len(w) + 1 for w in words]
+    total_cs = round((ph["end"] - ph["start"]) * 100)
+    lead_cs = round((ph["start"] - ph["show"]) * 100)
+    parts, used = [f"{{\\k{lead_cs}}}"], 0
+    for i, (w, wt) in enumerate(zip(words, weights)):
+        cs = total_cs - used if i == len(words) - 1 else round(total_cs * wt / sum(weights))
+        used += cs
+        parts.append(f"{{\\kf{cs}}}{esc(w)}" + ("" if i == len(words) - 1 else " "))
+    return f"{{\\an5\\pos({W//2},{Y_MAIN})\\1c{col}\\2c{DIM}}}" + "".join(parts)
 
-    def add(layer, a, b, style, text):
-        ev.append(f"Dialogue: {layer},{ass_time(a)},{ass_time(b)},{style},,0,0,0,,{text}")
 
-    # speaker blocks (contiguous runs of one speaker)
+def status_timeline(rows, phs):
+    """Non-overlapping status segments: speak now > get ready > up next > pause."""
+    cand = []  # (priority, start, end, text)
+    for r in rows:
+        name, col = SPEAKERS[r["spk"]]
+        cand.append((4, r["start"], r["end"],
+                     f"{{\\c{col}}}●  {name}  ·  SPEAK NOW   {{\\c&H00B0B8C4&\\fs28}}{r['id']}"))
+    for ph in phs:
+        if ph["first"] and ph["start"] - ph["show"] > 0.05:
+            name, col = SPEAKERS[ph["spk"]]
+            cand.append((3, ph["show"], ph["start"],
+                         f"{{\\c{DIM}}}○  {{\\c{col}}}{name}{{\\c{DIM}}}  ·  get ready…   {{\\fs28}}{ph['row']['id']}"))
     blocks = []
     for r in rows:
         if blocks and blocks[-1]["spk"] == r["spk"]:
             blocks[-1]["end"] = r["end"]
         else:
             blocks.append(dict(spk=r["spk"], start=r["start"], end=r["end"]))
-
     for i, b in enumerate(blocks):
-        name, col = SPEAKERS[b["spk"]]
-        # whose turn it is during pauses inside the block: dimmed name, no dialogue
-        mine = [r for r in rows if r["spk"] == b["spk"] and b["start"] <= r["start"] <= b["end"]]
-        edges = [b["start"] - 0.6] + [x for r in mine for x in (r["start"], r["end"])] + [b["end"] + 0.4]
-        for a, z in zip(edges[0::2], edges[1::2]):
-            if z - a > 0.05:
-                add(0, a, z, "Tag", f"{{\\an5\\pos({W//2},{tag_y})\\c{DIM}}}{name}'S TURN  ·  pause")
-        # "up next" hint in the 3 s before a new speaker's first line
+        name, _ = SPEAKERS[b["spk"]]
+        cand.append((1, b["start"] - LEAD - 0.5, b["end"] + 0.4,
+                     f"{{\\c{DIMMER}}}{name}'S TURN  ·  pause"))
         if i + 1 < len(blocks):
-            nxt = blocks[i + 1]
-            n_name, n_col = SPEAKERS[nxt["spk"]]
-            add(2, max(b["end"] + 0.4, nxt["start"] - 3.0), nxt["start"] - 0.6, "Small",
-                f"{{\\an5\\pos({W//2},{tag_y})}}up next:  {{\\c{n_col}\\b1}}{n_name}")
+            nn, ncol = SPEAKERS[blocks[i + 1]["spk"]]
+            cand.append((2, b["end"] + 0.4, blocks[i + 1]["start"] - LEAD,
+                         f"{{\\c{DIM}}}up next:  {{\\c{ncol}}}{nn}"))
+    cuts = sorted({max(0.0, x) for c in cand for x in (c[1], c[2])})
+    segs = []
+    for a, z in zip(cuts, cuts[1:]):
+        live = [c for c in cand if c[1] <= a + 1e-6 and c[2] >= z - 1e-6]
+        if not live:
+            continue
+        txt = max(live, key=lambda c: c[0])[3]
+        if segs and segs[-1][2] == txt and abs(segs[-1][1] - a) < 1e-6:
+            segs[-1][1] = z
+        else:
+            segs.append([a, z, txt])
+    return segs
 
-    for r in rows:
-        name, col = SPEAKERS[r["spk"]]
-        # bright speaker label while the line is being spoken (covers the dim one)
-        add(1, r["start"], r["end"], "Tag",
-            f"{{\\an5\\pos({W//2},{tag_y})\\c{col}}}● {name} SPEAKING  {{\\c&H00B0B8C4&\\fs30}}{r['id']}")
-        # subtitle phrases, timed in proportion to their length
-        ps = phrases(r["text"])
-        total = sum(len(p) for p in ps)
-        dur = r["end"] - r["start"]
-        t = r["start"]
-        for k, p in enumerate(ps):
-            seg = dur * len(p) / total
-            a, b = t, (r["end"] if k == len(ps) - 1 else t + seg)
-            add(3, a, b, "Sub", f"{{\\an5\\pos({W//2},{sub_y})\\c{col}}}{esc(p)}")
-            t += seg
+
+def build_ass(rows):
+    head = f"""[Script Info]
+ScriptType: v4.00+
+PlayResX: {W}
+PlayResY: {H}
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Main,Liberation Sans,56,&H00FFFFFF&,{DIM},&H00000000&,&H00000000&,-1,0,0,0,100,100,0,0,1,2,0,5,40,40,0,1
+Style: Status,Liberation Sans,38,&H00FFFFFF&,&H00FFFFFF&,&H00000000&,&H00000000&,-1,0,0,0,100,100,2,0,1,0,0,5,0,0,0,1
+Style: Next,Liberation Sans,34,{DIMMER},{DIMMER},&H00000000&,&H00000000&,0,0,0,0,100,100,0,0,1,0,0,5,0,0,0,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+"""
+    ev = []
+
+    def add(layer, a, b, style, text):
+        if b - a > 0.02:
+            ev.append(f"Dialogue: {layer},{ass_time(a)},{ass_time(b)},{style},,0,0,0,,{text}")
+
+    phs = all_phrases(rows)
+    for i, ph in enumerate(phs):
+        _, col = SPEAKERS[ph["spk"]]
+        add(1, ph["show"], ph["end"], "Main", karaoke(ph, col))
+        # read-ahead: the phrase after this one, if it comes soon
+        if i + 1 < len(phs) and phs[i + 1]["start"] - ph["end"] < 8:
+            nx = phs[i + 1]
+            label = "next:"
+            if nx["spk"] != ph["spk"]:
+                nn, ncol = SPEAKERS[nx["spk"]]
+                label = f"next ({{\\c{ncol}}}{nn}{{\\c{DIMMER}}}):"
+            add(1, ph["show"], nx["show"], "Next",
+                f"{{\\an5\\pos({W//2},{Y_NEXT})}}{label}  {esc(nx['text'])}")
+    for a, z, txt in status_timeline(rows, phs):
+        add(0, a, z, "Status", f"{{\\an5\\pos({W//2},{Y_STATUS})}}{txt}")
     ASS.write_text(head + "\n".join(ev) + "\n")
 
 
 def render():
-    vf = (f"pad={W}:{H}:0:{TOP}:color=0x0F1A2B,"
-          f"drawbox=x=0:y={TOP-3}:w={W}:h=3:color=0x2A3B57:t=fill,"
-          f"drawbox=x=0:y={TOP+VID_H}:w={W}:h=3:color=0x2A3B57:t=fill,"
+    vf = (f"pad={W}:{H}:0:0:color=0x0F1A2B,"
+          f"drawbox=x=0:y={VID_H}:w={W}:h=3:color=0x2A3B57:t=fill,"
+          f"drawbox=x=560:y={VID_H+95}:w=800:h=1:color=0x2A3B57:t=fill,"
           f"subtitles={ASS.name}")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", SRC.name, "-vf", vf,
                     "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p",
