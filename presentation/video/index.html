@@ -7,32 +7,43 @@
 <link rel="stylesheet" href="fonts/local.css">
 <style>
 :root{
-  --bg:#0E1A2C; --panel:#15243B; --line:#2A3B57;
-  --ink:#F3EFE6; --muted:#A3B2C7; --dim:#6F819B;
-  --gold:#D9A845; --blue:#62A0DA; --blue-d:#2D5E8E;
+  --bg:#FBFAF7; --panel:#FFFFFF; --line:#E3DED3;
+  --ink:#15233B; --muted:#4B5565; --dim:#6B7280;
+  --gold:#9A640C; --goldfill:#D4A02F; --blue:#2F6DB0;
   --serif:'Source Serif 4', 'DejaVu Serif', Georgia, serif;
   --sans:'IBM Plex Sans', 'DejaVu Sans', Arial, sans-serif;
   --mono:'IBM Plex Mono', 'DejaVu Sans Mono', monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;background:#070D17;overflow:hidden}
+html,body{width:100%;height:100%;background:#E9E6DF;overflow:hidden}
 #stage{position:absolute;left:0;top:0;width:1920px;height:1080px;background:var(--bg);color:var(--ink);font-family:var(--sans);transform-origin:0 0;overflow:hidden}
 .scene{position:absolute;inset:0;opacity:0}
 .abs{position:absolute}
-.eyebrow{font-size:24px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);font-weight:500}
+.eyebrow{font-size:24px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);font-weight:600}
 .h{font-family:var(--serif);font-weight:600;font-size:64px;line-height:1.1;color:var(--ink)}
 .body{font-size:32px;line-height:1.45;color:var(--muted)}
 .mono{font-family:var(--mono)}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:0 2px 10px rgba(21,35,59,.05)}
 .chip{display:flex;align-items:center;justify-content:center;border-radius:12px;font-size:30px;font-family:var(--mono)}
-.pill{display:inline-block;padding:8px 22px;border-radius:999px;font-size:24px;font-weight:600;letter-spacing:1px}
 .frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;font-size:.7em;margin:0 6px}
 .frac span:first-child{border-bottom:2px solid currentColor;padding:0 6px 4px}
 .frac span:last-child{padding-top:4px}
 .gold{color:var(--gold)} .blue{color:var(--blue)} .ink{color:var(--ink)} .muted{color:var(--muted)}
-#hud{position:fixed;left:0;right:0;bottom:0;height:4px;background:#1b2a42}
-#hud i{display:block;height:100%;width:0;background:var(--gold)}
-#help{position:fixed;right:12px;bottom:10px;color:#6F819B;font:13px var(--sans)}
+/* caption under every animation */
+.cap{position:absolute;left:0;width:1920px;top:1010px;text-align:center;font-size:24px;font-style:italic;color:var(--dim)}
+.cap b{font-style:normal;font-weight:600;letter-spacing:2px;text-transform:uppercase;font-size:20px;color:var(--gold);margin-right:12px}
+/* split-screen comparison */
+.colhead{position:absolute;top:262px;width:812px;text-align:center;font-size:26px;letter-spacing:4px;text-transform:uppercase;font-weight:600}
+.cmp{position:absolute;width:780px;padding:18px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.cmp .lab{font-size:20px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
+.cmp .val{font-size:30px;line-height:1.3;color:var(--ink)}
+.tag{padding:6px 16px;border-radius:999px;font-size:20px;font-weight:600;white-space:nowrap;letter-spacing:1px}
+.tag.same{background:#E3EDF8;color:var(--blue)}
+.tag.diff{background:#F7ECD8;color:var(--gold)}
+.tag.fix{background:#E2F0E6;color:#2E7D4F}
+#hud{position:fixed;left:0;right:0;bottom:0;height:4px;background:#d8d3c8}
+#hud i{display:block;height:100%;width:0;background:var(--goldfill)}
+#help{position:fixed;right:12px;bottom:10px;color:#6B7280;font:13px var(--sans)}
 </style>
 </head>
 <body>
@@ -42,10 +53,10 @@ html,body{width:100%;height:100%;background:#070D17;overflow:hidden}
 <!-- ============ S1 TITLE ============ -->
 <div class="scene" id="s1">
   <div class="abs eyebrow" style="left:160px;top:190px" data-t="0.3">CS307 · Artificial Intelligence · Mid-Semester Project</div>
-  <div class="abs" style="left:150px;top:240px;font-family:var(--serif);font-size:220px;font-weight:600;letter-spacing:6px" data-t="0.8" data-a="rise" data-d="1.1">INSIDE</div>
+  <div class="abs" style="left:150px;top:240px;font-family:var(--serif);font-size:220px;font-weight:600;letter-spacing:6px;color:var(--ink)" data-t="0.8" data-a="rise" data-d="1.1">INSIDE</div>
   <div class="abs" style="left:160px;top:500px;font-family:var(--serif);font-style:italic;font-size:46px;color:var(--muted)" data-t="1.6">Detecting LLM hallucinations from the model’s internal states</div>
   <div class="abs" style="left:160px;top:575px;font-size:28px;color:var(--dim)" data-t="2.2">Chen et al., ICLR 2024 · our implementation and reproduction</div>
-  <div class="abs" style="left:160px;top:660px;width:1600px;height:2px;background:var(--gold)" data-t="2.6" data-a="wipe" data-d="1.2"></div>
+  <div class="abs" style="left:160px;top:660px;width:1600px;height:3px;background:var(--goldfill)" data-t="2.6" data-a="wipe" data-d="1.2"></div>
   <div class="abs" style="left:160px;top:720px;display:flex;gap:40px">
     <div class="card" style="width:500px;padding:32px 36px" data-t="3.2" data-a="rise"><div style="font-family:var(--serif);font-size:42px;font-weight:600">Aayaan Ali Khan</div><div class="mono gold" style="font-size:28px;margin-top:8px">202411001</div></div>
     <div class="card" style="width:500px;padding:32px 36px" data-t="3.6" data-a="rise"><div style="font-family:var(--serif);font-size:42px;font-weight:600">Shlok Bhavsar</div><div class="mono gold" style="font-size:28px;margin-top:8px">202411018</div></div>
@@ -66,7 +77,9 @@ html,body{width:100%;height:100%;background:#070D17;overflow:hidden}
   <div id="s2chips"></div>
   <div class="abs" style="left:128px;top:830px;width:800px;text-align:center;font-size:30px;color:var(--blue)" data-t="7.6">answers agree</div>
   <div class="abs" style="left:992px;top:830px;width:800px;text-align:center;font-size:30px;color:var(--gold)" data-t="12.6">answers scatter → likely hallucination</div>
-  <div class="abs" style="left:0;top:930px;width:1920px;text-align:center;font-size:36px;font-family:var(--serif);font-style:italic" data-t="15">Idea: sample <b class="gold" style="font-style:normal">K</b> answers and measure how much they disagree.</div>
+  <div class="abs" style="left:0;top:920px;width:1920px;text-align:center;font-size:36px;font-family:var(--serif);font-style:italic" data-t="15">Idea: sample <b class="gold" style="font-style:normal">K</b> answers and measure how much they disagree.</div>
+  <div class="cap" data-t="4.2" data-out="14.4"><b>Animation</b>the same question is asked 5 times; each box is one sampled answer</div>
+  <div class="cap" data-t="15"><b>Animation</b>agreeing answers stack in a line (left); guessed answers scatter (right)</div>
 </div>
 
 <!-- ============ S3 LOOK INSIDE ============ -->
@@ -74,11 +87,13 @@ html,body{width:100%;height:100%;background:#070D17;overflow:hidden}
   <div class="abs eyebrow" style="left:128px;top:110px" data-t="0.3">02 · The key idea</div>
   <div class="abs h" style="left:128px;top:150px" data-t="0.5" data-a="rise">Look inside the model, not at the words</div>
   <svg id="s3svg" class="abs" style="left:0;top:0" width="1920" height="1080"></svg>
-  <div class="abs" style="left:150px;top:965px;width:560px;text-align:center;font-size:24px;color:var(--dim)" data-t="1.2">input tokens</div>
-  <div class="abs" style="left:150px;top:262px;width:560px;text-align:center;font-size:24px;color:var(--dim)" data-t="1.2">output</div>
-  <div class="abs" style="left:690px;top:560px;width:200px;font-size:26px;color:var(--gold)" data-t="5.8">middle<br>layer</div>
+  <div class="abs" style="left:150px;top:955px;width:560px;text-align:center;font-size:24px;color:var(--dim)" data-t="1.2">input tokens</div>
+  <div class="abs" style="left:150px;top:268px;width:560px;text-align:center;font-size:24px;color:var(--dim)" data-t="1.2">output</div>
+  <div class="abs" style="left:690px;top:560px;width:200px;font-size:26px;color:var(--gold);font-weight:600" data-t="5.8">middle<br>layer</div>
   <div class="abs" style="left:930px;top:300px;font-size:28px;color:var(--ink)" data-t="8"><span class="mono">z<sub>1</sub></span> = last-token vector <span class="muted">(4096 numbers)</span></div>
   <div class="abs" style="left:930px;top:850px;font-size:30px" data-t="15.5"><span class="mono gold">Z = [z<sub>1</sub> … z<sub>10</sub>]</span> <span class="muted">one vector per sampled answer, K = 10</span></div>
+  <div class="cap" data-t="1.2" data-out="6.6"><b>Animation</b>the LLM as a stack of 32 layers; a token’s signal travels up to the middle layer</div>
+  <div class="cap" data-t="7"><b>Animation</b>each column is one answer’s hidden vector, read from the middle layer</div>
 </div>
 
 <!-- ============ S4 MATH ============ -->
@@ -86,18 +101,22 @@ html,body{width:100%;height:100%;background:#070D17;overflow:hidden}
   <div class="abs eyebrow" style="left:128px;top:90px" data-t="0.3">03 · The math</div>
   <div class="abs h" style="left:128px;top:130px" data-t="0.5" data-a="rise">EigenScore: how spread out are the answers?</div>
   <svg id="s4svg" class="abs" style="left:0;top:0" width="1920" height="1080"></svg>
-  <div class="abs" style="left:128px;top:252px;width:560px;text-align:center;font-size:24px;color:var(--dim)" data-t="1.5">10 answer embeddings (projected)</div>
+  <div class="abs" style="left:128px;top:252px;width:560px;text-align:center;font-size:24px;color:var(--dim)" data-t="1.5">10 answer embeddings (projected to 2-D)</div>
   <div class="abs" style="left:780px;top:672px;width:400px;text-align:center;font-size:34px" data-t="4"><span class="mono">Σ = Z<sup>T</sup>JZ</span></div>
   <div class="abs" style="left:780px;top:722px;width:400px;text-align:center;font-size:24px;color:var(--dim)" data-t="4.4">covariance, 10 × 10</div>
   <div class="abs" style="left:1290px;top:672px;width:480px;text-align:center;font-size:34px" data-t="9"><span class="mono">λ<sub>1</sub> … λ<sub>10</sub></span></div>
   <div class="abs" style="left:1290px;top:722px;width:480px;text-align:center;font-size:24px;color:var(--dim)" data-t="9.4">eigenvalues = spread per direction</div>
-  <div class="abs" style="left:0;top:790px;width:1920px;text-align:center;font-size:52px;font-family:var(--serif)" data-t="12" data-a="scale">
+  <div class="abs" style="left:0;top:780px;width:1920px;text-align:center;font-size:52px;font-family:var(--serif)" data-t="12" data-a="scale">
     E = <span class="frac"><span>1</span><span>K</span></span> log det(Σ + αI) <span class="muted">=</span> <span class="frac"><span>1</span><span>K</span></span> Σ<sub style="font-size:.5em">i</sub> log λ<sub style="font-size:.6em">i</sub>
   </div>
   <div class="abs" style="left:128px;top:676px;width:560px;text-align:center;font-size:28px;font-weight:600;white-space:nowrap" id="s4state"></div>
-  <div class="abs" style="left:430px;top:965px;width:300px;text-align:right;font-size:26px;color:var(--blue)" data-t="16">low · trust</div>
-  <div class="abs" style="left:1190px;top:965px;width:400px;font-size:26px;color:var(--gold)" data-t="16">high · hallucination</div>
-  <div class="abs" style="left:1480px;top:950px;width:340px;text-align:left;font-size:22px;color:var(--dim)" data-t="34">α = 10⁻³ keeps Σ invertible<br>Σ is only 10 × 10: cheap</div>
+  <div class="abs" style="left:430px;top:900px;width:300px;text-align:right;font-size:26px;color:var(--blue)" data-t="16">low · trust</div>
+  <div class="abs" style="left:1190px;top:900px;width:400px;font-size:26px;color:var(--gold)" data-t="16">high · hallucination</div>
+  <div class="abs" style="left:1450px;top:240px;width:340px;text-align:right;font-size:22px;color:var(--dim)" data-t="34">α = 10⁻³ keeps Σ invertible<br>Σ is only 10 × 10: cheap</div>
+  <div class="cap" data-t="1.6" data-out="8.6"><b>Animation</b>dots = the 10 answers; the grid fills in their pairwise covariance</div>
+  <div class="cap" data-t="9" data-out="17.6"><b>Animation</b>bars = eigenvalues of the covariance, i.e. how much the answers vary in each direction</div>
+  <div class="cap" data-t="18" data-out="25.6"><b>Animation</b>answers pull together → every eigenvalue collapses → score moves to LOW</div>
+  <div class="cap" data-t="26"><b>Animation</b>answers spread apart → eigenvalues grow → score moves to HIGH (likely hallucination)</div>
 </div>
 
 <!-- ============ S5 CLIPPING ============ -->
@@ -109,73 +128,101 @@ html,body{width:100%;height:100%;background:#070D17;overflow:hidden}
   <div class="abs" style="left:0;top:520px;width:1920px;text-align:center;font-size:34px" data-t="3.6" data-out="7"><span class="gold">all wrong</span> <span class="muted">but all identical</span> → low score → <span class="gold">wrongly trusted</span></div>
   <svg id="s5svg" class="abs" style="left:0;top:0" width="1920" height="1080"></svg>
   <div class="abs" style="left:128px;top:850px;width:900px;text-align:center;font-size:24px;color:var(--dim)" data-t="8.6">activations of one neuron · penultimate layer</div>
-  <div class="abs" style="left:150px;top:300px;width:200px;font-size:24px;color:var(--gold)" data-t="12.2">0.2%</div>
-  <div class="abs" style="left:810px;top:300px;width:200px;text-align:right;font-size:24px;color:var(--gold)" data-t="12.2">99.8%</div>
+  <div class="abs" style="left:150px;top:300px;width:200px;font-size:24px;color:var(--gold);font-weight:600" data-t="12.2">0.2%</div>
+  <div class="abs" style="left:810px;top:300px;width:200px;text-align:right;font-size:24px;color:var(--gold);font-weight:600" data-t="12.2">99.8%</div>
   <div class="abs" style="left:1130px;top:340px;width:680px;display:flex;flex-direction:column;gap:34px">
     <div class="mono" style="font-size:40px" data-t="17.5" data-a="left">FC(h) = clip(h, h<sub>min</sub>, h<sub>max</sub>)</div>
     <div class="body" data-t="19" data-a="left">thresholds: <span class="ink">0.2% / 99.8%</span> per neuron</div>
     <div class="body" data-t="20.5" data-a="left">from a memory bank of <span class="ink">N = 3000</span> tokens</div>
     <div style="font-size:32px;line-height:1.45;color:var(--gold)" data-t="22.5" data-a="left">→ less overconfidence: hidden errors start to scatter</div>
   </div>
+  <div class="cap" data-t="1.4" data-out="7"><b>Animation</b>10 sampled answers, all the same wrong year</div>
+  <div class="cap" data-t="8.6" data-out="13.6"><b>Animation</b>histogram of one neuron’s activations; gold bars = rare extreme values</div>
+  <div class="cap" data-t="14"><b>Animation</b>extreme values are pushed in to the dashed thresholds (clipped)</div>
 </div>
 
-<!-- ============ S6 IMPLEMENTATION ============ -->
+<!-- ============ S6 IMPLEMENTATION: PAPER vs OURS ============ -->
 <div class="scene" id="s6">
-  <div class="abs eyebrow" style="left:128px;top:110px" data-t="0.3">05 · Our implementation</div>
-  <div class="abs h" style="left:128px;top:150px" data-t="0.5" data-a="rise">We made the official code run, then completed it</div>
-  <div class="abs card" style="left:128px;top:270px;width:940px;height:660px;padding:36px" data-t="1" data-a="scale">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <div class="mono" style="font-size:30px">alibaba/eigenscore</div>
-      <div id="s6pill" class="pill" style="background:#4A3A1A;color:var(--gold)">does not run</div>
-    </div>
-    <div id="s6count" style="font-size:28px;color:var(--muted);margin-top:18px">bugs fixed: 0 / 12</div>
-  </div>
-  <div id="s6chips"></div>
-  <div class="abs" style="left:1130px;top:270px;width:660px;display:flex;flex-direction:column;gap:30px">
-    <div class="card" style="padding:30px 34px;border-left:6px solid var(--gold)" data-t="11" data-a="left"><div style="font-size:34px;font-weight:600">Feature clipping</div><div class="body" style="font-size:28px">absent from the released code; we implemented it from the paper</div></div>
-    <div class="card" style="padding:30px 34px;border-left:6px solid var(--blue)" data-t="14" data-a="left"><div style="font-size:34px;font-weight:600">7B model on an 8 GB GPU</div><div class="body" style="font-size:28px">4-bit weights · keep only the middle layer</div></div>
-    <div class="card" style="padding:30px 34px;border-left:6px solid var(--blue);display:flex;align-items:center;justify-content:space-between" data-t="17" data-a="left"><div style="font-size:34px;font-weight:600">Automated tests</div><div id="s6tests" class="mono blue" style="font-size:48px">0 / 8</div></div>
-  </div>
+  <div class="abs eyebrow" style="left:128px;top:110px" data-t="0.3">05 · Implementation</div>
+  <div class="abs h" style="left:128px;top:150px" data-t="0.5" data-a="rise">Their code vs. our code</div>
+  <div class="cmpgrid" data-rows='[
+    ["Running it","Released repo crashes at start-up: 12 blocking bugs","All 12 fixed; runs end to end","fix","fixed"],
+    ["Feature clipping","Described in the paper, missing from the code","Implemented from §3.2 of the paper","fix","added"],
+    ["Hardware","Full-precision 7B model","4-bit 7B model on an 8 GB laptop GPU","diff","changed"],
+    ["Checks","No test suite","8 automated tests, all passing","fix","added"]]'
+    data-left="The paper’s code" data-right="Our version" data-t0="1.4"></div>
+  <div class="cap" data-t="1.6"><b>Animation</b>left: what the authors released · right: what we did, step by step</div>
 </div>
 
-<!-- ============ S7 RESULTS ============ -->
+<!-- ============ S7 SETUP: PAPER vs OURS ============ -->
 <div class="scene" id="s7">
-  <div class="abs eyebrow" style="left:128px;top:110px" data-t="0.3">06 · Results</div>
-  <div class="abs h" style="left:128px;top:150px" data-t="0.5" data-a="rise" data-out="14">The paper’s ranking reproduced exactly</div>
-  <div class="abs" style="left:128px;top:240px;font-size:28px;color:var(--muted)" data-t="1" data-out="14">Llama-2-7B (4-bit) · CoQA · 250 questions · AUROC</div>
-  <div class="abs" style="left:1300px;top:240px;width:490px;text-align:right;font-size:24px;color:var(--muted)" data-t="6" data-out="14"><span class="blue">■</span> ours &nbsp;&nbsp; <span class="ink">|</span> paper</div>
-  <svg id="s7svg" class="abs" style="left:0;top:0" width="1920" height="1080"></svg>
-  <div id="s7labels"></div>
-  <div class="abs" style="left:0;top:930px;width:1920px;text-align:center;font-size:34px;font-family:var(--serif)" data-t="9" data-out="14">EigenScore &gt; Lexical Sim. &gt; LN-Entropy &gt; Perplexity &gt; Energy</div>
-
-  <div class="abs h" style="left:128px;top:150px" data-t="14.6" data-a="rise">Feature clipping: too small to measure here</div>
-  <div class="abs" style="left:128px;top:250px;font-size:28px;color:var(--muted)" data-t="15">change in EigenScore AUROC with clipping (paired bootstrap)</div>
-  <div class="abs" style="left:860px;top:430px;width:200px;text-align:center;font-size:30px;font-weight:600" data-t="18.2">ours −1.0</div>
-  <div class="abs" style="left:1112px;top:430px;width:200px;text-align:center;font-size:30px;font-weight:600;color:var(--gold)" data-t="19.2">paper +1.1</div>
-  <div id="s7ticks"></div>
-  <div class="abs" style="left:0;top:740px;width:1920px;text-align:center;font-size:34px" data-t="21">95% interval <span class="mono blue">[−4.7, +2.6]</span> contains both → <span class="gold">inconclusive at 250 questions</span></div>
-  <div class="abs" style="left:0;top:810px;width:1920px;text-align:center;font-size:28px;color:var(--muted)" data-t="23.5">paper used 7,983 questions · clipping verified active (0.29% of activations)</div>
+  <div class="abs eyebrow" style="left:128px;top:110px" data-t="0.3">06 · Experiment</div>
+  <div class="abs h" style="left:128px;top:150px" data-t="0.5" data-a="rise">Their setup vs. our setup</div>
+  <div class="cmpgrid" data-rows='[
+    ["Model","LLaMA-7B, 16-bit","Llama-2-7B, 4-bit","diff","changed"],
+    ["Data","CoQA, 7,983 questions","CoQA, 250 questions","diff","smaller"],
+    ["Sampling","K = 10 · temperature 0.5","K = 10 · temperature 0.5","same","same"],
+    ["Method settings","α = 10⁻³ · p = 0.2% · N = 3000","α = 10⁻³ · p = 0.2% · N = 3000","same","same"],
+    ["Correct if","ROUGE-L > 0.5","ROUGE-L > 0.5","same","same"]]'
+    data-left="The paper" data-right="Our reproduction" data-t0="1.4"></div>
+  <div class="cap" data-t="1.6"><b>Animation</b>each row: the paper’s choice (left), then ours (right); tags mark same or changed</div>
 </div>
 
-<!-- ============ S8 END-SEM ============ -->
+<!-- ============ S8 RESULTS: PAPER vs OURS ============ -->
 <div class="scene" id="s8">
-  <div class="abs eyebrow" style="left:128px;top:110px" data-t="0.3">07 · By end-semester</div>
-  <div class="abs h" style="left:128px;top:150px" data-t="0.5" data-a="rise">Our improvement: multi-layer EigenScore</div>
+  <div class="abs eyebrow" style="left:128px;top:110px" data-t="0.3">07 · Results</div>
+  <div class="abs h" style="left:128px;top:150px" data-t="0.5" data-a="rise">Their results vs. our results (AUROC, CoQA)</div>
+  <div class="colhead" style="left:128px;color:var(--muted)" data-t="1">The paper</div>
+  <div class="colhead" style="left:980px;color:var(--blue)" data-t="1">Our reproduction</div>
+  <div class="abs" style="left:959px;top:260px;width:2px;height:610px;background:var(--line)" data-t="0.8" data-a="wipeY"></div>
   <svg id="s8svg" class="abs" style="left:0;top:0" width="1920" height="1080"></svg>
-  <div class="abs" style="left:690px;top:560px;width:300px;font-size:26px;color:var(--gold)" data-t="2" data-out="5.6">paper: one<br>hand-picked layer</div>
-  <div class="abs" style="left:860px;top:640px;width:260px;text-align:center;font-size:26px;color:var(--ink)" data-t="11.5">one combined<br>score</div>
-  <div class="abs" style="left:128px;top:990px;width:1000px;font-size:26px;color:var(--muted)" data-t="12.5">no layer to hand-tune · more robust across models</div>
+  <div id="s8labels"></div>
+  <div class="abs" style="left:128px;top:830px;width:812px;text-align:center;font-size:26px;font-family:var(--serif)" data-t="15">EigenScore › Lexical › LN-Ent › Perplexity › Energy</div>
+  <div class="abs" style="left:980px;top:830px;width:812px;text-align:center;font-size:26px;font-family:var(--serif)" data-t="16.2">EigenScore › Lexical › LN-Ent › Perplexity › Energy</div>
+  <div class="abs" style="left:0;top:890px;width:1920px;text-align:center;font-size:36px;font-weight:600;color:var(--blue)" data-t="17.6" data-a="scale">Same ranking, reproduced exactly</div>
+  <div class="abs" style="left:0;top:950px;width:1920px;text-align:center;font-size:22px;color:var(--dim)" data-t="19">ours shown without clipping · with clipping our EigenScore is 82.5 (the paper’s 80.8 includes clipping)</div>
+  <div class="cap" data-t="2"><b>Animation</b>bars grow method by method: the paper’s score (left), then ours (right); axis starts at 50 = chance</div>
+</div>
+
+<!-- ============ S9 FEATURE CLIPPING: PAPER vs OURS ============ -->
+<div class="scene" id="s9">
+  <div class="abs eyebrow" style="left:128px;top:110px" data-t="0.3">07 · Results</div>
+  <div class="abs h" style="left:128px;top:150px" data-t="0.5" data-a="rise">Does feature clipping help EigenScore?</div>
+  <div class="colhead" style="left:128px;color:var(--muted)" data-t="1">The paper</div>
+  <div class="colhead" style="left:980px;color:var(--blue)" data-t="1">Our reproduction</div>
+  <div class="abs" style="left:959px;top:260px;width:2px;height:560px;background:var(--line)" data-t="0.8" data-a="wipeY"></div>
+  <svg id="s9svg" class="abs" style="left:0;top:0" width="1920" height="1080"></svg>
+  <div id="s9labels"></div>
+  <div class="abs" style="left:128px;top:360px;width:812px;text-align:center;font-family:var(--serif);font-size:88px;color:var(--gold)" data-t="2">+1.1</div>
+  <div class="abs" style="left:128px;top:470px;width:812px;text-align:center;font-size:26px;color:var(--muted)" data-t="2.4">AUROC points gained · 7,983 questions</div>
+  <div class="abs" style="left:980px;top:360px;width:812px;text-align:center;font-family:var(--serif);font-size:88px;color:var(--ink)" data-t="5">−1.0</div>
+  <div class="abs" style="left:980px;top:470px;width:812px;text-align:center;font-size:26px;color:var(--muted)" data-t="5.4">AUROC points · 250 questions · 95% CI [−4.7, +2.6]</div>
+  <div class="abs" style="left:0;top:880px;width:1920px;text-align:center;font-size:34px" data-t="10.5">Our interval contains both 0 and +1.1 → <span class="gold" style="font-weight:600">inconclusive at this scale</span>, not contradicted</div>
+  <div class="abs" style="left:0;top:940px;width:1920px;text-align:center;font-size:24px;color:var(--dim)" data-t="12">clipping verified active: 0.29% of activations clipped</div>
+  <div class="cap" data-t="2.4"><b>Animation</b>same axis on both sides: the paper’s gain (diamond) and our estimate with its 95% interval (bar)</div>
+</div>
+
+<!-- ============ S10 END-SEM ============ -->
+<div class="scene" id="s10">
+  <div class="abs eyebrow" style="left:128px;top:110px" data-t="0.3">08 · By end-semester</div>
+  <div class="abs h" style="left:128px;top:150px" data-t="0.5" data-a="rise">Our improvement: multi-layer EigenScore</div>
+  <svg id="s10svg" class="abs" style="left:0;top:0" width="1920" height="1080"></svg>
+  <div class="abs" style="left:690px;top:560px;width:300px;font-size:26px;color:var(--gold);font-weight:600" data-t="2" data-out="5.6">paper: one<br>hand-picked layer</div>
+  <div class="abs" style="left:860px;top:640px;width:260px;text-align:center;font-size:26px;color:var(--ink);font-weight:600" data-t="11.5">one combined<br>score</div>
+  <div class="abs" style="left:770px;top:740px;width:440px;text-align:center;font-size:24px;color:var(--muted)" data-t="12.5">no layer to hand-tune ·<br>more robust across models</div>
   <div class="abs" style="left:1200px;top:330px;width:590px;display:flex;flex-direction:column;gap:30px">
-    <div class="card" style="padding:28px 32px;border-left:6px solid var(--gold)" data-t="15" data-a="left"><div style="font-size:32px;font-weight:600">+ Hybrid detector</div><div class="body" style="font-size:27px">EigenScore + token confidence, to catch confidently wrong answers</div></div>
+    <div class="card" style="padding:28px 32px;border-left:6px solid var(--goldfill)" data-t="15" data-a="left"><div style="font-size:32px;font-weight:600">+ Hybrid detector</div><div class="body" style="font-size:27px">EigenScore + token confidence, to catch confidently wrong answers</div></div>
     <div class="card" style="padding:28px 32px;border-left:6px solid var(--blue)" data-t="17.5" data-a="left"><div style="font-size:32px;font-weight:600">+ Adaptive K</div><div class="body" style="font-size:27px">stop sampling once the score is clear: lower cost</div></div>
     <div style="font-size:26px;color:var(--muted)" data-t="20">full-scale runs, same bootstrap tests</div>
   </div>
+  <div class="cap" data-t="1.6" data-out="5.6"><b>Animation</b>the paper reads one fixed layer (gold)</div>
+  <div class="cap" data-t="6"><b>Animation</b>we read a band of middle layers and merge them into one score</div>
 </div>
 
-<!-- ============ S9 CLOSE ============ -->
-<div class="scene" id="s9">
+<!-- ============ S11 CLOSE ============ -->
+<div class="scene" id="s11">
   <div class="abs" style="left:0;top:330px;width:1920px;text-align:center;font-family:var(--serif);font-size:130px;font-weight:600" data-t="0.4" data-a="rise">Thank you</div>
-  <div class="abs" style="left:560px;top:530px;width:800px;height:2px;background:var(--gold)" data-t="1" data-a="wipe"></div>
+  <div class="abs" style="left:560px;top:530px;width:800px;height:3px;background:var(--goldfill)" data-t="1" data-a="wipe"></div>
   <div class="abs" style="left:0;top:580px;width:1920px;text-align:center;font-size:34px" data-t="1.4">Aayaan Ali Khan · Shlok Bhavsar · Prapti Chotaliya</div>
   <div class="abs" style="left:0;top:880px;width:1920px;text-align:center;font-size:24px;color:var(--dim)" data-t="2">Chen et al., “INSIDE: LLMs’ Internal States Retain the Power of Hallucination Detection”, ICLR 2024 · github.com/alibaba/eigenscore</div>
 </div>
@@ -195,54 +242,60 @@ function hex(c){return[parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),parse
 function mix(a,b,p){const A=hex(a),B=hex(b);return'rgb('+A.map((v,i)=>Math.round(lerp(v,B[i],clamp(p)))).join(',')+')'}
 function S(tag,attrs,parent){const e=document.createElementNS(SVGNS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
 function H(html,parent){const d=document.createElement('div');d.innerHTML=html.trim();const e=d.firstChild;parent.appendChild(e);return e}
-const C={bg:'#0E1A2C',panel:'#15243B',line:'#2A3B57',ink:'#F3EFE6',muted:'#A3B2C7',dim:'#6F819B',gold:'#D9A845',blue:'#62A0DA',blued:'#2D5E8E'};
+const C={bg:'#FBFAF7',panel:'#FFFFFF',line:'#E3DED3',layer:'#D6DCE5',ink:'#15233B',muted:'#4B5565',dim:'#6B7280',
+  gold:'#D4A02F',goldT:'#9A640C',goldPale:'#F7ECD8',blue:'#2F6DB0',bluePale:'#E3EDF8',blueMid:'#9DBBDD',grey:'#BDB6A8'};
 
 // ---------- scenes ----------
 const SCENES=[
- {id:'s1',dur:14},{id:'s2',dur:24},{id:'s3',dur:22},{id:'s4',dur:42},
- {id:'s5',dur:28},{id:'s6',dur:26},{id:'s7',dur:30},{id:'s8',dur:26},{id:'s9',dur:10}];
+ {id:'s1',dur:14},{id:'s2',dur:24},{id:'s3',dur:22},{id:'s4',dur:42},{id:'s5',dur:28},
+ {id:'s6',dur:20},{id:'s7',dur:22},{id:'s8',dur:26},{id:'s9',dur:20},{id:'s10',dur:26},{id:'s11',dur:10}];
 let acc=0;for(const s of SCENES){s.start=acc;acc+=s.dur;s.el=document.getElementById(s.id)}
 const TOTAL=acc;
 
 // ---------- background constellation ----------
 const bg=document.getElementById('bg');const R0=rng(7);const BGP=[];
-for(let i=0;i<70;i++){BGP.push({x:R0()*1920,y:R0()*1080,r:1+R0()*2.2,ph:R0()*6.28,w:.05+R0()*.12,a:.08+R0()*.18,e:S('circle',{fill:C.blue},bg)})}
+for(let i=0;i<70;i++){BGP.push({x:R0()*1920,y:R0()*1080,r:1+R0()*2.2,ph:R0()*6.28,w:.05+R0()*.12,a:.06+R0()*.12,e:S('circle',{fill:C.blue},bg)})}
 function bgUpdate(t){for(const p of BGP){p.e.setAttribute('cx',p.x+Math.sin(t*p.w+p.ph)*26);p.e.setAttribute('cy',p.y+Math.cos(t*p.w*.8+p.ph)*18);p.e.setAttribute('r',p.r);p.e.setAttribute('opacity',p.a)}}
 
-// ---------- layer stack builder (S3, S8) ----------
-function buildStack(svg,t0){
-  const bars=[];
-  for(let i=0;i<32;i++){const y=930-i*20;bars.push(S('rect',{x:200,y:y,width:460,height:13,rx:3,fill:C.line},svg))}
-  return bars;
-}
+// ---------- layer stack (S3, S10) ----------
+function buildStack(svg){const bars=[];for(let i=0;i<32;i++)bars.push(S('rect',{x:200,y:930-i*20,width:460,height:13,rx:3,fill:C.layer},svg));return bars}
 const layerY=i=>930-i*20+6.5;
+
+// ---------- split-screen comparison builder ----------
+document.querySelectorAll('.cmpgrid').forEach(g=>{
+  const rows=JSON.parse(g.dataset.rows),t0=+g.dataset.t0,host=g.parentNode;
+  H(`<div class="colhead" style="left:128px;color:${C.muted}" data-t="${t0-.4}">${g.dataset.left}</div>`,host);
+  H(`<div class="colhead" style="left:980px;color:${C.blue}" data-t="${t0-.4}">${g.dataset.right}</div>`,host);
+  H(`<div class="abs" style="left:959px;top:260px;width:2px;height:720px;background:${C.line}" data-t="${t0-.6}" data-a="wipeY"></div>`,host);
+  const n=rows.length,top=325,step=n>4?128:150;
+  rows.forEach((r,i)=>{const y=top+i*step,tp=t0+.4+i*3,to=tp+1.5;
+    H(`<div class="cmp card" style="left:144px;top:${y}px" data-t="${tp}" data-a="left"><div><div class="lab">${r[0]}</div><div class="val">${r[1]}</div></div></div>`,host);
+    H(`<div class="cmp card" style="left:996px;top:${y}px;border-left:5px solid ${r[3]==='same'?C.blue:r[3]==='fix'?'#2E7D4F':C.gold}" data-t="${to}" data-a="right"><div><div class="lab">${r[0]}</div><div class="val">${r[2]}</div></div><div class="tag ${r[3]}">${r[4]}</div></div>`,host);
+  });
+  g.remove();
+});
 
 // ---------- S2 chips ----------
 (function(){
   const host=document.getElementById('s2chips');
-  const know=['1932','1932','1932','1932','1932'];
-  const guess=['1932','1928','1936','1941','1930'];
-  const offs=[-120,90,-40,140,-150];
-  know.forEach((v,i)=>H(`<div class="abs chip" style="left:${428}px;top:${490+i*66}px;width:200px;height:54px;background:#1C3350;color:${C.ink};border:1px solid ${C.blued}" data-t="${4.5+i*.35}" data-a="rise">${v}</div>`,host));
-  guess.forEach((v,i)=>H(`<div class="abs chip" style="left:${1292+offs[i]}px;top:${490+i*66}px;width:200px;height:54px;background:#3A2F18;color:${C.ink};border:1px solid #7A5C22" data-t="${9.5+i*.45}" data-a="rise">${v}</div>`,host));
+  const know=['1932','1932','1932','1932','1932'],guess=['1932','1928','1936','1941','1930'],offs=[-120,90,-40,140,-150];
+  know.forEach((v,i)=>H(`<div class="abs chip" style="left:428px;top:${490+i*66}px;width:200px;height:54px;background:${C.bluePale};color:${C.ink};border:1px solid ${C.blueMid}" data-t="${4.5+i*.35}" data-a="rise">${v}</div>`,host));
+  guess.forEach((v,i)=>H(`<div class="abs chip" style="left:${1292+offs[i]}px;top:${490+i*66}px;width:200px;height:54px;background:${C.goldPale};color:${C.ink};border:1px solid #DDBE7E" data-t="${9.5+i*.45}" data-a="rise">${v}</div>`,host));
 })();
 
 // ---------- S3 ----------
 const S3={};
 (function(){
-  const svg=document.getElementById('s3svg');
-  S3.bars=buildStack(svg);
+  const svg=document.getElementById('s3svg');S3.bars=buildStack(svg);
   S3.glow=S('circle',{r:9,fill:C.gold,opacity:0},svg);
   S3.arrow=S('path',{d:`M 665 ${layerY(15)} C 780 ${layerY(15)}, 820 600, 905 600`,stroke:C.gold,'stroke-width':3,fill:'none'},svg);
-  S3.arrowLen=760; S3.arrow.setAttribute('stroke-dasharray',S3.arrowLen);
+  S3.arrowLen=760;S3.arrow.setAttribute('stroke-dasharray',S3.arrowLen);
   const R=rng(11);S3.cols=[];
-  for(let k=0;k<10;k++){const g=S('g',{},svg);for(let j=0;j<12;j++){S('rect',{x:930+k*82,y:370+j*38,width:64,height:32,rx:4,fill:mix(C.blued,'#9CC8F0',R())},g)}S3.cols.push(g)}
+  for(let k=0;k<10;k++){const g=S('g',{},svg);for(let j=0;j<12;j++)S('rect',{x:930+k*82,y:370+j*38,width:64,height:32,rx:4,fill:mix('#BFD6EE',C.blue,R())},g);S3.cols.push(g)}
 })();
 function s3(t){
-  S3.bars.forEach((b,i)=>{const p=seg(t,1+i*.04,1.4+i*.04);b.setAttribute('opacity',p);
-    const hl=i===15?seg(t,5.4,6.2):0;b.setAttribute('fill',mix(C.line,C.gold,hl))});
-  const pr=clamp((t-3)/2.4);S3.glow.setAttribute('cx',430);S3.glow.setAttribute('cy',lerp(950,layerY(15),ease(pr)));
-  S3.glow.setAttribute('opacity',t>3&&t<6.4?1:0);
+  S3.bars.forEach((b,i)=>{b.setAttribute('opacity',seg(t,1+i*.04,1.4+i*.04));b.setAttribute('fill',mix(C.layer,C.gold,i===15?seg(t,5.4,6.2):0))});
+  const pr=clamp((t-3)/2.4);S3.glow.setAttribute('cx',430);S3.glow.setAttribute('cy',lerp(950,layerY(15),ease(pr)));S3.glow.setAttribute('opacity',t>3&&t<6.4?1:0);
   S3.arrow.setAttribute('stroke-dashoffset',S3.arrowLen*(1-seg(t,6.6,7.6)));
   S3.cols.forEach((g,k)=>{const st=k===0?7.6:10+(k-1)*.55;const p=seg(t,st,st+.6);g.setAttribute('opacity',p);g.setAttribute('transform',`translate(0,${(1-p)*30})`)});
 }
@@ -255,30 +308,24 @@ const S4={};
   const cx=408,cy=500;S4.pts=[];
   for(let i=0;i<10;i++){const a=i/10*6.283+R()*.5,rs=150+R()*60,rt=8+R()*16,at=R()*6.283;
     S4.pts.push({sx:cx+Math.cos(a)*rs*1.15,sy:cy+Math.sin(a)*rs*.85,tx:cx+Math.cos(at)*rt,ty:cy+Math.sin(at)*rt,e:S('circle',{r:11,fill:C.blue},svg)})}
-  // heatmap
   S4.cells=[];const M=[];for(let i=0;i<10;i++){M.push([]);for(let j=0;j<10;j++)M[i][j]=i===j?1:(j<i?M[j][i]:.15+R()*.45)}
-  for(let i=0;i<10;i++)for(let j=0;j<10;j++)S4.cells.push({i,j,v:M[i][j],e:S('rect',{x:800+j*36,y:290+i*36,width:33,height:33,rx:3},svg)});
-  // eigen bars
+  for(let i=0;i<10;i++)for(let j=0;j<10;j++)S4.cells.push({i,j,v:M[i][j],e:S('rect',{x:800+j*36,y:290+i*36,width:33,height:33,rx:3,stroke:C.line,'stroke-width':1},svg)});
   S4.base=[1,.8,.64,.52,.42,.34,.27,.21,.16,.12];
   S4.ebars=S4.base.map((b,k)=>S('rect',{x:1300+k*48,width:34,rx:3,fill:C.gold},svg));
   S('line',{x1:1290,x2:1780,y1:650,y2:650,stroke:C.dim,'stroke-width':2},svg);
-  // gauge
-  S4.track=S('rect',{x:760,y:975,width:400,height:10,rx:5,fill:C.line},svg);
-  S4.fill=S('rect',{x:760,y:975,height:10,rx:5},svg);
-  S4.needle=S('circle',{cy:980,r:16,fill:C.ink},svg);
+  S4.track=S('rect',{x:760,y:910,width:400,height:10,rx:5,fill:C.line},svg);
+  S4.fill=S('rect',{x:760,y:910,height:10,rx:5},svg);
+  S4.needle=S('circle',{cy:915,r:16,fill:C.ink},svg);
 })();
-function s4state(t){ // 0 = tight, 1 = spread
-  let s=.6; s=lerp(s,0,seg(t,18,21)); s=lerp(s,1,seg(t,26,29)); return s }
+function s4state(t){let s=.6;s=lerp(s,0,seg(t,18,21));s=lerp(s,1,seg(t,26,29));return s}
 function s4(t){
-  const s=s4state(t);const show=seg(t,1.5,2.5);
-  S4.box.setAttribute('opacity',show);
+  const s=s4state(t);S4.box.setAttribute('opacity',seg(t,1.5,2.5));
   S4.pts.forEach((p,i)=>{p.e.setAttribute('cx',lerp(p.tx,p.sx,s));p.e.setAttribute('cy',lerp(p.ty,p.sy,s));p.e.setAttribute('opacity',seg(t,1.8+i*.08,2.4+i*.08));p.e.setAttribute('fill',mix(C.blue,C.gold,seg(s,.65,1)))});
-  S4.cells.forEach((c,n)=>{const p=seg(t,4.5+n*.035,4.9+n*.035);const v=c.v*(.12+.88*s);c.e.setAttribute('opacity',p);c.e.setAttribute('fill',mix(C.panel,c.i===c.j?C.gold:C.blue,v))});
+  S4.cells.forEach((c,n)=>{const v=c.v*(.12+.88*s);c.e.setAttribute('opacity',seg(t,4.5+n*.035,4.9+n*.035));c.e.setAttribute('fill',mix('#F4F1EA',c.i===c.j?C.gold:C.blue,v))});
   const g=seg(t,9,11);
   S4.ebars.forEach((b,k)=>{const h=(6+330*S4.base[k]*Math.pow(s,1.6))*seg(t,9+k*.1,10.2+k*.1);b.setAttribute('y',650-h);b.setAttribute('height',Math.max(h,0));b.setAttribute('opacity',g>0?1:0)});
-  const gs=seg(t,16,17);
-  S4.track.setAttribute('opacity',gs);S4.fill.setAttribute('opacity',gs);S4.needle.setAttribute('opacity',gs);
-  const nx=760+400*s;S4.fill.setAttribute('width',400*s);S4.fill.setAttribute('fill',mix(C.blue,C.gold,s));S4.needle.setAttribute('cx',nx);
+  const gs=seg(t,16,17);[S4.track,S4.fill,S4.needle].forEach(e=>e.setAttribute('opacity',gs));
+  S4.fill.setAttribute('width',400*s);S4.fill.setAttribute('fill',mix(C.blue,C.gold,s));S4.needle.setAttribute('cx',760+400*s);
   const st=document.getElementById('s4state');
   if(t>=19&&t<25){st.innerHTML='<span class="blue">agree → small λ → low score</span>';st.style.opacity=seg(t,19,19.8)*(1-seg(t,24.4,25))}
   else if(t>=27){st.innerHTML='<span class="gold">disagree → large λ → high score</span>';st.style.opacity=seg(t,27,27.8)}
@@ -289,7 +336,7 @@ function s4(t){
 const S5={};
 (function(){
   const host=document.getElementById('s5chips');
-  for(let i=0;i<10;i++)H(`<div class="abs chip" style="left:${200+i*156}px;top:380px;width:132px;height:64px;background:#3A2F18;color:${C.ink};border:1px solid #7A5C22" data-t="${1.2+i*.12}" data-a="rise" data-out="7">1928</div>`,host);
+  for(let i=0;i<10;i++)H(`<div class="abs chip" style="left:${200+i*156}px;top:380px;width:132px;height:64px;background:${C.goldPale};color:${C.ink};border:1px solid #DDBE7E" data-t="${1.2+i*.12}" data-a="rise" data-out="7">1928</div>`,host);
   const svg=document.getElementById('s5svg');
   S5.panel=S('rect',{x:128,y:280,width:900,height:550,rx:18,fill:C.panel,stroke:C.line},svg);
   S5.bars=[];const n=41,x0=170,w=18,gap=2,base=790;
@@ -299,104 +346,96 @@ const S5={};
     if(!tail&&(i<5||i>35))h=0;
     const x=x0+i*(w+gap);S5.bars.push({x,h,tail,target:i<20?x0+6*(w+gap):x0+34*(w+gap),e:S('rect',{x,y:base-h,width:w,height:h,rx:2,fill:tail?C.gold:C.blue},svg)})}
   S5.base=base;
-  S5.l1=S('line',{x1:x0+5.5*(w+gap)-1,x2:x0+5.5*(w+gap)-1,y1:340,y2:base,stroke:C.gold,'stroke-width':3,'stroke-dasharray':'10 8'},svg);
-  S5.l2=S('line',{x1:x0+35.5*(w+gap)-1,x2:x0+35.5*(w+gap)-1,y1:340,y2:base,stroke:C.gold,'stroke-width':3,'stroke-dasharray':'10 8'},svg);
-  S('line',{x1:150,x2:1006,y1:base,y2:base,stroke:C.dim,'stroke-width':2},svg).setAttribute('class','s5axis');
+  S5.l1=S('line',{x1:x0+5.5*(w+gap)-1,x2:x0+5.5*(w+gap)-1,y1:340,y2:base,stroke:C.goldT,'stroke-width':3,'stroke-dasharray':'10 8'},svg);
+  S5.l2=S('line',{x1:x0+35.5*(w+gap)-1,x2:x0+35.5*(w+gap)-1,y1:340,y2:base,stroke:C.goldT,'stroke-width':3,'stroke-dasharray':'10 8'},svg);
+  S5.axis=S('line',{x1:150,x2:1006,y1:base,y2:base,stroke:C.dim,'stroke-width':2},svg);
 })();
 function s5(t){
-  const show=seg(t,8,8.8);S5.panel.setAttribute('opacity',show);
-  document.querySelector('.s5axis').setAttribute('opacity',show);
+  const show=seg(t,8,8.8);S5.panel.setAttribute('opacity',show);S5.axis.setAttribute('opacity',show);
   const c=seg(t,14,16.5);
-  S5.bars.forEach((b,i)=>{const p=seg(t,8.4+i*.03,9+i*.03);const h=b.h*p;b.e.setAttribute('y',S5.base-h);b.e.setAttribute('height',h);
-    if(b.tail){b.e.setAttribute('x',lerp(b.x,b.target,c));b.e.setAttribute('fill',mix(C.gold,'#E8D2A0',c))}});
+  S5.bars.forEach((b,i)=>{const h=b.h*seg(t,8.4+i*.03,9+i*.03);b.e.setAttribute('y',S5.base-h);b.e.setAttribute('height',h);
+    if(b.tail){b.e.setAttribute('x',lerp(b.x,b.target,c));b.e.setAttribute('fill',mix(C.gold,C.goldT,c))}});
   const l=seg(t,12,13);[S5.l1,S5.l2].forEach(e=>{e.setAttribute('opacity',l);e.setAttribute('transform',`translate(0,${(1-l)*-40})`)});
 }
 
-// ---------- S6 ----------
-const S6={};
-(function(){
-  const names=['missing module','np.float removed','hard-coded paths','log dir missing','broken imports','dead dependency','missing model path','debugger import','plot blocks','path parsing','cuda hard-coded','2 of 10 answers used'];
-  const host=document.getElementById('s6chips');S6.chips=[];
-  names.forEach((n,k)=>{const c=k%3,r=Math.floor(k/3);S6.chips.push(H(`<div class="abs chip" style="left:${164+c*296}px;top:${420+r*120}px;width:276px;height:96px;font-size:23px;font-family:var(--sans);text-align:center;padding:0 12px;line-height:1.25" data-t="${1.6+k*.15}" data-a="scale">${n}</div>`,host))});
-})();
-function s6(t){
-  let fixed=0;
-  S6.chips.forEach((c,k)=>{const f=seg(t,4+k*.42,4.35+k*.42);if(f>.5)fixed++;
-    c.style.background=mix('#2A2414','#1C3350',f);c.style.border='1px solid '+mix('#7A5C22',C.blued,f);c.style.color=mix(C.gold,C.ink,f)});
-  document.getElementById('s6count').textContent=`bugs fixed: ${fixed} / 12`;
-  const ok=t>9.6;const pill=document.getElementById('s6pill');
-  pill.textContent=ok?'runs':'does not run';pill.style.background=ok?'#1C3350':'#4A3A1A';pill.style.color=ok?C.blue:C.gold;
-  document.getElementById('s6tests').textContent=`${Math.round(8*seg(t,18.5,21))} / 8`;
-}
-
-// ---------- S7 ----------
-const S7={};
-(function(){
-  const svg=document.getElementById('s7svg');const host=document.getElementById('s7labels');
-  const rows=[['EigenScore',83.5,80.8],['Lexical Similarity',80.5,77.8],['LN-Entropy',77.5,73.6],['Perplexity',72.3,68.3],['Energy',54.7,54.7]];
-  const X=v=>520+(v-50)*24;S7.X=X;S7.rows=[];
-  S7.axis=S('g',{},svg);
-  [50,60,70,80,90].forEach(v=>{S('line',{x1:X(v),x2:X(v),y1:320,y2:840,stroke:C.line,'stroke-width':1.5},S7.axis);
-    H(`<div class="abs" style="left:${X(v)-40}px;top:850px;width:80px;text-align:center;font-size:24px;color:${C.dim}" data-t="1.4" data-out="14">${v}</div>`,host)});
-  H(`<div class="abs" style="left:${X(50)-100}px;top:884px;width:200px;text-align:center;font-size:22px;color:${C.dim}" data-t="1.4" data-out="14">chance</div>`,host);
-  rows.forEach((r,i)=>{const y=340+i*100;
-    H(`<div class="abs" style="left:128px;top:${y+4}px;width:360px;font-size:32px;${i===0?'font-weight:600;':''}" data-t="1.2" data-out="14"><span class="mono gold" style="font-size:26px;display:inline-block;width:46px" data-rank>${i+1}</span>${r[0]}</div>`,host);
-    const bar=S('rect',{x:X(50),y:y,height:48,rx:4,fill:i===0?C.blue:C.blued},svg);
-    const tick=S('rect',{x:X(r[2])-2,y:y-8,width:4,height:64,fill:C.ink},svg);
-    const lab=H(`<div class="abs mono" style="top:${y+6}px;font-size:28px;${i===0?'font-weight:500;':''}">${r[1].toFixed(1)}</div>`,host);
-    S7.rows.push({bar,tick,lab,v:r[1],y})});
-  // CI panel
-  const Xc=v=>360+(v+6)*120;S7.ci=S('g',{},svg);
-  S7.cline=S('line',{x1:Xc(-6),x2:Xc(4),y1:600,y2:600,stroke:C.dim,'stroke-width':2},S7.ci);
-  S7.zero=S('line',{x1:Xc(0),x2:Xc(0),y1:500,y2:640,stroke:C.muted,'stroke-width':2,'stroke-dasharray':'6 6'},S7.ci);
-  S7.int=S('rect',{y:592,height:16,rx:8,fill:C.blue},S7.ci);
-  S7.pt=S('circle',{cx:Xc(-1),cy:600,r:18,fill:C.ink},S7.ci);
-  S7.pp=S('rect',{x:Xc(1.1)-15,y:585,width:30,height:30,fill:C.gold,transform:`rotate(45 ${Xc(1.1)} 600)`},S7.ci);
-  S7.Xc=Xc;
-  const th=document.getElementById('s7ticks');
-  [-6,-4,-2,0,2,4].forEach(v=>H(`<div class="abs mono" style="left:${Xc(v)-50}px;top:650px;width:100px;text-align:center;font-size:24px;color:${C.dim}" data-t="16">${v>0?'+':''}${v}</div>`,th));
-})();
-function s7(t){
-  const out=1-seg(t,13.4,14);
-  S7.axis.setAttribute('opacity',seg(t,1.2,2)*out);
-  S7.rows.forEach((r,i)=>{const p=seg(t,2+i*.35,4+i*.35);const w=(S7.X(r.v)-S7.X(50))*p;
-    r.bar.setAttribute('width',w);r.bar.setAttribute('opacity',out);
-    r.tick.setAttribute('opacity',seg(t,6,6.6)*out);
-    r.lab.style.left=(S7.X(50)+w+14)+'px';r.lab.style.opacity=seg(t,3+i*.35,4+i*.35)*out});
-  document.querySelectorAll('#s7 [data-rank]').forEach(e=>e.style.opacity=seg(t,7.5,8.2));
-  const c=seg(t,15.6,16.4);S7.cline.setAttribute('opacity',c);S7.zero.setAttribute('opacity',c);
-  const ip=seg(t,17,18.2);const a=S7.Xc(-1),L=S7.Xc(-4.7),Rr=S7.Xc(2.6);
-  S7.int.setAttribute('x',lerp(a,L,ip));S7.int.setAttribute('width',Math.max(0,lerp(a,Rr,ip)-lerp(a,L,ip)));S7.int.setAttribute('opacity',ip>0?1:0);
-  S7.pt.setAttribute('opacity',seg(t,17.6,18.2));S7.pp.setAttribute('opacity',seg(t,19,19.6));
-}
-
-// ---------- S8 ----------
+// ---------- S8: paper vs ours bar charts ----------
 const S8={};
 (function(){
-  const svg=document.getElementById('s8svg');S8.bars=buildStack(svg);S8.paths=[];
-  for(let i=11;i<=19;i++){const y=layerY(i);const p=S('path',{d:`M 665 ${y} C 800 ${y}, 860 600, 990 600`,stroke:C.gold,'stroke-width':2.5,fill:'none','stroke-dasharray':600,'stroke-dashoffset':600},svg);S8.paths.push(p)}
-  S8.node=S('circle',{cx:990,cy:600,r:22,fill:C.gold},svg);
+  const svg=document.getElementById('s8svg'),host=document.getElementById('s8labels');
+  const rows=[['EigenScore',80.8,83.5],['Lexical Sim.',77.8,80.5],['LN-Entropy',73.6,77.5],['Perplexity',68.3,72.3],['Energy',54.7,54.7]];
+  const W=470/35; // px per AUROC point, axis 50..85
+  S8.items=[];S8.axes=[];
+  [[128,0],[980,1]].forEach(([ox,side])=>{
+    const X=v=>ox+250+(v-50)*W;
+    const ax=S('g',{},svg);S8.axes.push(ax);
+    [50,60,70,80].forEach(v=>{S('line',{x1:X(v),x2:X(v),y1:330,y2:790,stroke:C.line,'stroke-width':1.5},ax);
+      H(`<div class="abs" style="left:${X(v)-30}px;top:792px;width:60px;text-align:center;font-size:20px;color:${C.dim}" data-t="1.4">${v}</div>`,host)});
+    rows.forEach((r,i)=>{const y=345+i*88,v=r[1+side];
+      H(`<div class="abs" style="left:${ox+10}px;top:${y+6}px;width:230px;font-size:28px;${i===0?'font-weight:600;':''}" data-t="1.2">${r[0]}</div>`,host);
+      const bar=S('rect',{x:X(50),y:y,height:46,rx:4,fill:side?(i===0?C.blue:C.blueMid):(i===0?'#8C8577':C.grey)},svg);
+      const lab=H(`<div class="abs mono" style="top:${y+6}px;font-size:26px;${i===0?'font-weight:500;':''}">${v.toFixed(1)}</div>`,host);
+      const st=2+i*2.4+side*1.2;
+      S8.items.push({bar,lab,w:X(v)-X(50),x0:X(50),st});
+    });
+  });
 })();
 function s8(t){
-  S8.bars.forEach((b,i)=>{const app=seg(t,.8+i*.03,1.2+i*.03);b.setAttribute('opacity',app);
-    let hl=0;if(i===15)hl=seg(t,1.6,2.2);if(i>=11&&i<=19)hl=Math.max(hl,seg(t,6+Math.abs(i-15)*.45,6.6+Math.abs(i-15)*.45));
-    b.setAttribute('fill',mix(C.line,C.gold,hl))});
-  S8.paths.forEach((p,k)=>p.setAttribute('stroke-dashoffset',600*(1-seg(t,9+k*.08,10.6+k*.08))));
-  const n=seg(t,10.6,11.4);S8.node.setAttribute('opacity',n);S8.node.setAttribute('r',22*n);
+  S8.axes.forEach(a=>a.setAttribute('opacity',seg(t,1.2,2)));
+  S8.items.forEach(it=>{const p=seg(t,it.st,it.st+1.1);it.bar.setAttribute('width',it.w*p);it.lab.style.left=(it.x0+it.w*p+12)+'px';it.lab.style.opacity=seg(t,it.st+.5,it.st+1.1)});
 }
 
-const UPD={s3,s4,s5,s6,s7,s8};
+// ---------- S9: feature clipping, paper vs ours ----------
+const S9={};
+(function(){
+  const svg=document.getElementById('s9svg'),host=document.getElementById('s9labels');S9.p=[];
+  [[128,0],[980,1]].forEach(([ox,side])=>{
+    const X=v=>ox+56+(v+6)*70;const y=650;
+    const g={};g.axis=S('line',{x1:X(-6),x2:X(4),y1:y,y2:y,stroke:C.dim,'stroke-width':2},svg);
+    g.zero=S('line',{x1:X(0),x2:X(0),y1:y-80,y2:y+40,stroke:C.muted,'stroke-width':2,'stroke-dasharray':'6 6'},svg);
+    [-6,-4,-2,0,2,4].forEach(v=>H(`<div class="abs mono" style="left:${X(v)-40}px;top:${y+48}px;width:80px;text-align:center;font-size:22px;color:${C.dim}" data-t="1.4">${v>0?'+':''}${v}</div>`,host));
+    if(!side){g.mark=S('rect',{x:X(1.1)-15,y:y-15,width:30,height:30,fill:C.gold,transform:`rotate(45 ${X(1.1)} ${y})`},svg)}
+    else{g.int=S('rect',{y:y-8,height:16,rx:8,fill:C.blue},svg);g.pt=S('circle',{cx:X(-1),cy:y,r:17,fill:C.ink},svg);
+      g.ghost=S('rect',{x:X(1.1)-12,y:y-12,width:24,height:24,fill:'none',stroke:C.gold,'stroke-width':3,transform:`rotate(45 ${X(1.1)} ${y})`},svg)}
+    g.X=X;S9.p.push(g)});
+})();
+function s9(t){
+  const a=seg(t,1.2,2);S9.p.forEach(g=>{g.axis.setAttribute('opacity',a);g.zero.setAttribute('opacity',a)});
+  const L=S9.p[0],R=S9.p[1];
+  L.mark.setAttribute('opacity',seg(t,2.6,3.2));
+  const ip=seg(t,5.8,7.2),c=R.X(-1),lo=R.X(-4.7),hi=R.X(2.6);
+  R.int.setAttribute('x',lerp(c,lo,ip));R.int.setAttribute('width',Math.max(0,lerp(c,hi,ip)-lerp(c,lo,ip)));R.int.setAttribute('opacity',ip>0?1:0);
+  R.pt.setAttribute('opacity',seg(t,5.4,6));R.ghost.setAttribute('opacity',seg(t,8.5,9.2));
+}
+
+// ---------- S10 ----------
+const S10={};
+(function(){
+  const svg=document.getElementById('s10svg');S10.bars=buildStack(svg);S10.paths=[];
+  for(let i=11;i<=19;i++){const y=layerY(i);S10.paths.push(S('path',{d:`M 665 ${y} C 800 ${y}, 860 600, 990 600`,stroke:C.gold,'stroke-width':2.5,fill:'none','stroke-dasharray':600,'stroke-dashoffset':600},svg))}
+  S10.node=S('circle',{cx:990,cy:600,r:22,fill:C.gold},svg);
+})();
+function s10(t){
+  S10.bars.forEach((b,i)=>{b.setAttribute('opacity',seg(t,.8+i*.03,1.2+i*.03));
+    let hl=0;if(i===15)hl=seg(t,1.6,2.2);if(i>=11&&i<=19)hl=Math.max(hl,seg(t,6+Math.abs(i-15)*.45,6.6+Math.abs(i-15)*.45));
+    b.setAttribute('fill',mix(C.layer,C.gold,hl))});
+  S10.paths.forEach((p,k)=>p.setAttribute('stroke-dashoffset',600*(1-seg(t,9+k*.08,10.6+k*.08))));
+  const n=seg(t,10.6,11.4);S10.node.setAttribute('opacity',n);S10.node.setAttribute('r',22*n);
+}
+
+const UPD={s3,s4,s5,s8,s9,s10};
 
 // ---------- generic element animation ----------
 for(const s of SCENES){s.items=[...s.el.querySelectorAll('[data-t]')].map(e=>({e,t:+e.dataset.t,d:+(e.dataset.d||.7),a:e.dataset.a||'fade',out:e.dataset.out!==undefined?+e.dataset.out:null}))}
 function applyItem(it,lt){
-  const p=ease((lt-it.t)/it.d);const po=it.out!==null?ease((lt-it.out)/.5):0;const e=it.e;
+  const p=ease((lt-it.t)/it.d),po=it.out!==null?ease((lt-it.out)/.5):0,e=it.e;
   e.style.opacity=p*(1-po);
   switch(it.a){
     case'rise':e.style.transform=`translateY(${(1-p)*36}px)`;break;
     case'scale':e.style.transform=`scale(${.9+.1*p})`;break;
     case'left':e.style.transform=`translateX(${(1-p)*-50}px)`;break;
+    case'right':e.style.transform=`translateX(${(1-p)*50}px)`;break;
     case'wipe':e.style.opacity=p>0?1-po:0;e.style.clipPath=`inset(0 ${(1-p)*100}% 0 0)`;break;
+    case'wipeY':e.style.opacity=p>0?1-po:0;e.style.clipPath=`inset(0 0 ${(1-p)*100}% 0)`;break;
   }
 }
 
@@ -406,12 +445,9 @@ function renderAt(t){
   bgUpdate(t);
   for(const s of SCENES){
     const lt=t-s.start;
-    const vis=lt>-XF&&lt<s.dur+XF;
-    if(!vis){s.el.style.display='none';continue}
+    if(!(lt>-XF&&lt<s.dur+XF)){s.el.style.display='none';continue}
     s.el.style.display='block';
-    const isFirst=s===SCENES[0],isLast=s===SCENES[SCENES.length-1];
-    const fin=isFirst?1:clamp((lt+XF)/XF);const fout=isLast?1:clamp((s.dur+XF-lt)/XF);
-    // crossfade: incoming fades in over [-XF,0], outgoing fades out over [dur, dur+XF]
+    const fin=s===SCENES[0]?1:clamp((lt+XF)/XF),fout=s===SCENES[SCENES.length-1]?1:clamp((s.dur+XF-lt)/XF);
     s.el.style.opacity=Math.min(fin,fout);
     for(const it of s.items)applyItem(it,lt);
     if(UPD[s.id])UPD[s.id](lt);
@@ -428,7 +464,7 @@ addEventListener('resize',fit);fit();
 if(RENDER){document.getElementById('hud').style.display='none';document.getElementById('help').style.display='none';renderAt(0)}
 else{
   let t=0,playing=true,last=performance.now();
-  function loop(now){const dt=(now-last)/1000;last=now;if(playing){t+=dt;if(t>TOTAL)t=TOTAL}renderAt(t);requestAnimationFrame(loop)}
+  function loop(now){const dt=(now-last)/1000;last=now;if(playing)t=Math.min(TOTAL,t+dt);renderAt(t);requestAnimationFrame(loop)}
   addEventListener('keydown',e=>{
     if(e.code==='Space'){playing=!playing;e.preventDefault()}
     if(e.key==='r')t=0;
