@@ -37,7 +37,7 @@ Video: `out/inside_explainer.mp4`, 4:14 long, no sound. Speaking order: **Prapti
 
 | # | Start | End | Cue on screen | Say |
 |---|---|---|---|---|
-| P1 | 0:01 | 0:13 | the big word "INSIDE" rises in | "Hello everyone. We are Prapti Chotaliya, Aayaan Ali Khan and Shlok Bhavsar. For our CS307 mid-semester project, we implemented INSIDE, an ICLR 2024 paper on detecting hallucinations in large language models." |
+| P1 | 0:01 | 0:13 | the big word "INSIDE" rises in | "Hello everyone. I'm Prapti Chotaliya, and my teammates are Aayaan Ali Khan and Shlok Bhavsar. For our CS307 mid-semester project, we implemented INSIDE, an ICLR 2024 paper on detecting hallucinations in large language models." |
 
 ### Slide 2 · The problem (0:14 – 0:38)
 
