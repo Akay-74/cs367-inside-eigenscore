@@ -1,0 +1,21 @@
+<section id="setup" data-transition="fade" style="background:#F6F3EC;color:#2B3445;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#8C5A0E">3 · Implementation</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;color:#15233B">Experimental setup: paper and ours</h2>
+</div>
+<table style="font-size:28px;color:#2B3445">
+<tr><th style="width:30%;text-align:left"></th><th style="width:35%;text-align:left">Paper</th><th style="width:35%;text-align:left">This work</th></tr>
+<tr><td>Model</td><td>LLaMA-7B, fp16</td><td>Llama-2-7B, 4-bit NF4</td></tr>
+<tr><td>Data</td><td>CoQA, 7,983 questions</td><td>CoQA, 250 questions</td></tr>
+<tr><td>Hardware</td><td>Not stated</td><td>RTX 4060 laptop, 8 GB</td></tr>
+<tr><td>K · temperature · top-p</td><td>10 · 0.5 · 0.99</td><td>10 · 0.5 · 0.99</td></tr>
+<tr><td>top-k</td><td>5</td><td>10 (repository default)</td></tr>
+<tr><td>α · p · N</td><td>10⁻³ · 0.2% · 3000</td><td>10⁻³ · 0.2% · 3000</td></tr>
+<tr><td>Correctness</td><td>ROUGE-L and sentence similarity</td><td>ROUGE-L only</td></tr>
+</table>
+<p style="font-size:28px;color:#8C5A0E">So we test whether the <b>ranking</b> of methods reproduces, not the exact numbers.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS307 · Reproducing INSIDE (ICLR 2024)</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-size:24px;color:#5F6673">14 / 21</p>
+<aside>[Speaker: Prapti · about 35 s]
+This table compares our setup with the paper's. We kept every method hyperparameter the same: ten samples, temperature 0.5, the same regulariser, and the same clipping percentile and memory-bank size. The differences are forced by hardware. We used Llama-2-7B in 4-bit precision on an 8 GB laptop GPU, and we evaluated 250 CoQA questions rather than all 7,983. We also used only ROUGE-L as the correctness measure. For these reasons, the claim we test is whether the ranking of the methods reproduces, rather than the exact AUROC values. We ran the experiment twice on identical questions with the same seed: once without and once with feature clipping.</aside>
+</section>

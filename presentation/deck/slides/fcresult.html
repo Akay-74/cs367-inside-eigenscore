@@ -1,0 +1,39 @@
+<section id="fcresult" data-transition="fade" style="background:#F6F3EC;color:#2B3445;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#8C5A0E">4 · Results</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;color:#15233B">Feature clipping: inconclusive at this scale</h2>
+</div>
+<div style="position:relative;width:1664px;height:240px;background:#FFFDF8;border:1px solid #D9D3C5;border-radius:16px">
+<div style="position:absolute;left:100px;top:160px;width:1464px;height:2px;background:#5F6673"></div>
+<div style="position:absolute;left:977px;top:40px;width:2px;height:150px;background:#5F6673"></div>
+<div style="position:absolute;left:290px;top:104px;width:1069px;height:10px;background:#2F5D8A;border-radius:5px"></div>
+<x-shape kind="ellipse" style="position:absolute;left:816px;top:93px;width:32px;height:32px;background:#15233B"></x-shape>
+<x-shape kind="diamond" style="position:absolute;left:1123px;top:93px;width:32px;height:32px;background:#B07A1E"></x-shape>
+<p style="position:absolute;left:707px;top:36px;width:250px;text-align:center;font-size:24px;font-weight:600;color:#15233B">Ours: −1.0</p>
+<p style="position:absolute;left:1039px;top:36px;width:200px;text-align:center;font-size:24px;font-weight:600;color:#8C5A0E">Paper: +1.1</p>
+<p style="position:absolute;left:353px;top:176px;width:80px;text-align:center;font-size:24px;color:#5F6673">−4</p>
+<p style="position:absolute;left:645px;top:176px;width:80px;text-align:center;font-size:24px;color:#5F6673">−2</p>
+<p style="position:absolute;left:938px;top:176px;width:80px;text-align:center;font-size:24px;color:#5F6673">0</p>
+<p style="position:absolute;left:1231px;top:176px;width:80px;text-align:center;font-size:24px;color:#5F6673">+2</p>
+<p style="position:absolute;left:1360px;top:176px;width:280px;text-align:right;font-size:24px;color:#5F6673">Δ AUROC (points)</p>
+</div>
+<p style="font-size:26px;color:#3E4756">Blue bar: 95% confidence interval of our change, [−4.7, +2.6], from a paired bootstrap on identical questions.</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;border-left:6px solid #2F5D8A;padding:4px 0 4px 28px">
+<h3 style="font-size:30px;font-weight:600;color:#15233B">Neither confirmed nor refuted</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4756">The interval contains both 0 and the paper’s +1.1.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;border-left:6px solid #2F5D8A;padding:4px 0 4px 28px">
+<h3 style="font-size:30px;font-weight:600;color:#15233B">Clipping is active</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4756">0.29% of activations clipped; at most 0.4% expected.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;border-left:6px solid #2F5D8A;padding:4px 0 4px 28px">
+<h3 style="font-size:30px;font-weight:600;color:#15233B">Needs more data</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4756">A 1-point effect needs far more than 250 questions.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS307 · Reproducing INSIDE (ICLR 2024)</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-size:24px;color:#5F6673">17 / 21</p>
+<aside>[Speaker: Prapti · about 45 s]
+The second claim, that feature clipping improves EigenScore, did not reproduce at our scale. The paper reports a gain of 1.1 points on CoQA. We measured a change of minus 1.0, but the 95 percent confidence interval runs from minus 4.7 to plus 2.6. That interval contains both zero and the paper's plus 1.1, so our experiment neither confirms nor contradicts the claim: it simply lacks the resolution. We verified that the clipping is actually operating: 0.29 percent of activations were clipped, which matches the expected rate for a 0.2 percent threshold on each tail. Detecting a one-point effect requires many more questions; the paper used almost eight thousand. I will now hand over to Shlok for the limitations.</aside>
+</section>

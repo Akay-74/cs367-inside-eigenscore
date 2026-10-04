@@ -1,0 +1,30 @@
+<section id="limitations" data-transition="fade" style="background:#ECE7DC;color:#2B3445;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#8C5A0E">5 · Limitations</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;color:#15233B">What we learned the method cannot yet do</h2>
+</div>
+<div style="display:flex;gap:64px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:40px;font-weight:600;color:#15233B">Of the method</h3>
+<ul style="font-size:28px;line-height:1.5;color:#3E4756">
+<li>One fixed layer, int(L/2), chosen by hand; the paper’s own ablation shows AUROC changes by several points with the layer</li>
+<li>K = 10 to 20 generations per query: 10–20× the cost of answering</li>
+<li>Self-consistent hallucinations remain hard; the clipping gain is small</li>
+<li>Needs internal states, so not usable on closed APIs</li>
+</ul>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:40px;font-weight:600;color:#15233B">Of our reproduction</h3>
+<ul style="font-size:28px;line-height:1.5;color:#3E4756">
+<li>250 questions: confidence intervals of about ±4 points</li>
+<li>Different model (Llama-2) in 4-bit precision</li>
+<li>ROUGE-L correctness only; sentence-similarity AUROC not yet measured</li>
+<li>top-k of 10 instead of 5</li>
+</ul>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS307 · Reproducing INSIDE (ICLR 2024)</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-size:24px;color:#5F6673">18 / 21</p>
+<aside>[Speaker: Shlok · about 40 s]
+Working through the paper in detail showed us several limitations. In the method itself, the embedding is always taken from one hand-chosen layer, the middle one, even though the paper's own ablation shows that performance changes by several points depending on the layer. The method also needs ten to twenty generations per question, which multiplies the cost of answering. Self-consistent hallucinations remain difficult, and the gain from clipping is small. Finally, it requires access to internal states, so it cannot be used with closed APIs. Our own reproduction is limited by its sample size, the quantised Llama-2 model, and the use of ROUGE-L as the only correctness measure.</aside>
+</section>

@@ -1,0 +1,29 @@
+<section id="built" data-transition="fade" style="background:#F6F3EC;color:#2B3445;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#8C5A0E">3 · Implementation</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;color:#15233B">What we built</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;flex:1">
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #D9D3C5;border-radius:16px;padding:36px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:36px;font-weight:600;color:#15233B">A working pipeline</h3>
+<p style="font-size:26px;line-height:1.45;color:#3E4756">All 12 defects repaired; embeddings pooled across batches; one command each for generation and evaluation.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #D9D3C5;border-radius:16px;padding:36px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:36px;font-weight:600;color:#15233B">Feature clipping, from the paper</h3>
+<p style="font-size:26px;line-height:1.45;color:#3E4756">FeatureClipper: ring-buffer memory bank, per-neuron percentiles, forward hook on the penultimate layer, warm-up guard.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #D9D3C5;border-radius:16px;padding:36px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:36px;font-weight:600;color:#15233B">A 7B model on an 8 GB GPU</h3>
+<p style="font-size:26px;line-height:1.45;color:#3E4756">4-bit NF4 weights; K = 10 split into smaller passes; a hook that keeps only the middle layer instead of all 33.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #D9D3C5;border-radius:16px;padding:36px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:36px;font-weight:600;color:#15233B">Verified by 8 tests</h3>
+<p style="font-size:26px;line-height:1.45;color:#3E4756">Thresholds match numpy.percentile; low-memory path identical to the full path; pooled score equals the original.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS307 · Reproducing INSIDE (ICLR 2024)</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-size:24px;color:#5F6673">13 / 21</p>
+<aside>[Speaker: Prapti · about 50 s]
+Our implementation has four parts. First, we repaired all twelve defects and pooled the embeddings across batches, so the pipeline runs end to end with one command for generation and one for evaluation. Second, we implemented feature clipping from the paper's description. A FeatureClipper class keeps a ring buffer of recent token activations, computes per-neuron percentile thresholds, and is attached as a forward hook on the penultimate layer, so the clipping affects generation as the paper intends. Third, we made a 7-billion-parameter model run on an 8 GB laptop GPU, using 4-bit weights, smaller generation passes, and a hook that keeps only the one layer EigenScore needs. Fourth, we wrote eight automated tests; for example, the clipping thresholds agree with NumPy's percentile function, and the low-memory path gives exactly the same scores as the original.
+[Optional: cut to a 10-second screen recording of the tests passing and of the generation command running.]</aside>
+</section>

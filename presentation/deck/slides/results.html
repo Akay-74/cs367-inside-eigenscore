@@ -1,0 +1,52 @@
+<section id="results" data-transition="fade" style="background:#F6F3EC;color:#2B3445;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#8C5A0E">4 · Results</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;color:#15233B">The paper’s ranking reproduces exactly</h2>
+</div>
+<div style="display:flex;gap:40px;align-items:center">
+<div style="display:flex;align-items:center;gap:12px"><div style="width:28px;height:28px;background:#B8B2A4"></div><p style="font-size:24px;color:#3E4756">Paper (LLaMA-7B)</p></div>
+<div style="display:flex;align-items:center;gap:12px"><div style="width:28px;height:28px;background:#2F5D8A"></div><p style="font-size:24px;color:#3E4756">Ours (Llama-2-7B, 4-bit, no clipping)</p></div>
+<p style="font-size:24px;color:#5F6673">AUROC, CoQA · bars start at 50 (chance)</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:22px">
+<div style="display:flex;align-items:center;gap:24px">
+<p style="width:300px;font-size:28px;color:#15233B">Energy</p>
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;align-items:center;gap:12px"><div style="width:121px;height:26px;background:#B8B2A4"></div><p style="font-size:24px;color:#5F6673">54.7</p></div>
+<div style="display:flex;align-items:center;gap:12px"><div style="width:121px;height:26px;background:#2F5D8A"></div><p style="font-size:24px;color:#15233B">54.7</p></div>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:24px">
+<p style="width:300px;font-size:28px;color:#15233B">Perplexity</p>
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;align-items:center;gap:12px"><div style="width:470px;height:26px;background:#B8B2A4"></div><p style="font-size:24px;color:#5F6673">68.3</p></div>
+<div style="display:flex;align-items:center;gap:12px"><div style="width:573px;height:26px;background:#2F5D8A"></div><p style="font-size:24px;color:#15233B">72.3</p></div>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:24px">
+<p style="width:300px;font-size:28px;color:#15233B">LN-Entropy</p>
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;align-items:center;gap:12px"><div style="width:607px;height:26px;background:#B8B2A4"></div><p style="font-size:24px;color:#5F6673">73.6</p></div>
+<div style="display:flex;align-items:center;gap:12px"><div style="width:707px;height:26px;background:#2F5D8A"></div><p style="font-size:24px;color:#15233B">77.5</p></div>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:24px">
+<p style="width:300px;font-size:28px;color:#15233B">Lexical Similarity</p>
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;align-items:center;gap:12px"><div style="width:715px;height:26px;background:#B8B2A4"></div><p style="font-size:24px;color:#5F6673">77.8</p></div>
+<div style="display:flex;align-items:center;gap:12px"><div style="width:784px;height:26px;background:#2F5D8A"></div><p style="font-size:24px;color:#15233B">80.5</p></div>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:24px">
+<p style="width:300px;font-size:28px;font-weight:600;color:#15233B">EigenScore</p>
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;align-items:center;gap:12px"><div style="width:792px;height:26px;background:#B8B2A4"></div><p style="font-size:24px;color:#5F6673">80.8</p></div>
+<div style="display:flex;align-items:center;gap:12px"><div style="width:861px;height:26px;background:#2F5D8A"></div><p style="font-size:24px;font-weight:600;color:#15233B">83.5</p></div>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">Paper’s 80.8 includes feature clipping; our clipped run gives 82.5.</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-size:24px;color:#5F6673">15 / 21</p>
+<aside>[Speaker: Prapti · about 45 s]
+These are our main results. Grey bars are the paper's numbers and blue bars are ours. The ordering of the five methods is identical to the paper's: EigenScore is the best detector, followed by lexical similarity, length-normalised entropy and perplexity, while the energy score is barely above chance, which is expected because it was designed for out-of-distribution detection rather than hallucination. Our EigenScore reaches 83.5 AUROC. One detail matters for a fair comparison: the paper's EigenScore of 80.8 already includes feature clipping, so the like-for-like number from our clipped run is 82.5. Despite a different model and 4-bit precision, our absolute values are within a few points of the paper's.</aside>
+</section>

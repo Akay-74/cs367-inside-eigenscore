@@ -1,0 +1,26 @@
+<section id="problem" data-transition="fade" style="background:#F6F3EC;color:#2B3445;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#8C5A0E">1 · The problem</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;color:#15233B">Hallucination: fluent, confident, and wrong</h2>
+</div>
+<div style="display:flex;gap:64px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:32px;justify-content:center">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:44px;line-height:1.3;color:#15233B">A language model answers in the same fluent style whether it knows the answer or not.</p>
+<p style="font-size:30px;line-height:1.5;color:#3E4756">Goal of the paper: estimate, from the model alone, how likely an answer is to be wrong, with no external knowledge base or fact-checker.</p>
+</div>
+<div style="width:720px;display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #D9D3C5;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#5F6673">Example from our CoQA run</p>
+<p style="font-size:28px;color:#15233B"><b>Q:</b> [question taken from one CoQA story]</p>
+<p style="font-size:28px;color:#15233B"><b>Reference:</b> [ground-truth answer]</p>
+<hr style="border-top:1px solid #D9D3C5;width:100%">
+<p style="font-size:26px;color:#3E4756">Sample 1: [model answer]</p>
+<p style="font-size:26px;color:#3E4756">Sample 2: [model answer]</p>
+<p style="font-size:26px;color:#3E4756">Sample 3: [model answer]</p>
+<p style="font-size:24px;color:#8C5A0E">[Pick one question where the samples disagree]</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS307 · Reproducing INSIDE (ICLR 2024)</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-size:24px;color:#5F6673">3 / 21</p>
+<aside>[Speaker: Aayaan · about 35 s]
+Large language models produce fluent text whether or not they actually know the answer. When the content is factually wrong, we call it a hallucination. The difficulty is that a hallucinated answer looks exactly like a correct one. On the right is a question from the CoQA dataset, together with several answers sampled from the model we used. [Read the question briefly and point out that the samples disagree.] The goal of the paper is to estimate how likely an answer is to be wrong using only the model itself, without consulting an external knowledge source.</aside>
+</section>

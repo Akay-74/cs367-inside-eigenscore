@@ -1,0 +1,31 @@
+<section id="endsem" data-transition="fade" style="background:#F6F3EC;color:#2B3445;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#8C5A0E">5 · End-semester plan</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;color:#15233B">Our extension: a more robust, cheaper EigenScore</h2>
+</div>
+<div style="display:flex;gap:32px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#15233B;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#D9A845">Main contribution</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:36px;font-weight:600;color:#F6F3EC">Multi-layer EigenScore</h3>
+<p style="font-size:26px;line-height:1.45;color:#C9D3E0">Combine the score over a band of middle layers, with normalised embeddings, instead of one hand-picked layer.</p>
+<p style="font-size:24px;line-height:1.45;color:#AEBACB">Removes a hyperparameter that changes from model to model.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #D9D3C5;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#8C5A0E">Second</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:36px;font-weight:600;color:#15233B">Hybrid detector</h3>
+<p style="font-size:26px;line-height:1.45;color:#3E4756">Combine EigenScore with token-level confidence (LN-Entropy) to target self-consistent hallucinations.</p>
+<p style="font-size:24px;line-height:1.45;color:#5F6673">When all answers agree, confidence is the only signal left.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #D9D3C5;border-radius:16px;padding:40px">
+<p style="font-size:24px;letter-spacing:2px;text-transform:uppercase;color:#8C5A0E">Stretch</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:36px;font-weight:600;color:#15233B">Adaptive K</h3>
+<p style="font-size:26px;line-height:1.45;color:#3E4756">Sample answers one at a time and stop early once the score is clearly low or high.</p>
+<p style="font-size:24px;line-height:1.45;color:#5F6673">Report AUROC against the average number of generations.</p>
+</div>
+</div>
+<p style="font-size:26px;color:#3E4756"><b>Foundation:</b> complete the reproduction at full CoQA scale, with sentence-similarity AUROC and the paper’s top-k = 5.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS307 · Reproducing INSIDE (ICLR 2024)</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-size:24px;color:#5F6673">19 / 21</p>
+<aside>[Speaker: Aayaan · about 55 s]
+For the end-semester we plan to go beyond reproduction and improve the method. Our main contribution will be a multi-layer EigenScore. Instead of relying on one hand-picked middle layer, we will combine the score over a band of middle layers and normalise the embeddings, so the detector no longer depends on a layer choice that changes from model to model. Second, we will build a hybrid detector that combines EigenScore with token-level confidence. When all ten answers agree, EigenScore has nothing left to measure, but the model's token confidence may still reveal a self-consistent hallucination. As a stretch goal, we will make the number of samples adaptive: generate answers one at a time and stop as soon as the score is clearly low or clearly high, reducing cost. All of this rests on first completing the reproduction at full scale, with the paper's second correctness measure.</aside>
+</section>

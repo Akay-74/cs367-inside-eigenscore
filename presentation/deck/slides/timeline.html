@@ -1,0 +1,26 @@
+<section id="timeline" data-transition="fade" style="background:#F6F3EC;color:#2B3445;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#8C5A0E">5 · End-semester plan</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;color:#15233B">Plan and how we will measure success</h2>
+</div>
+<div style="display:flex;gap:64px;flex:1">
+<table style="flex:1;font-size:28px;color:#2B3445">
+<tr><th style="width:28%;text-align:left">Weeks</th><th style="width:72%;text-align:left">Work</th></tr>
+<tr><td>[1–2]</td><td>Full-scale CoQA and NQ runs; add AUC_s</td></tr>
+<tr><td>[3–4]</td><td>Multi-layer EigenScore; layer-band study</td></tr>
+<tr><td>[5]</td><td>Hybrid detector with LN-Entropy</td></tr>
+<tr><td>[6]</td><td>Adaptive K, if time permits</td></tr>
+<tr><td>[7]</td><td>Final report and presentation</td></tr>
+</table>
+<div style="width:560px;display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #D9D3C5;border-radius:16px;padding:40px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:36px;font-weight:600;color:#15233B">Success criteria</h3>
+<p style="font-size:26px;line-height:1.45;color:#3E4756">Higher AUROC than single-layer EigenScore on at least two datasets</p>
+<p style="font-size:26px;line-height:1.45;color:#3E4756">Gains backed by a paired bootstrap, as in this study</p>
+<p style="font-size:26px;line-height:1.45;color:#3E4756">Adaptive K: equal AUROC with fewer generations</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS307 · Reproducing INSIDE (ICLR 2024)</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-size:24px;color:#5F6673">20 / 21</p>
+<aside>[Speaker: Aayaan · about 30 s]
+This is our timeline. We will first run the full-scale experiments and add the sentence-similarity metric, then develop the multi-layer EigenScore, followed by the hybrid detector, and the adaptive sampling scheme if time permits. We will judge success by whether the new detector improves AUROC over the original EigenScore on at least two datasets, with every improvement checked by the same paired bootstrap we used in this study.</aside>
+</section>

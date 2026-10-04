@@ -1,0 +1,42 @@
+<section id="eigenscore" data-transition="fade" style="background:#F6F3EC;color:#2B3445;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#8C5A0E">2 · Method</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;color:#15233B">EigenScore: spread measured by eigenvalues</h2>
+</div>
+<div style="display:flex;gap:64px;flex:1">
+<div style="width:760px;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #D9D3C5;border-radius:16px;padding:40px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:30px;line-height:1.6;color:#15233B">Σ = Zᵀ J Z  ∈ ℝ^(K×K)</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:30px;line-height:1.6;color:#15233B">E = (1/K) · log det(Σ + αI)</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:30px;line-height:1.6;color:#15233B">  = (1/K) · Σᵢ log λᵢ</p>
+</div>
+<p style="font-size:28px;line-height:1.5;color:#3E4756">Z holds the K answer embeddings as columns, J centres them, and α = 10⁻³ keeps the matrix invertible.</p>
+<p style="font-size:28px;line-height:1.5;color:#3E4756">Each eigenvalue λᵢ is the variance along one direction of disagreement.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<svg aria-label="Two panels. Left: ten answer embeddings clustered tightly, with small eigenvalue bars. Right: ten embeddings spread widely, with large eigenvalue bars." width="760" height="420" viewBox="0 0 760 420" style="width:760px;height:420px">
+<rect x="1" y="1" width="358" height="418" rx="14" fill="#FFFDF8" stroke="#D9D3C5"/>
+<rect x="401" y="1" width="358" height="418" rx="14" fill="#FFFDF8" stroke="#D9D3C5"/>
+<line x1="30" y1="270" x2="330" y2="270" stroke="#D9D3C5" stroke-width="2"/>
+<line x1="430" y1="270" x2="730" y2="270" stroke="#D9D3C5" stroke-width="2"/>
+<g fill="#2F5D8A">
+<circle cx="170" cy="130" r="9"/><circle cx="186" cy="138" r="9"/><circle cx="178" cy="118" r="9"/><circle cx="194" cy="124" r="9"/><circle cx="164" cy="146" r="9"/><circle cx="182" cy="152" r="9"/><circle cx="198" cy="142" r="9"/><circle cx="172" cy="112" r="9"/><circle cx="160" cy="128" r="9"/><circle cx="190" cy="110" r="9"/>
+<circle cx="480" cy="70" r="9"/><circle cx="640" cy="90" r="9"/><circle cx="560" cy="150" r="9"/><circle cx="700" cy="200" r="9"/><circle cx="460" cy="210" r="9"/><circle cx="620" cy="225" r="9"/><circle cx="520" cy="110" r="9"/><circle cx="690" cy="60" r="9"/><circle cx="590" cy="60" r="9"/><circle cx="500" cy="180" r="9"/>
+</g>
+<g fill="#B07A1E">
+<rect x="70" y="370" width="30" height="30"/><rect x="115" y="390" width="30" height="10"/><rect x="160" y="394" width="30" height="6"/><rect x="205" y="396" width="30" height="4"/><rect x="250" y="397" width="30" height="3"/>
+<rect x="470" y="295" width="30" height="105"/><rect x="515" y="315" width="30" height="85"/><rect x="560" y="330" width="30" height="70"/><rect x="605" y="345" width="30" height="55"/><rect x="650" y="358" width="30" height="42"/>
+</g>
+</svg>
+<div style="display:flex;gap:40px">
+<p style="width:360px;font-size:24px;line-height:1.4;color:#3E4756"><b>Confident.</b> Answers agree; eigenvalues fall to the floor α. Low score.</p>
+<p style="width:360px;font-size:24px;line-height:1.4;color:#3E4756"><b>Guessing.</b> Answers diverge; eigenvalues stay large. High score.</p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS307 · Reproducing INSIDE (ICLR 2024)</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-size:24px;color:#5F6673">7 / 21</p>
+<aside>[Speaker: Shlok · about 45 s]
+Formally, we stack the K embeddings as the columns of a matrix Z, centre them, and form the K-by-K covariance matrix sigma. The EigenScore is one over K times the log-determinant of sigma plus a small multiple of the identity, which equals the average log-eigenvalue. Each eigenvalue is the variance of the answers along one direction. On the left, the model is confident: the ten embeddings almost coincide, so nearly all eigenvalues fall to the floor set by alpha, and the score is low. On the right, the model is guessing: the embeddings spread out in several directions, the eigenvalues stay large, and the score is high.
+[Animation suggestion: animate the points moving from the tight cluster to the spread cluster while the eigenvalue bars grow.]</aside>
+</section>
