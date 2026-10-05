@@ -10,35 +10,36 @@ You generate **one audio file** in ElevenLabs and send it to me. I split it into
 | Setting | Value | Why |
 |---|---|---|
 | Voice | your cloned voice | |
-| Model | **Eleven Multilingual v2** | supports the `<break>` pauses below; the most natural for narration |
+| Model | **Eleven v4** | follows audio tags like `[long pause]` reliably |
 | Speed | **1.0** (use 1.05 if a re-take is needed) | |
-| Stability | **55–60%** | steady and even, suits a formal academic tone |
+| Stability | **Natural** (or Robust if lines come out over-acted) | steady, formal academic delivery |
 | Similarity | **80–85%** | sounds like you |
-| Style exaggeration | **0–10%** | keep it calm; higher values sound dramatic |
 | Speaker boost | **on** | |
 | Output | MP3 44.1 kHz 192 kbps, or WAV | |
 
-Do **not** use Eleven v3 for this: it ignores the `<break>` tags, and the pauses between lines are how I find where each line starts.
+v4 doesn't use `<break>` tags. It uses audio tags in square brackets instead: `[long pause]` separates the lines, and `[calm, confident]` at the start sets your tone. The long pauses between lines are how I find where each line starts, so keep them.
+
+Some settings in the table (Stability, Similarity, Speaker boost) may not appear for v4. If one isn't there, skip it.
 
 ---
 
 ## 2 · Paste this text, exactly as it is, into ElevenLabs
 
-Numbers are written out in words and "EigenScore" is spaced as "Eigen Score", so the voice pronounces them correctly. The `<break time="1.5s" />` tags create the pauses I use to cut the lines apart. Don't remove them.
+Numbers are written out in words and "EigenScore" is spaced as "Eigen Score", so the voice pronounces them correctly. The `[long pause]` tags create the gaps I use to cut the lines apart. Don't remove them.
 
 ```
-We used Llama 2 in four-bit, instead of Llama in sixteen-bit, <break time="1.5s" />
-and two hundred and fifty questions instead of nearly eight thousand, because of our hardware. <break time="1.5s" />
-Everything else, the sampling, the method settings, and the correctness rule, is exactly the same. <break time="1.5s" />
-Here are the results, side by side. Eigen Score scores eighty point eight in the paper, and eighty-three point five in ours. <break time="1.5s" />
-Lexical similarity, entropy, perplexity, and energy follow in the same order on both sides. <break time="1.5s" />
-So the paper's ranking is reproduced exactly, with Eigen Score the best detector. <break time="1.5s" />
-The paper reports that clipping adds one point one points. <break time="1.5s" />
-We measured minus one point zero, but our ninety-five percent interval runs from minus four point seven, to plus two point six. <break time="1.5s" />
-It covers both zero and the paper's gain, so with two hundred and fifty questions, the result is inconclusive. <break time="1.5s" />
-By end-semester, we will improve the method. The paper reads only one hand-picked layer. <break time="1.5s" />
-We will combine a band of middle layers into one score, so no layer needs hand-tuning. <break time="1.5s" />
-We will also add token confidence to catch confident mistakes, and adaptive sampling to reduce cost. <break time="1.5s" />
+[calm, confident] We used Llama 2 in four-bit, instead of Llama in sixteen-bit, [long pause]
+and two hundred and fifty questions instead of nearly eight thousand, because of our hardware. [long pause]
+Everything else, the sampling, the method settings, and the correctness rule, is exactly the same. [long pause]
+Here are the results, side by side. Eigen Score scores eighty point eight in the paper, and eighty-three point five in ours. [long pause]
+Lexical similarity, entropy, perplexity, and energy follow in the same order on both sides. [long pause]
+So the paper's ranking is reproduced exactly, with Eigen Score the best detector. [long pause]
+The paper reports that clipping adds one point one points. [long pause]
+We measured minus one point zero, but our ninety-five percent interval runs from minus four point seven, to plus two point six. [long pause]
+It covers both zero and the paper's gain, so with two hundred and fifty questions, the result is inconclusive. [long pause]
+By end-semester, we will improve the method. The paper reads only one hand-picked layer. [long pause]
+We will combine a band of middle layers into one score, so no layer needs hand-tuning. [long pause]
+We will also add token confidence to catch confident mistakes, and adaptive sampling to reduce cost. [long pause]
 Thank you for watching.
 ```
 
@@ -72,9 +73,11 @@ The slots are in `voice_slots.json`. Compared with the subtitle guide, some line
 
 ## 4 · If a line sounds wrong
 
-- **Wrong word stress or mispronunciation:** regenerate just that one line, by itself and without the break tag. Name the file by its number, for example `S8.mp3`, and send it along. I'll replace that line.
+- **Wrong word stress or mispronunciation:** regenerate just that one line, by itself and without the `[long pause]` tag. Name the file by its number, for example `S8.mp3`, and send it along. I'll replace that line.
 - **"Llama" sounds odd:** try writing it as "Lama".
 - **Everything feels rushed or too slow:** regenerate the whole text at Speed 0.95 or 1.05.
+- **Too dramatic or uneven:** remove `[calm, confident]`, or switch Stability to Robust.
+- **v4 adds a long pause in the middle of a line:** that's fine, I always cut at the 12 longest pauses. If a line still gets cut in the wrong place, generate the lines as separate files instead (see the next point).
 - **Prefer separate files?** You can generate each line on its own and name them `S1.mp3` … `S13.mp3`. That works too.
 
 ---
