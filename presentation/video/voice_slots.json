@@ -1,0 +1,18 @@
+{
+  "_note": "Placement slots for generated (ElevenLabs) lines. Times are video time m:ss. 'latest_end' is when the next line or scene change needs the floor.",
+  "S": [
+    {"id": "S1",  "start": "2:31.8", "latest_end": "2:35.9"},
+    {"id": "S2",  "start": "2:36.2", "latest_end": "2:41.6"},
+    {"id": "S3",  "start": "2:41.9", "latest_end": "2:51.0"},
+    {"id": "S4",  "start": "2:53.0", "latest_end": "3:00.7"},
+    {"id": "S5",  "start": "3:01.0", "latest_end": "3:09.2"},
+    {"id": "S6",  "start": "3:09.6", "latest_end": "3:17.0"},
+    {"id": "S7",  "start": "3:19.6", "latest_end": "3:22.9"},
+    {"id": "S8",  "start": "3:23.2", "latest_end": "3:31.0"},
+    {"id": "S9",  "start": "3:31.3", "latest_end": "3:37.6"},
+    {"id": "S10", "start": "3:39.5", "latest_end": "3:44.9"},
+    {"id": "S11", "start": "3:45.2", "latest_end": "3:52.2"},
+    {"id": "S12", "start": "3:52.5", "latest_end": "4:03.5"},
+    {"id": "S13", "start": "4:05.0", "latest_end": "4:13.5"}
+  ]
+}
