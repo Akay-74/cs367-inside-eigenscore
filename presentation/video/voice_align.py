@@ -39,6 +39,18 @@ def align(spk, words_json, audio, outdir):
     for k in range(len(spans)-1):
         nxt = first[k+1]
         spans[k][1] = max(spans[k][1], max(w["e"] for w in words[:nxt]) if nxt else spans[k][1])
+    # move each boundary to the longest silence among the nearby words (robust to misheard names)
+    for k in range(len(lines)-1):
+        cur = first[k+1]
+        gap = lambda j: words[j]["s"]-words[j-1]["e"]
+        if cur <= 0 or gap(cur) >= 0.15:
+            continue                      # boundary already sits in a real pause
+        lo, hi = max(1, cur-1), min(len(words)-1, cur+1)
+        best = max(range(lo, hi+1), key=gap)
+        if gap(best) < 0.4:
+            continue
+        first[k+1] = best
+        spans[k][1] = words[best-1]["e"]; spans[k+1][0] = words[best]["s"]
     # cut points: middle of the gap between consecutive lines
     cuts=[]
     for k in range(len(spans)):
