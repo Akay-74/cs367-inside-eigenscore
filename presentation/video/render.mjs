@@ -12,11 +12,14 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const outDir = path.join(here, 'out');
 mkdirSync(outDir, { recursive: true });
 const FPS = Number(process.env.FPS || 30);
+const START = Number(process.env.START || 0);   // seconds of the timeline to skip at the start
+const QUERY = process.env.SKIP ? `&skip=${process.env.SKIP}` : '';   // e.g. SKIP=s1 hides the title scene
+const OUTNAME = process.env.OUT || 'inside_explainer.mp4';
 
 const browser = await chromium.launch(
   process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
 const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
-await page.goto('file://' + path.join(here, 'index.html') + '?render=1');
+await page.goto('file://' + path.join(here, 'index.html') + '?render=1' + QUERY);
 await page.evaluate(() => document.fonts.ready);
 const total = await page.evaluate(() => window.TOTAL);
 
@@ -30,17 +33,17 @@ if (stillsArg !== -1) {
   process.exit(0);
 }
 
-const out = path.join(outDir, 'inside_explainer.mp4');
+const out = path.join(outDir, OUTNAME);
 const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS),
   '-i', '-', '-c:v', 'libx264', '-preset', 'medium', '-crf', '18', '-pix_fmt', 'yuv420p',
   '-movflags', '+faststart', out], { stdio: ['pipe', 'inherit', 'inherit'] });
 
-const frames = Math.round(total * FPS);
+const frames = Math.round((total - START) * FPS);
 for (let f = 0; f <= frames; f++) {
-  await page.evaluate(t => window.renderAt(t), f / FPS);
+  await page.evaluate(t => window.renderAt(t), START + f / FPS);
   const buf = await page.screenshot({ type: 'jpeg', quality: 95 });
   if (!ff.stdin.write(buf)) await new Promise(r => ff.stdin.once('drain', r));
-  if (f % (FPS * 10) === 0) console.log(`${(f / FPS).toFixed(0)}s / ${total}s`);
+  if (f % (FPS * 10) === 0) console.log(`${(START + f / FPS).toFixed(0)}s / ${total}s`);
 }
 ff.stdin.end();
 await new Promise(r => ff.on('close', r));

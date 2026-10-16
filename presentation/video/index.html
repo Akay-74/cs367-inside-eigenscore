@@ -445,15 +445,19 @@ function applyItem(it,lt){
 
 // ---------- master render ----------
 const XF=.7;
+const SKIP=new Set((new URLSearchParams(location.search).get('skip')||'').split(',').filter(Boolean));
 function renderAt(t){
   bgUpdate(t);
+  const shown=SCENES.filter(s=>!SKIP.has(s.id));
+  // when leading scenes are skipped, the new first scene opens with its heading already in place
+  const lead=SKIP.size&&shown[0]!==SCENES[0]?shown[0]:null;
   for(const s of SCENES){
     const lt=t-s.start;
-    if(!(lt>-XF&&lt<s.dur+XF)){s.el.style.display='none';continue}
+    if(SKIP.has(s.id)||!(lt>-XF&&lt<s.dur+XF)){s.el.style.display='none';continue}
     s.el.style.display='block';
-    const fin=s===SCENES[0]?1:clamp((lt+XF)/XF),fout=s===SCENES[SCENES.length-1]?1:clamp((s.dur+XF-lt)/XF);
+    const fin=s===shown[0]?1:clamp((lt+XF)/XF),fout=s===shown[shown.length-1]?1:clamp((s.dur+XF-lt)/XF);
     s.el.style.opacity=Math.min(fin,fout);
-    for(const it of s.items)applyItem(it,lt);
+    for(const it of s.items)applyItem(it,(s===lead&&it.t<=1)?Math.max(lt,it.t+it.d):lt);
     if(UPD[s.id])UPD[s.id](lt);
   }
   document.querySelector('#hud i').style.width=(t/TOTAL*100)+'%';
