@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>INSIDE Viva Guide</title>
+<link rel="stylesheet" href="../video/fonts/local.css">
+<style>
+@page { size: A4; margin: 16mm 17mm 18mm 17mm; }
+:root{ --ink:#15233B; --body:#2F3A4C; --muted:#5B6576; --gold:#9A640C; --goldbg:#FBF3E4; --blue:#2F6DB0; --bluebg:#EAF1FA; --line:#DDD7CB; --greenbg:#E8F3EC; --green:#2E7D4F; }
+*{box-sizing:border-box}
+html{ -webkit-print-color-adjust:exact; print-color-adjust:exact }
+body{ margin:0; font-family:'IBM Plex Sans','DejaVu Sans',Arial,sans-serif; font-size:10.6pt; line-height:1.5; color:var(--body); }
+h1,h2,h3{ font-family:'Source Serif 4','DejaVu Serif',Georgia,serif; color:var(--ink); line-height:1.2; margin:0 }
+h2{ font-size:19pt; margin:0 0 4mm; padding-top:1mm; break-after:avoid }
+h2 .num{ color:var(--gold); margin-right:6px }
+h3{ font-size:12.5pt; margin:5mm 0 1.5mm; break-after:avoid }
+p{ margin:0 0 2.6mm } ul,ol{ margin:0 0 2.6mm; padding-left:5.5mm } li{ margin:0 0 1mm }
+b{ color:var(--ink) }
+.section{ margin-top:8mm } .pb{ break-before:page; margin-top:0 } .tight table{ font-size:8.8pt; margin:1mm 0 2.5mm } .tight td,.tight th{ padding:1mm 2mm }
+.lead{ font-size:11.5pt; color:var(--ink) }
+.mono, code{ font-family:'IBM Plex Mono','DejaVu Sans Mono',monospace; font-size:9.4pt }
+code{ background:#F3F0E9; padding:0 3px; border-radius:3px }
+.box{ border-radius:8px; padding:3mm 4mm; margin:3mm 0 3.5mm; break-inside:avoid }
+.say{ background:var(--goldbg); border-left:4px solid #D4A02F }
+.say .tag, .note .tag, .eg .tag{ font-size:8pt; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; display:block; margin-bottom:1mm }
+.say .tag{ color:var(--gold) }
+.note{ background:var(--bluebg); border-left:4px solid var(--blue) } .note .tag{ color:var(--blue) }
+.eg{ background:var(--greenbg); border-left:4px solid var(--green) } .eg .tag{ color:var(--green) }
+table{ width:100%; border-collapse:collapse; margin:2mm 0 3.5mm; font-size:9.8pt; break-inside:avoid }
+th{ text-align:left; color:var(--ink); font-weight:600; border-bottom:1.5px solid var(--ink); padding:1.4mm 2mm }
+td{ border-bottom:1px solid var(--line); padding:1.4mm 2mm; vertical-align:top }
+tr.hl td{ background:var(--bluebg); font-weight:600; color:var(--ink) }
+.formula{ font-family:'Source Serif 4',Georgia,serif; font-size:14pt; text-align:center; color:var(--ink); margin:3mm 0 }
+.grid2{ display:grid; grid-template-columns:1fr 1fr; gap:4mm }
+.qa{ break-inside:avoid; margin:0 0 3mm; padding-bottom:2.5mm; border-bottom:1px solid var(--line) }
+.qa .q{ font-weight:600; color:var(--ink); margin-bottom:.8mm }
+.qa .q::before{ content:"Q. "; color:var(--gold) }
+.qa .a::before{ content:"A. "; color:var(--blue); font-weight:600 }
+.small{ font-size:9pt; color:var(--muted) }
+figure{ margin:3mm 0; text-align:center; break-inside:avoid } figcaption{ font-size:8.8pt; color:var(--muted); margin-top:1mm }
+/* cover */
+.cover{ height:258mm; display:flex; flex-direction:column; justify-content:space-between }
+.cover .eyebrow{ color:var(--gold); letter-spacing:3px; font-size:9pt; font-weight:600; text-transform:uppercase }
+.cover h1{ font-size:40pt; margin:4mm 0 2mm }
+.cover .sub{ font-family:'Source Serif 4',Georgia,serif; font-style:italic; font-size:15pt; color:var(--muted) }
+.toc{ columns:2; column-gap:8mm; font-size:10.5pt } .toc div{ margin:0 0 1.3mm }
+.toc span{ color:var(--gold); font-weight:600; display:inline-block; width:7mm }
+.pitch{ font-size:11.5pt }
+</style>
+</head>
+<body>
+
+<!-- ================= COVER ================= -->
+<div class="cover">
+  <div>
+    <div class="eyebrow">CS307 · Viva preparation guide</div>
+    <h1>INSIDE, explained simply</h1>
+    <div class="sub">Everything you need to know about the paper, our code and our results, without the heavy maths</div>
+    <p class="small" style="margin-top:4mm">Paper: Chen et al., “INSIDE: LLMs’ Internal States Retain the Power of Hallucination Detection”, ICLR 2024.<br>
+    Team: Aayaan Ali Khan (202411001) · Shlok Bhavsar (202411018) · Prapti Chotaliya (202411030)</p>
+  </div>
+
+  <div class="box say pitch">
+    <span class="tag">The 30-second answer to “what did you do?”</span>
+    Large language models sometimes make things up and sound just as confident when they do. The paper INSIDE detects this by asking the model the same question 10 times and looking <i>inside</i> the model at how different those 10 answers are in meaning. If the answers scatter, the model is probably guessing. We took the authors’ code, which did not run, fixed 12 bugs, wrote the missing “feature clipping” part ourselves, made it run on an 8 GB laptop GPU, and reproduced the paper’s main result: their method, EigenScore, is the best of the five detectors, in exactly the paper’s order.
+  </div>
+
+  <div>
+    <h3 style="margin-top:0">Contents</h3>
+    <div class="toc">
+      <div><span>1</span>The problem: hallucination</div>
+      <div><span>2</span>Words you must know</div>
+      <div><span>3</span>How others detect it (baselines)</div>
+      <div><span>4</span>Idea 1: EigenScore</div>
+      <div><span>5</span>Idea 2: Feature clipping</div>
+      <div><span>6</span>How detectors are scored</div>
+      <div><span>7</span>What we built</div>
+      <div><span>8</span>The code, file by file</div>
+      <div><span>9</span>Setup and results</div>
+      <div><span>10</span>Limitations</div>
+      <div><span>11</span>End-semester plan</div>
+      <div><span>12</span>Likely viva questions</div>
+      <div><span>13</span>One-page number sheet</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 1 ================= -->
+<div class="section pb">
+<h2><span class="num">1</span>The problem: hallucination</h2>
+<p class="lead">A <b>hallucination</b> is when a language model gives an answer that is fluent and confident but factually wrong.</p>
+<p>Example: you ask “In which year did the bridge open?” and the model says “1928” in a perfectly normal tone, when the real answer is 1932. Nothing in the wording tells you it is wrong.</p>
+<p>This is dangerous wherever people trust the answer: medical, legal, education, search. So we want a <b>hallucination detector</b>: a number that says “this answer is probably wrong, double-check it”.</p>
+
+<h3>The hard part</h3>
+<ul>
+  <li>At the moment the model answers, <b>we do not know the correct answer</b>. If we did, we wouldn’t need the model.</li>
+  <li>We also don’t want to call Google or a database to fact-check every answer. That is slow and not always possible.</li>
+  <li>So the detector must work using <b>only the model itself</b>.</li>
+</ul>
+
+<h3>The key intuition the whole paper rests on</h3>
+<div class="box eg"><span class="tag">Analogy</span>
+Ask a student the same question five times. If they really know it, they give the same answer every time. If they are guessing, they say a different thing each time. <b>Inconsistency is a sign of guessing.</b> The paper does the same with the model: sample several answers and measure how much they disagree.
+</div>
+<p>Others had this idea before (for example, comparing the words of the answers). INSIDE’s new twist is <b>where</b> it measures the disagreement: not in the words, but in the model’s internal “thoughts”. That is why the paper is called INSIDE.</p>
+<div class="box note"><span class="tag">What INSIDE stands for</span>
+<b>IN</b>ternal <b>S</b>tates for halluc<b>I</b>nation <b>DE</b>tection. It is the name of the overall framework; <b>EigenScore</b> is the actual score it computes.</div>
+</div>
+
+<!-- ================= 2 ================= -->
+<div class="section">
+<h2><span class="num">2</span>Words you must know</h2>
+<table>
+<tr><th style="width:24%">Term</th><th>Plain meaning</th></tr>
+<tr><td><b>LLM</b></td><td>Large language model, e.g. LLaMA. It writes text one small piece at a time.</td></tr>
+<tr><td><b>Token</b></td><td>One small piece of text (a word or part of a word). The model predicts the next token, then the next, and so on.</td></tr>
+<tr><td><b>Layer</b></td><td>The model is a stack of processing stages. LLaMA-7B has 32. Text goes in at the bottom, the prediction comes out at the top.</td></tr>
+<tr><td><b>Hidden state / embedding</b></td><td>At every layer the model keeps a list of numbers describing “what it currently understands”. For LLaMA-7B this list has <b>4096 numbers</b>. Think of it as the model’s internal notes. Two sentences with the same meaning get similar lists.</td></tr>
+<tr><td><b>Sampling</b></td><td>Generating with some randomness, so the same question can give different answers. This is what lets us ask “10 times”.</td></tr>
+<tr><td><b>Temperature</b> (0.5)</td><td>How random the sampling is. 0 = always the same answer; higher = more varied. 0.5 is moderate.</td></tr>
+<tr><td><b>Top-p / top-k</b></td><td>Only pick the next token from the most likely options (top 99% of probability / top k tokens). Prevents silly words.</td></tr>
+<tr><td><b>K</b> (= 10)</td><td>Number of answers sampled per question.</td></tr>
+<tr><td><b>Logits / probabilities</b></td><td>The model’s scores for each possible next token. Older detectors use only these.</td></tr>
+<tr><td><b>Activation / neuron</b></td><td>One of the numbers inside a hidden state. “Extreme activation” = one of these numbers is unusually large.</td></tr>
+<tr><td><b>Penultimate layer</b></td><td>The second-to-last layer (layer 31 of 32).</td></tr>
+<tr><td><b>CoQA</b></td><td>The question-answering dataset we used: a short story followed by questions about it. 7,983 questions.</td></tr>
+<tr><td><b>ROUGE-L</b></td><td>A score (0 to 1) for how much two texts overlap in words, based on the longest common sequence of words.</td></tr>
+<tr><td><b>AUROC</b></td><td>The score used to compare detectors. Explained in Section 6. 0.5 = coin toss, 1.0 = perfect.</td></tr>
+<tr><td><b>4-bit quantisation</b></td><td>Storing each model weight with 4 bits instead of 16, so the model fits in less memory. Slightly less precise.</td></tr>
+</table>
+</div>
+
+<!-- ================= 3 ================= -->
+<div class="section pb">
+<h2><span class="num">3</span>How others detect it: the four baselines</h2>
+<p>The paper compares EigenScore against four existing methods. You should be able to explain each in one line.</p>
+<table>
+<tr><th style="width:22%">Method</th><th style="width:40%">What it measures</th><th>Weakness</th></tr>
+<tr><td><b>Perplexity</b></td><td>How unsure the model was about each word of <i>one</i> answer (average over its tokens).</td><td>Being sure of each word ≠ being right. Fluent wrong answers score well.</td></tr>
+<tr><td><b>LN-Entropy</b><br><span class="small">(length-normalised entropy)</span></td><td>How unsure the model was, averaged over the K answers, divided by answer length so long answers aren’t punished.</td><td>Still only looks at word-level confidence, not meaning.</td></tr>
+<tr><td><b>Energy score</b></td><td>A score from the raw logits, originally made to spot inputs that are “out of distribution” (unlike the training data).</td><td>Not designed for hallucination. In the paper and in our run it is close to chance (≈55).</td></tr>
+<tr><td><b>Lexical Similarity</b></td><td>Average word overlap (ROUGE-L) between every pair of the K answers. High overlap = consistent.</td><td>Compares <i>words</i>, not meaning. “1932” and “in the year nineteen thirty-two” look different.</td></tr>
+</table>
+<div class="box note"><span class="tag">The gap INSIDE fills</span>
+The first three only look at <b>word probabilities</b>. The fourth looks at <b>surface words</b>. Neither uses the model’s rich internal understanding, which is still there at the middle layers. INSIDE uses that.</div>
+<figure>
+<svg width="620" height="120" viewBox="0 0 620 120">
+  <rect x="5" y="20" width="180" height="80" rx="10" fill="#F3F0E9" stroke="#DDD7CB"/>
+  <rect x="220" y="20" width="180" height="80" rx="10" fill="#F3F0E9" stroke="#DDD7CB"/>
+  <rect x="435" y="20" width="180" height="80" rx="10" fill="#EAF1FA" stroke="#2F6DB0" stroke-width="2"/>
+  <text x="95" y="52" text-anchor="middle" font-family="IBM Plex Sans" font-size="14" font-weight="600" fill="#15233B">Word probabilities</text>
+  <text x="95" y="74" text-anchor="middle" font-family="IBM Plex Sans" font-size="11" fill="#5B6576">Perplexity, LN-Entropy, Energy</text>
+  <text x="310" y="52" text-anchor="middle" font-family="IBM Plex Sans" font-size="14" font-weight="600" fill="#15233B">Output words</text>
+  <text x="310" y="74" text-anchor="middle" font-family="IBM Plex Sans" font-size="11" fill="#5B6576">Lexical Similarity</text>
+  <text x="525" y="52" text-anchor="middle" font-family="IBM Plex Sans" font-size="14" font-weight="600" fill="#2F6DB0">Internal states</text>
+  <text x="525" y="74" text-anchor="middle" font-family="IBM Plex Sans" font-size="11" fill="#2F6DB0">INSIDE / EigenScore</text>
+</svg>
+<figcaption>Three places a detector can look. INSIDE is the only one that reads the model’s internal notes.</figcaption>
+</figure>
+</div>
+
+<!-- ================= 4 ================= -->
+<div class="section pb">
+<h2><span class="num">4</span>Idea 1: EigenScore</h2>
+<p class="lead">EigenScore answers one question: <b>“How spread out are the 10 answers, in terms of meaning?”</b></p>
+
+<h3>Step by step</h3>
+<ol>
+  <li><b>Ask 10 times.</b> Sample K = 10 answers to the same question (temperature 0.5).</li>
+  <li><b>Take one “meaning fingerprint” per answer.</b> For each answer, read the hidden state at the <b>middle layer</b> (layer 16 of 32) at the <b>last token</b> of the answer. That is a list of 4096 numbers that summarises the answer’s meaning.</li>
+  <li><b>Measure how differently the 10 fingerprints vary.</b> Build a small 10 × 10 table (the <b>covariance matrix</b>) saying how each pair of answers varies together.</li>
+  <li><b>Read off the spread.</b> Take the table’s <b>eigenvalues</b>: each one says how much spread there is in one main direction.</li>
+  <li><b>Combine into one number.</b> EigenScore = the average of the logs of those eigenvalues. <b>High = answers disagree = likely hallucination.</b></li>
+</ol>
+
+<figure>
+<svg width="600" height="190" viewBox="0 0 600 190">
+  <rect x="5" y="5" width="285" height="150" rx="10" fill="#FFFFFF" stroke="#DDD7CB"/>
+  <rect x="310" y="5" width="285" height="150" rx="10" fill="#FFFFFF" stroke="#DDD7CB"/>
+  <g fill="#2F6DB0"><circle cx="140" cy="75" r="6"/><circle cx="152" cy="82" r="6"/><circle cx="146" cy="68" r="6"/><circle cx="158" cy="72" r="6"/><circle cx="135" cy="86" r="6"/><circle cx="150" cy="90" r="6"/><circle cx="162" cy="84" r="6"/><circle cx="142" cy="62" r="6"/><circle cx="132" cy="74" r="6"/><circle cx="156" cy="62" r="6"/></g>
+  <g fill="#D4A02F"><circle cx="350" cy="35" r="6"/><circle cx="520" cy="50" r="6"/><circle cx="440" cy="85" r="6"/><circle cx="560" cy="120" r="6"/><circle cx="345" cy="125" r="6"/><circle cx="500" cy="135" r="6"/><circle cx="400" cy="60" r="6"/><circle cx="560" cy="30" r="6"/><circle cx="470" cy="30" r="6"/><circle cx="385" cy="110" r="6"/></g>
+  <text x="147" y="178" text-anchor="middle" font-family="IBM Plex Sans" font-size="13" fill="#2F6DB0" font-weight="600">Model knows: tight cloud → LOW score</text>
+  <text x="452" y="178" text-anchor="middle" font-family="IBM Plex Sans" font-size="13" fill="#9A640C" font-weight="600">Model guesses: spread cloud → HIGH score</text>
+</svg>
+<figcaption>Each dot is one of the 10 answers’ meaning fingerprints (squashed to 2-D for the picture).</figcaption>
+</figure>
+
+<h3>The formula, read in plain words</h3>
+<div class="formula">EigenScore = (1/K) · log det(Σ + α·I) = average of log(eigenvalues)</div>
+<ul>
+  <li><b>Σ (covariance):</b> the 10 × 10 table of how the answers vary together.</li>
+  <li><b>Eigenvalues:</b> think of the cloud of points as a blob. Eigenvalues are like its length, width, height… in its main directions. Tight blob = all small; spread blob = large.</li>
+  <li><b>det (determinant):</b> the product of the eigenvalues, which is the <b>volume</b> of the blob. Log turns the product into a sum, then we average.</li>
+  <li><b>α = 0.001</b> is a tiny number added so we never take log(0) when answers are identical (a flat blob has zero volume).</li>
+</ul>
+<div class="box eg"><span class="tag">Tiny worked example</span>
+Identical answers → eigenvalues all ≈ 0, plus α = 0.001 → log<sub>10</sub>(0.001) = −3 → score ≈ <b>−3</b> (very low, trust it).<br>
+Very different answers → eigenvalues like 50, 20, 10… → logs ≈ 1.7, 1.3, 1… → score <b>much higher</b> (flag it).<br>
+Only the <i>ranking</i> of scores matters, so the base of the log (ours uses log<sub>10</sub>) doesn’t change any result.</div>
+
+<h3>Why these specific choices?</h3>
+<ul>
+  <li><b>Why the middle layer?</b> Early layers mostly hold surface information about words; the last layers are busy choosing the exact next word. The middle layers hold the most “meaning”. The paper tested every layer (its Figure 3b): the middle ones were clearly best.</li>
+  <li><b>Why the last token?</b> The model reads left to right, so the last token has “seen” the whole answer. The paper found it worked better than averaging all tokens.</li>
+  <li><b>Why only a 10 × 10 table, not 4096 × 4096?</b> We compare the 10 answers with each other, so the table is answers × answers. It gives the same useful eigenvalues and is tiny and cheap.</li>
+  <li><b>Why is it called an entropy?</b> For a bell-shaped cloud of points, log-volume is (up to a constant) its <b>differential entropy</b>, a standard measure of uncertainty. So EigenScore is literally “uncertainty about meaning”.</li>
+  <li><b>Why better than Lexical Similarity?</b> Two answers with different words but the same meaning get close fingerprints, so they aren’t wrongly counted as disagreeing.</li>
+</ul>
+</div>
+
+<!-- ================= 5 ================= -->
+<div class="section">
+<h2><span class="num">5</span>Idea 2: Test-time feature clipping</h2>
+<h3>The blind spot</h3>
+<p>EigenScore catches guessing. But sometimes the model is <b>confidently wrong</b>: it gives the same wrong answer all 10 times. The answers agree, the cloud is tight, the score is low, and the detector wrongly trusts it. The paper calls this a <b>self-consistent hallucination</b>.</p>
+
+<h3>The paper’s fix</h3>
+<p>The authors noticed that in the <b>penultimate layer</b> a few neurons sometimes take <b>extreme values</b>, much bigger than usual. They argue these extreme values push the model into being over-confident. So they <b>cap</b> them:</p>
+<ul>
+  <li>For each of the 4096 neurons, look at its recent values (a <b>memory bank</b> of the last <b>N = 3000 tokens</b>).</li>
+  <li>Find that neuron’s normal range: its <b>0.2nd percentile</b> (low limit) and <b>99.8th percentile</b> (high limit).</li>
+  <li>Any value outside the range is pulled back to the limit. Values inside are untouched.</li>
+  <li>This is done <b>while the model is generating</b>, so it changes the answers themselves. A less over-confident model produces more varied answers, and EigenScore can then notice it.</li>
+</ul>
+<div class="box eg"><span class="tag">Analogy</span>
+A volume limiter on a microphone: normal speech passes unchanged, only sudden shouts are turned down. Here a few “shouting” neurons are turned down so the model stops being overly sure of itself.</div>
+<div class="formula">FC(h) = min( max(h, h<sub>min</sub>), h<sub>max</sub> )   (clip h to [h<sub>min</sub>, h<sub>max</sub>])</div>
+<div class="box note"><span class="tag">Important for the viva</span>
+This half of the paper was <b>not in the authors’ released code at all</b>. We wrote it ourselves from the paper’s description (file <code>func/feature_clip.py</code>).</div>
+<p>In the paper, clipping improves EigenScore on CoQA from <b>79.3 to 80.4</b> (AUC<sub>s</sub>), only about +1 point. It is a small effect, which matters for our results (Section 9).</p>
+</div>
+
+<!-- ================= 6 ================= -->
+<div class="section">
+<h2><span class="num">6</span>How detectors are scored</h2>
+<h3>Step 1: label each answer right or wrong</h3>
+<p>For evaluation only, we do use the reference answer from the dataset. An answer is counted <b>correct if its ROUGE-L overlap with the reference is above 0.5</b>. This gives the paper’s <b>AUC<sub>r</sub></b> (r for ROUGE).</p>
+<p>The paper also uses a second rule, <b>AUC<sub>s</sub></b>: a sentence-embedding model (nli-roberta-large) says correct if the cosine similarity is above 0.9. We could not use that model, so we report AUC<sub>r</sub> only.</p>
+
+<h3>Step 2: AUROC, in one sentence</h3>
+<div class="box say"><span class="tag">Say this</span>
+AUROC is the chance that, if you pick one wrong answer and one right answer at random, the detector gives the wrong one the more suspicious score. 50% is a coin toss, 100% is perfect.</div>
+<p>The full name is Area Under the ROC Curve. The ROC curve plots “true positives caught” against “false alarms” as you slide the alarm threshold; the area under it is the AUROC. In the code, EigenScore is <b>negated</b> before computing AUROC so that “bigger = more trustworthy” for every method.</p>
+
+<h3>Step 3: is a difference real or luck? (paired bootstrap)</h3>
+<p>With only 250 questions, a 1–3 point difference could be luck. A <b>bootstrap</b> checks this:</p>
+<ol>
+  <li>Randomly re-pick 250 questions from our 250, with repeats allowed.</li>
+  <li>Compute both methods’ AUROC on that resample and note the difference.</li>
+  <li>Repeat <b>10,000 times</b>. The middle 95% of the differences is the <b>95% confidence interval (CI)</b>.</li>
+</ol>
+<p>“Paired” means both methods are always scored on the same resampled questions, which is fairer. If the CI does not include 0, the difference is unlikely to be luck.</p>
+<p class="small">The paper also reports PCC (Pearson correlation between the score and the correctness value). We focus on AUROC.</p>
+</div>
+
+<!-- ================= 7 ================= -->
+<div class="section pb">
+<h2><span class="num">7</span>What we built</h2>
+<p class="lead">We started from the authors’ official GitHub repository (<code>alibaba/eigenscore</code>, commit <code>ea8062a</code>). It <b>could not run</b>, and it was <b>missing feature clipping</b>.</p>
+
+<h3>The 12 blocking bugs we fixed (know 4–5 by heart)</h3>
+<table>
+<tr><th style="width:4%">#</th><th style="width:44%">Problem</th><th>Fix</th></tr>
+<tr><td>1</td><td>Imported a file (<code>dataeval.TruthfulQA</code>) that doesn’t exist → crashed at start.</td><td>Removed the import.</td></tr>
+<tr><td>2</td><td>Used <code>np.float</code>, removed in NumPy 1.24 → every EigenScore function crashed.</td><td>Changed to <code>np.float64</code>.</td></tr>
+<tr><td>3</td><td>Paths pointed to the authors’ own computer (<code>/disk1/chenchao/…</code>).</td><td>Paths relative to the repo, changeable by environment variables.</td></tr>
+<tr><td>4</td><td>Opened the log file before creating its folder.</td><td>Create the folder first.</td></tr>
+<tr><td>5</td><td>Imports only worked when run from inside one folder.</td><td>Proper package imports.</td></tr>
+<tr><td>6</td><td>Loaded a heavy library (selfcheckgpt) for code that was never used.</td><td>Load it only where used.</td></tr>
+<tr><td>7</td><td>Built a BERTScore model from a missing path for a disabled metric.</td><td>Removed it.</td></tr>
+<tr><td>8</td><td>Debugger (<code>ipdb</code>) imported at the top of files.</td><td>Commented out.</td></tr>
+<tr><td>9</td><td>Plot saved to a missing folder, then froze waiting for a screen.</td><td>Create folder, no pop-up window.</td></tr>
+<tr><td>10</td><td>File name parsing crashed for normal paths.</td><td>Pass the whole path.</td></tr>
+<tr><td>11</td><td><code>.to("cuda")</code> hard-coded 16 times, ignoring the device option.</td><td>Use the tensors’ own device.</td></tr>
+<tr><td>12</td><td><code>DEFAULT_DEVICE='cuda:7'</code> (a GPU we don’t have).</td><td>Left as is: that file isn’t used in our pipeline.</td></tr>
+</table>
+<div class="box note"><span class="tag">One extra bug found while running</span>
+To save memory we generate the 10 answers in small batches. The original code computed EigenScore <b>inside</b> the batch loop, so only the <b>last batch (2 of the 10 answers)</b> was used. We collect all 10 fingerprints first and compute the score once. A test checks this gives the original result when there is only one batch.</div>
+
+<h3>Feature clipping, written from scratch</h3>
+<ul>
+  <li><b>Memory bank</b> = a ring buffer holding the last 3000 tokens’ penultimate-layer values (when full, the oldest is overwritten).</li>
+  <li><b>Thresholds</b> = per-neuron 0.2% and 99.8% percentiles, recomputed when the bank changes.</li>
+  <li><b>Warm-up</b>: no clipping until at least 256 tokens are stored, so limits aren’t guessed from a handful of values.</li>
+  <li><b>Hook</b>: attached to the penultimate layer with a PyTorch <i>forward hook</i> (a function that runs every time that layer produces output), so clipping happens during generation.</li>
+</ul>
+
+<h3>Making a 7-billion-parameter model fit an 8 GB laptop GPU</h3>
+<ul>
+  <li><b>4-bit weights (NF4)</b>: the model shrinks from about 13.5 GB to about 3.9 GB.</li>
+  <li><b>Smaller batches</b>: generate the 10 answers 2 at a time (<code>--num_return_sequences 2</code>) but still keep K = 10 in total.</li>
+  <li><b><code>--low_memory</code></b>: normally the model returns every layer’s values for every token (gigabytes for long CoQA stories). EigenScore needs only one layer, so a hook saves just the middle layer. A test proves the result is identical.</li>
+</ul>
+
+<h3>8 automated tests (all pass)</h3>
+<ol>
+  <li>Everything imports.</li>
+  <li>Clipping thresholds equal <code>numpy.percentile</code>.</li>
+  <li>Clipping matches the paper’s equation.</li>
+  <li>Ring buffer wrap-around and warm-up work.</li>
+  <li>Batched (pooled) EigenScore = original EigenScore.</li>
+  <li>EigenScore is lower for consistent answers than for diverse ones.</li>
+  <li>Low-memory capture = full capture.</li>
+  <li>The code finds the right layers for LLaMA / OPT / Falcon / GPT-2.</li>
+</ol>
+</div>
+
+<!-- ================= 8 ================= -->
+<div class="section">
+<h2><span class="num">8</span>The code, file by file</h2>
+<table>
+<tr><th style="width:30%">File</th><th>What it does</th></tr>
+<tr><td><code>pipeline/generate.py</code></td><td>Main script. Loads the model and dataset, samples K answers per question, computes all scores, saves them to a <code>.pkl</code> file.</td></tr>
+<tr><td><code>func/metric.py</code></td><td>The scores: EigenScore (<code>getEigenIndicator_v0</code>), perplexity, energy, LN-entropy, lexical similarity.</td></tr>
+<tr><td><code>func/feature_clip.py</code></td><td><b>Ours.</b> FeatureClipper (memory bank, thresholds, hook) and the low-memory middle-layer capture.</td></tr>
+<tr><td><code>func/evalFunc.py</code></td><td>Labels answers right/wrong (ROUGE-L &gt; 0.5) and computes AUROC for every method.</td></tr>
+<tr><td><code>func/plot.py</code></td><td>Draws the ROC curves.</td></tr>
+<tr><td><code>models/_load_model.py</code></td><td>Loads the model (local folder, HuggingFace id, or short name), optionally in 4-bit.</td></tr>
+<tr><td><code>dataeval/coqa.py</code> etc.</td><td>Read the datasets and build prompts.</td></tr>
+<tr><td><code>tests/test_setup.py</code></td><td>The 8 tests.</td></tr>
+<tr><td><code>CHANGES.md</code>, <code>RESULTS.md</code></td><td>List of every fix, and our results with statistics.</td></tr>
+</table>
+
+<h3>What happens for one question</h3>
+<ol>
+  <li>Build the prompt: CoQA story + the question.</li>
+  <li><code>model.generate(...)</code> samples answers with temperature 0.5, top-p 0.99, top-k 10, max 256 new tokens, in batches until there are 10. If clipping is on, the hook clips the penultimate layer at every step.</li>
+  <li>From the word probabilities: perplexity, energy, LN-entropy.</li>
+  <li>From the 10 texts: lexical similarity (pairwise ROUGE-L).</li>
+  <li>From the middle-layer, last-token fingerprints: EigenScore.</li>
+  <li>Save everything. Afterwards, <code>evalFunc</code> compares each answer to the reference and computes AUROC.</li>
+</ol>
+
+<h3>The EigenScore code in 6 lines</h3>
+<pre class="mono" style="background:#F3F0E9;padding:3mm 4mm;border-radius:8px;white-space:pre-wrap;font-size:8.8pt;margin:2mm 0">alpha = 1e-3
+selected_layer = int(len(hidden_states[0]) / 2)                  # middle layer
+last_embeddings[i] = hidden_states[last_token_i][selected_layer][i]  # one 4096-number fingerprint per answer
+CovMatrix = torch.cov(last_embeddings)                         # 10 x 10 table
+u, s, vT = np.linalg.svd(CovMatrix + alpha * np.eye(10))       # s = eigenvalues
+eigenScore = np.mean(np.log10(s))                              # average log</pre>
+<p class="small">SVD of a symmetric covariance matrix gives exactly its eigenvalues; that’s why the code uses <code>svd</code>.</p>
+
+<h3>The commands</h3>
+<pre class="mono" style="background:#F3F0E9;padding:3mm 4mm;border-radius:8px;white-space:pre-wrap;font-size:8.6pt;margin:2mm 0">python -m pipeline.generate --model llama2-7b-hf --dataset coqa --load_in_4bit --low_memory \
+   --feature_clip --no_sentsim --num_generations_per_prompt 10 --num_return_sequences 2 \
+   --fraction_of_data_to_use 0.03132 --seed 2023
+python -m func.evalFunc data/output/llama2-7b-hf_coqa_10/0.pkl --correctness rouge
+python -m tests.test_setup        # 8/8 pass</pre>
+</div>
+
+<!-- ================= 9 ================= -->
+<div class="section pb">
+<h2><span class="num">9</span>Setup and results</h2>
+<h3>Our setup vs the paper’s</h3>
+<table>
+<tr><th style="width:26%"></th><th>Paper</th><th>Ours</th></tr>
+<tr><td>Model</td><td>LLaMA-7B, 16-bit</td><td>Llama-2-7B, 4-bit</td></tr>
+<tr><td>Data</td><td>CoQA, 7,983 questions</td><td>CoQA, 250 questions</td></tr>
+<tr><td>Hardware</td><td>not stated</td><td>RTX 4060 laptop, 8 GB</td></tr>
+<tr><td>K, temperature, top-p</td><td>10, 0.5, 0.99</td><td>same</td></tr>
+<tr><td>top-k</td><td>5</td><td>10 (repo default)</td></tr>
+<tr><td>α, p, N</td><td>0.001, 0.2%, 3000</td><td>same</td></tr>
+<tr><td>Correctness</td><td>ROUGE-L and sentence similarity</td><td>ROUGE-L only</td></tr>
+</table>
+<p>Because the model, precision and sample size differ, we test whether the <b>ranking</b> of methods reproduces, not the exact numbers. The model answered <b>36.8%</b> of the 250 questions correctly. Two runs, same seed (2023), same questions: one without and one with clipping. About 6 seconds per question.</p>
+
+<h3>Main result: the ranking reproduces exactly</h3>
+<table>
+<tr><th>Method (AUROC, CoQA)</th><th>Paper</th><th>Ours</th><th>Ours + clipping</th></tr>
+<tr class="hl"><td>EigenScore</td><td>80.8</td><td>83.5</td><td>82.5</td></tr>
+<tr><td>Lexical Similarity</td><td>77.8</td><td>80.5</td><td>79.3</td></tr>
+<tr><td>LN-Entropy</td><td>73.6</td><td>77.5</td><td>77.3</td></tr>
+<tr><td>Perplexity</td><td>68.3</td><td>72.3</td><td>71.4</td></tr>
+<tr><td>Energy</td><td>54.7</td><td>54.7</td><td>53.1</td></tr>
+</table>
+<div class="box say"><span class="tag">Say this</span>
+EigenScore &gt; Lexical Similarity &gt; LN-Entropy &gt; Perplexity &gt; Energy, the same order as the paper. Our numbers are within a few points of the paper’s despite a different, compressed model.</div>
+<div class="box note"><span class="tag">A detail examiners like</span>
+The paper’s EigenScore of 80.8 <b>already includes feature clipping</b> (its baselines don’t). So the fair comparison for 80.8 is our clipped run, <b>82.5</b>.</div>
+
+<h3>Is EigenScore really better than Lexical Similarity?</h3>
+<p>Paired bootstrap, 10,000 resamples: EigenScore is ahead by <b>+2.9 points</b>, 95% CI <b>[−0.6, +6.5]</b>, and better in <b>95%</b> of resamples. This matches the paper’s ~+3 on CoQA. The interval just touches 0, simply because 250 questions is a small sample.</p>
+
+<h3>Did feature clipping help?</h3>
+<p>Change with clipping: <b>−1.0 point</b>, 95% CI <b>[−4.7, +2.6]</b>, helps in only 30% of resamples. The paper claims <b>+1.1</b>. Our interval contains both 0 and +1.1, so the result is <b>inconclusive</b>: we can neither confirm nor reject the paper’s claim. A 1-point effect needs far more than 250 questions; the paper used 7,983.</p>
+<p>We confirmed clipping was really working: <b>13,749,839</b> of 1,159,186 × 4096 values were clipped = <b>0.29%</b>. That is just under the 0.4% maximum expected (0.2% per side).</p>
+<p class="small">We also measured AUC<sub>r</sub> where the paper’s clipping table uses AUC<sub>s</sub>, so they are not exactly the same measurement.</p>
+</div>
+
+<!-- ================= 10 + 11 ================= -->
+<div class="section">
+<h2><span class="num">10</span>Limitations</h2>
+<h3>Of the method itself</h3>
+<ul>
+  <li><b>Cost:</b> needs 10 to 20 answers per question, so 10 to 20 times the compute of answering once.</li>
+  <li><b>Needs access to the model’s insides:</b> can’t be used with closed APIs like ChatGPT, which only return text.</li>
+  <li><b>One hand-picked layer:</b> always the middle layer, yet the paper’s own test shows the score changes by several points depending on the layer.</li>
+  <li><b>Confident mistakes:</b> still hard; clipping only helps slightly.</li>
+  <li><b>Short answers:</b> on TriviaQA (one- or two-word answers) plain perplexity did as well or better in the paper.</li>
+  <li><b>It only detects</b> a likely hallucination; it doesn’t correct it.</li>
+</ul>
+<h3>Of our reproduction</h3>
+<ul>
+  <li>250 questions → confidence intervals of about ±4 points; a full run would take about 13 hours per setting on our GPU.</li>
+  <li>Llama-2 in 4-bit instead of LLaMA in 16-bit.</li>
+  <li>ROUGE-L correctness only (no AUC<sub>s</sub>).</li>
+  <li>top-k 10 instead of 5.</li>
+</ul>
+
+<h2 style="margin-top:7mm"><span class="num">11</span>End-semester plan</h2>
+<table>
+<tr><th style="width:26%">Extension</th><th>Idea</th><th style="width:28%">Why</th></tr>
+<tr class="hl"><td>Multi-layer EigenScore (main)</td><td>Combine the score from a band of middle layers (e.g. 12–20), with normalised fingerprints, instead of one hand-picked layer.</td><td>Removes a model-dependent choice; more robust across models.</td></tr>
+<tr><td>Hybrid detector</td><td>Combine EigenScore with token confidence (LN-Entropy).</td><td>When all answers agree, word-level confidence is the only signal left: targets confident mistakes.</td></tr>
+<tr><td>Adaptive K (stretch)</td><td>Sample answers one at a time; stop as soon as the score is clearly low or high.</td><td>Cuts the 10× cost.</td></tr>
+<tr><td>Foundation</td><td colspan="2">Full CoQA (and NQ) run, add sentence-similarity AUROC, use top-k 5; judge every gain with the same paired bootstrap.</td></tr>
+</table>
+</div>
+
+<!-- ================= 12 ================= -->
+<div class="section pb">
+<h2><span class="num">12</span>Likely viva questions</h2>
+
+<div class="qa"><div class="q">What is a hallucination and why is it hard to detect?</div><div class="a">A fluent, confident but wrong answer. It’s hard because at answer time there’s no correct answer to compare with, and the wording looks normal.</div></div>
+<div class="qa"><div class="q">Explain EigenScore in one minute.</div><div class="a">Ask the model 10 times. For each answer take the middle-layer, last-token hidden state as a meaning fingerprint. Build the 10 × 10 covariance of these fingerprints; its eigenvalues tell how spread out the answers are. The average log eigenvalue is the score: high means the answers disagree, so it’s probably a hallucination.</div></div>
+<div class="qa"><div class="q">Why internal states instead of the output text?</div><div class="a">Turning internal states into words throws information away. Hidden states keep the meaning, so two differently worded but equivalent answers look similar, while word overlap would call them different.</div></div>
+<div class="qa"><div class="q">What is an eigenvalue here, intuitively?</div><div class="a">The amount of spread of the answers along one main direction. Small eigenvalues = answers bunched together; large = spread out.</div></div>
+<div class="qa"><div class="q">Why add α = 0.001?</div><div class="a">If the answers are identical the eigenvalues are 0 and log(0) is undefined. α keeps the matrix invertible and sets a floor; it’s too small to affect normal cases.</div></div>
+<div class="qa"><div class="q">Why the middle layer and the last token?</div><div class="a">The paper tested layers: middle layers hold the most meaning; early ones are surface-level and the last ones focus on picking the next word. The last token has seen the whole answer, and beat averaging all tokens.</div></div>
+<div class="qa"><div class="q">How is EigenScore related to entropy?</div><div class="a">For a Gaussian (bell-shaped) cloud, the log-determinant of the covariance is its differential entropy up to a constant. So EigenScore measures uncertainty in meaning-space.</div></div>
+<div class="qa"><div class="q">What is a self-consistent hallucination and how does clipping help?</div><div class="a">When the model gives the same wrong answer every time, so consistency checks trust it. Clipping caps rare extreme neuron values in the penultimate layer, which the paper links to over-confidence, so the model varies more and EigenScore can catch it.</div></div>
+<div class="qa"><div class="q">How did you implement clipping?</div><div class="a">A FeatureClipper class: ring-buffer memory of the last 3000 tokens, per-neuron 0.2% / 99.8% percentiles, clamp values outside, 256-token warm-up, attached as a forward hook on the penultimate layer so it acts during generation. Tested against numpy.percentile.</div></div>
+<div class="qa"><div class="q">What is AUROC?</div><div class="a">The probability that a randomly chosen wrong answer gets a more suspicious score than a randomly chosen right one. 0.5 = chance, 1 = perfect.</div></div>
+<div class="qa"><div class="q">How did you decide if an answer was correct?</div><div class="a">ROUGE-L overlap with the reference answer above 0.5 (the paper’s AUC<sub>r</sub>). Used only for evaluation, never by the detector.</div></div>
+<div class="qa"><div class="q">Your numbers are higher than the paper’s. Why?</div><div class="a">Different model (Llama-2 vs LLaMA-1), 4-bit precision, only 250 questions and top-k 10. That’s why we compare the ranking, which matched exactly. With ±4-point intervals, a few points of difference is expected.</div></div>
+<div class="qa"><div class="q">Why only 250 questions?</div><div class="a">An 8 GB laptop GPU at about 6 seconds per question: the full 7,983 would take about 13 hours per setting. Planned for end-sem.</div></div>
+<div class="qa"><div class="q">Feature clipping made things worse in your run. Is the paper wrong?</div><div class="a">No conclusion either way. The change was −1.0 with a 95% interval of [−4.7, +2.6], which includes both 0 and the paper’s +1.1. The effect is too small to measure with 250 questions. We did verify clipping was active (0.29% of values clipped).</div></div>
+<div class="qa"><div class="q">What is a bootstrap confidence interval?</div><div class="a">Resample our 250 questions with replacement 10,000 times, recompute the difference each time; the middle 95% of those differences is the interval. If it excludes 0, the difference is unlikely to be luck.</div></div>
+<div class="qa"><div class="q">Why is Energy so bad?</div><div class="a">It was built to detect unusual inputs (out-of-distribution), not wrong answers. The paper includes it to show that OOD methods don’t transfer; it’s near chance both there and in our run.</div></div>
+<div class="qa"><div class="q">Why 4-bit? Doesn’t it change the model?</div><div class="a">Slightly, but it was the only way to fit a 7B model plus its hidden states into 8 GB (13.5 GB → 3.9 GB). Since the ranking still matched the paper, the method seems robust to it.</div></div>
+<div class="qa"><div class="q">What did <code>--low_memory</code> do and how do you know it’s correct?</div><div class="a">Instead of storing every layer for every token, a hook saves only the middle layer EigenScore needs. A test shows the scores are identical to the full method.</div></div>
+<div class="qa"><div class="q">What was wrong with the original code?</div><div class="a">It couldn’t start (missing module, removed NumPy type, hard-coded paths to the authors’ machine and GPU, etc.: 12 blocking bugs), feature clipping was missing, and when batching it used only 2 of the 10 answers. All listed in CHANGES.md.</div></div>
+<div class="qa"><div class="q">Why is the covariance 10 × 10 and not 4096 × 4096?</div><div class="a">We compare answers with each other, so it’s answers × answers. It contains the same non-zero spread information and is far cheaper.</div></div>
+<div class="qa"><div class="q">What is K and does it matter?</div><div class="a">Number of sampled answers. The paper found accuracy rises until about 15 and then flattens; K = 20 was its best trade-off. We used 10 like its main experiments.</div></div>
+<div class="qa"><div class="q">Can this be used on ChatGPT?</div><div class="a">Not directly: it needs the model’s hidden states, which closed APIs don’t expose. It works for open models like LLaMA.</div></div>
+<div class="qa"><div class="q">What will you add by end-sem and why?</div><div class="a">Multi-layer EigenScore (remove the hand-picked layer), a hybrid with token confidence (catch confident mistakes), and adaptive K (reduce cost), all evaluated at full scale with the same bootstrap.</div></div>
+<div class="qa"><div class="q">What is temperature and why 0.5?</div><div class="a">It controls randomness in sampling. We need some variety to compare answers, but not so much that even known facts come out differently. 0.5 is the paper’s setting.</div></div>
+<div class="qa"><div class="q">Who did what?</div><div class="a">[Fill in before the viva: e.g. bug fixes, clipping implementation, experiments and statistics, report and video.]</div></div>
+</div>
+
+<!-- ================= 13 ================= -->
+<div class="section pb tight">
+<h2><span class="num">13</span>One-page number sheet</h2>
+<div class="grid2">
+<table>
+<tr><th colspan="2">Method settings</th></tr>
+<tr><td>K (answers per question)</td><td><b>10</b></td></tr>
+<tr><td>Temperature / top-p / top-k</td><td>0.5 / 0.99 / 10 (paper 5)</td></tr>
+<tr><td>Layer used</td><td>middle: 16 of 32</td></tr>
+<tr><td>Token used</td><td>last token of the answer</td></tr>
+<tr><td>Fingerprint size</td><td>4096 numbers</td></tr>
+<tr><td>α</td><td>0.001</td></tr>
+<tr><td>Clipping layer</td><td>penultimate (31 of 32)</td></tr>
+<tr><td>Clipping percentile p</td><td>0.2% each side</td></tr>
+<tr><td>Memory bank N</td><td>3000 tokens</td></tr>
+<tr><td>Warm-up before clipping</td><td>256 tokens</td></tr>
+<tr><td>Correct if</td><td>ROUGE-L &gt; 0.5</td></tr>
+</table>
+<table>
+<tr><th colspan="2">Our experiment</th></tr>
+<tr><td>Model</td><td>Llama-2-7B, 4-bit NF4</td></tr>
+<tr><td>GPU</td><td>RTX 4060 laptop, 8 GB</td></tr>
+<tr><td>Questions</td><td>250 CoQA (paper 7,983)</td></tr>
+<tr><td>Seed</td><td>2023</td></tr>
+<tr><td>Model accuracy</td><td>36.8%</td></tr>
+<tr><td>Speed</td><td>~6 s / question</td></tr>
+<tr><td>Bugs fixed</td><td>12 (+1 batching bug)</td></tr>
+<tr><td>Tests</td><td>8 / 8 pass</td></tr>
+<tr><td>Memory: 16-bit → 4-bit</td><td>13.5 GB → 3.9 GB</td></tr>
+<tr><td>Values clipped</td><td>0.29% (max expected 0.4%)</td></tr>
+</table>
+</div>
+<table>
+<tr><th>AUROC (CoQA)</th><th>Paper</th><th>Ours</th><th>Ours + FC</th></tr>
+<tr class="hl"><td>EigenScore</td><td>80.8 (with FC)</td><td>83.5</td><td>82.5</td></tr>
+<tr><td>Lexical Similarity</td><td>77.8</td><td>80.5</td><td>79.3</td></tr>
+<tr><td>LN-Entropy</td><td>73.6</td><td>77.5</td><td>77.3</td></tr>
+<tr><td>Perplexity</td><td>68.3</td><td>72.3</td><td>71.4</td></tr>
+<tr><td>Energy</td><td>54.7</td><td>54.7</td><td>53.1</td></tr>
+</table>
+<table>
+<tr><th>Statistical checks (paired bootstrap, 10,000 resamples)</th><th>Difference</th><th>95% CI</th><th>Verdict</th></tr>
+<tr><td>EigenScore − Lexical Similarity</td><td>+2.9</td><td>[−0.6, +6.5]</td><td>better in 95% of resamples; matches paper’s ~+3</td></tr>
+<tr><td>Feature clipping effect on EigenScore</td><td>−1.0</td><td>[−4.7, +2.6]</td><td>inconclusive (paper: +1.1)</td></tr>
+</table>
+<table>
+<tr><th colspan="2">Paper facts</th></tr>
+<tr><td>Venue</td><td>ICLR 2024, Chen et al. (Alibaba); code: github.com/alibaba/eigenscore</td></tr>
+<tr><td>Models in paper</td><td>LLaMA-7B, LLaMA-13B, OPT-6.7B</td></tr>
+<tr><td>Datasets in paper</td><td>CoQA, SQuAD, NQ, TriviaQA</td></tr>
+<tr><td>Clipping gain in paper</td><td>CoQA EigenScore 79.3 → 80.4 (AUC<sub>s</sub>)</td></tr>
+<tr><td>Best K in paper</td><td>gains flatten after ~15; K = 20 suggested</td></tr>
+</table>
+</div>
+
+</body>
+</html>
