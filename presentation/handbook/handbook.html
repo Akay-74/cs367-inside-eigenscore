@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Project Handbook</title>
+<link rel="stylesheet" href="../poster/fonts_formal/fonts.css">
+<style>
+@page { size: A4; margin: 17mm 17mm 18mm 17mm; }
+:root{ --navy:#24405F; --slate:#3B5B7E; --blue:#2C5D8F; --amber:#C46A1D; --ink:#1A1A1A; --text:#2B2B2B; --muted:#5E6470; --rule:#C9CED6; --tint:#F2F5FA; --amberbg:#FBF1E6; }
+*{ box-sizing:border-box }
+html{ -webkit-print-color-adjust:exact; print-color-adjust:exact }
+body{ margin:0; font-family:'Lato',Arial,sans-serif; font-size:10.4pt; line-height:1.5; color:var(--text) }
+h1,h2,h3,h4{ font-family:'Merriweather',Georgia,serif; color:var(--navy); line-height:1.25; margin:0 }
+h2{ font-size:17pt; margin:0 0 4mm; padding-bottom:2mm; border-bottom:.6mm solid var(--slate); break-after:avoid }
+h2 .n{ color:var(--amber); margin-right:3mm }
+h3{ font-size:12.3pt; margin:5mm 0 1.8mm; break-after:avoid }
+h4{ font-size:10.8pt; margin:3.5mm 0 1.2mm; color:var(--ink); break-after:avoid }
+p{ margin:0 0 2.6mm; text-align:justify } ul,ol{ margin:0 0 2.6mm; padding-left:6mm } li{ margin-bottom:1mm }
+b{ color:var(--ink) }
+.chapter{ break-before:page }
+code, .mono{ font-family:'Courier New',monospace; font-size:9.2pt; background:#EEF1F5; padding:0 1.2mm; border-radius:1mm }
+pre{ font-family:'Courier New',monospace; font-size:8.7pt; line-height:1.35; background:#F4F6F9; border-left:1mm solid var(--slate); padding:2.6mm 3.5mm; margin:2mm 0 3mm; white-space:pre-wrap; break-inside:avoid }
+table{ width:100%; border-collapse:collapse; font-size:9.6pt; margin:1.5mm 0 3.5mm; break-inside:avoid }
+th{ text-align:left; border-top:.45mm solid var(--ink); border-bottom:.3mm solid var(--ink); padding:1.4mm 2mm; color:var(--ink) }
+td{ padding:1.3mm 2mm; border-bottom:.2mm solid var(--rule); vertical-align:top }
+tr:last-child td{ border-bottom:.45mm solid var(--ink) }
+td.num, th.num{ text-align:right; font-variant-numeric:tabular-nums } tr.hl td{ background:var(--tint); font-weight:700; color:var(--navy) }
+.box{ border-left:1.2mm solid var(--slate); background:var(--tint); padding:2.6mm 4mm; margin:2.5mm 0 3.5mm; break-inside:avoid }
+.box.amber{ border-left-color:var(--amber); background:var(--amberbg) }
+.box .t{ display:block; font-size:8.6pt; letter-spacing:1.4px; text-transform:uppercase; font-weight:700; color:var(--slate); margin-bottom:.8mm }
+.box.amber .t{ color:var(--amber) }
+figure{ margin:2.5mm 0 3.5mm; text-align:center; break-inside:avoid } figcaption{ font-size:8.8pt; color:var(--muted); font-style:italic; margin-top:1mm }
+.eq{ font-family:'Merriweather',Georgia,serif; text-align:center; font-size:12.5pt; color:var(--ink); margin:2.5mm 0 }
+.grid2{ display:grid; grid-template-columns:1fr 1fr; gap:4mm }
+.qa{ margin:0 0 2.6mm; padding-bottom:2mm; border-bottom:.2mm solid var(--rule); break-inside:avoid }
+.qa .q{ font-weight:700; color:var(--navy) } .qa .q::before{ content:"Q. "; color:var(--amber) }
+.small{ font-size:9pt; color:var(--muted) }
+/* cover */
+.cover{ height:262mm; display:flex; flex-direction:column; justify-content:space-between }
+.cover .kicker{ font-size:10pt; letter-spacing:3px; text-transform:uppercase; color:var(--slate); font-weight:700 }
+.cover h1{ font-size:30pt; margin:5mm 0 3mm; color:var(--navy) }
+.cover .sub{ font-family:'Merriweather',Georgia,serif; font-style:italic; font-size:13pt; color:var(--muted) }
+.toc{ columns:2; column-gap:8mm; font-size:10pt } .toc div{ margin-bottom:1.3mm } .toc span{ display:inline-block; width:8mm; color:var(--amber); font-weight:700 }
+.status{ display:inline-block; font-size:8.3pt; font-weight:700; letter-spacing:.8px; padding:.3mm 2mm; border-radius:1mm }
+.status.done{ background:#E8EFF7; color:var(--blue) } .status.todo{ background:var(--amberbg); color:var(--amber) }
+svg text{ font-family:'Lato',Arial,sans-serif }
+</style>
+</head>
+<body>
+
+<!-- ================= COVER ================= -->
+<div class="cover">
+  <div>
+    <div class="kicker">Project Handbook · Internal team document</div>
+    <h1>LLM Hallucination Detection using EigenScore</h1>
+    <div class="sub">Everything about the project in one place: the idea, the method, our code, our results, our deliverables and the plan ahead</div>
+    <p class="small" style="margin-top:5mm">Team: Aayaan Ali Khan (202411001) · Shlok Bhavsar (202411018) · Prapti Chotaliya (202411030)<br>Indian Institute of Information Technology Vadodara</p>
+  </div>
+
+  <div class="box">
+    <span class="t">The project in 60 seconds</span>
+    Large language models (LLMs) sometimes give confident answers that are wrong. This is called <b>hallucination</b>. Our system detects it. It asks the model the same question <b>10 times</b>, reads the model’s <b>internal representation</b> of each answer (4,096 numbers from layer 16 of 32), and measures how spread out those 10 representations are using <b>eigenvalues</b>. The result is one number, the <b>EigenScore</b>: tight agreement gives a low score (trust the answer), wide disagreement a high score (flag it). The method comes from the research paper <i>INSIDE</i> (Chen et al., ICLR 2024). The authors’ code did not run, so we repaired it, wrote its missing half (<b>feature clipping</b>) ourselves, made a 7-billion-parameter model run on an <b>8 GB laptop GPU</b>, and tested it on 250 CoQA questions. It reaches <b>83.5% AUROC</b>: in 83.5% of (wrong, correct) answer pairs, it gives the wrong answer the higher score. Next we plan to improve the method itself (<b>multi-layer EigenScore</b>).
+  </div>
+
+  <div>
+    <h3 style="margin-top:0">Contents</h3>
+    <div class="toc">
+      <div><span>1</span>The big picture</div>
+      <div><span>2</span>Background concepts</div>
+      <div><span>3</span>The method in detail</div>
+      <div><span>4</span>What we built</div>
+      <div><span>5</span>Code walkthrough</div>
+      <div><span>6</span>How to run it</div>
+      <div><span>7</span>Experiment and results</div>
+      <div><span>8</span>Deliverables so far</div>
+      <div><span>9</span>Future plan</div>
+      <div><span>10</span>Likely questions and answers</div>
+      <div><span>11</span>Where everything is</div>
+      <div><span>A</span>Number sheet</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 1 ================= -->
+<div class="chapter">
+<h2><span class="n">1</span>The big picture</h2>
+<h3>1.1 The problem</h3>
+<p>LLMs such as Llama or ChatGPT write fluent text, but they sometimes state things that are false, in the same confident tone they use for true statements. This is called <b>hallucination</b>. A reader cannot tell a hallucinated answer from a correct one by looking at it. That is dangerous wherever people rely on the answer: education, search, medicine, law.</p>
+<div class="box"><span class="t">Problem statement</span>Build a system that, for any question given to an LLM, outputs a <b>hallucination score</b> estimating how likely the answer is to be wrong, <b>without access to the correct answer</b>, <b>without external fact-checking</b>, and able to run on a <b>consumer GPU with 8 GB of memory</b>.</div>
+<h3>1.2 The core idea in one picture</h3>
+<p>If you ask a student the same question several times and they really know it, they give the same answer every time. If they are guessing, the answers change. We do the same with the model: <b>ask 10 times, then measure how much the answers disagree</b>.</p>
+<figure>
+<svg width="100%" viewBox="0 0 560 120">
+  <rect x="1" y="1" width="558" height="118" fill="#fff" stroke="#C9CED6"/>
+  <text x="280" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1A1A1A">“In which year did the bridge open?”, asked 5 times</text>
+  <text x="14" y="58" font-size="12.5" font-weight="700" fill="#2C5D8F">Model knows</text>
+  <g font-size="12.5" fill="#2C5D8F"><rect x="130" y="42" width="60" height="22" fill="#E8EFF7" stroke="#A9C1DC"/><text x="160" y="58" text-anchor="middle">1932</text><rect x="198" y="42" width="60" height="22" fill="#E8EFF7" stroke="#A9C1DC"/><text x="228" y="58" text-anchor="middle">1932</text><rect x="266" y="42" width="60" height="22" fill="#E8EFF7" stroke="#A9C1DC"/><text x="296" y="58" text-anchor="middle">1932</text><rect x="334" y="42" width="60" height="22" fill="#E8EFF7" stroke="#A9C1DC"/><text x="364" y="58" text-anchor="middle">1932</text><rect x="402" y="42" width="60" height="22" fill="#E8EFF7" stroke="#A9C1DC"/><text x="432" y="58" text-anchor="middle">1932</text></g>
+  <text x="14" y="96" font-size="12.5" font-weight="700" fill="#C46A1D">Model guesses</text>
+  <g font-size="12.5" fill="#C46A1D"><rect x="130" y="80" width="60" height="22" fill="#FBF1E6" stroke="#E7C29B"/><text x="160" y="96" text-anchor="middle">1932</text><rect x="198" y="80" width="60" height="22" fill="#FBF1E6" stroke="#E7C29B"/><text x="228" y="96" text-anchor="middle">1928</text><rect x="266" y="80" width="60" height="22" fill="#FBF1E6" stroke="#E7C29B"/><text x="296" y="96" text-anchor="middle">1936</text><rect x="334" y="80" width="60" height="22" fill="#FBF1E6" stroke="#E7C29B"/><text x="364" y="96" text-anchor="middle">1941</text><rect x="402" y="80" width="60" height="22" fill="#FBF1E6" stroke="#E7C29B"/><text x="432" y="96" text-anchor="middle">1930</text></g>
+  <text x="480" y="58" font-size="12" font-weight="700" fill="#2C5D8F">→ trust</text><text x="480" y="96" font-size="12" font-weight="700" fill="#C46A1D">→ flag</text>
+</svg>
+<figcaption>Figure 1. Agreement signals knowledge; scattered answers signal guessing (illustrative example).</figcaption>
+</figure>
+<p>The clever part: we do not compare the <i>words</i> of the answers. We compare the model’s <b>internal representation</b> of each answer, a list of numbers that captures its meaning. “1932” and “in nineteen thirty-two” share no words, but they mean the same thing.</p>
+
+<h3>1.3 Where the idea comes from, and what is ours</h3>
+<table>
+<tr><th style="width:38%">From the research paper (INSIDE, ICLR 2024)</th><th>Done by us</th></tr>
+<tr><td>The EigenScore idea and formula</td><td>Got the authors’ broken code running: fixed <b>12 blocking bugs</b> + 1 hidden scoring bug</td></tr>
+<tr><td>The feature-clipping idea (described in words only)</td><td><b>Implemented feature clipping from scratch</b>; it was missing from the released code</td></tr>
+<tr><td>Experiments on large GPUs</td><td>Made a 7B model run on an <b>8 GB laptop GPU</b> (4-bit weights, one-layer capture)</td></tr>
+<tr><td>—</td><td><b>8 automated tests</b>, a full experiment on 250 CoQA questions, statistical analysis (bootstrap)</td></tr>
+<tr><td>—</td><td>Report, explainer video with voiceover, viva guide, design-project poster</td></tr>
+<tr><td>—</td><td>A proposed improvement (multi-layer EigenScore) with a ready experiment plan</td></tr>
+</table>
+
+<h3>1.4 Timeline so far</h3>
+<table>
+<tr><th style="width:24%">Stage</th><th>What happened</th><th style="width:14%">Status</th></tr>
+<tr><td>Paper selection</td><td>Chose INSIDE (ICLR 2024) on LLM hallucination detection</td><td><span class="status done">DONE</span></td></tr>
+<tr><td>Implementation</td><td>Repaired code, added feature clipping, 8 GB GPU support, tests</td><td><span class="status done">DONE</span></td></tr>
+<tr><td>Experiment</td><td>250 CoQA questions, with and without clipping, on an RTX 4060 laptop</td><td><span class="status done">DONE</span></td></tr>
+<tr><td>Mid-semester (CS307)</td><td>IEEE-format report, explainer video with 3 voices, viva</td><td><span class="status done">DONE</span></td></tr>
+<tr><td>Design-project poster</td><td>Formal A2 landscape poster, results verified</td><td><span class="status done">DONE</span></td></tr>
+<tr><td>Extension</td><td>Multi-layer EigenScore + normalisation + hybrid; plan and script ready</td><td><span class="status todo">TO RUN</span></td></tr>
+</table>
+</div>
+
+<!-- ================= 2 ================= -->
+<div class="chapter">
+<h2><span class="n">2</span>Background concepts</h2>
+<p>You only need these few ideas to understand the whole project.</p>
+<table>
+<tr><th style="width:24%">Term</th><th>Plain meaning</th></tr>
+<tr><td><b>LLM</b></td><td>Large language model. It writes text one small piece at a time, always predicting the next piece. We use <b>Llama-2-7B</b> (Meta; 7 billion parameters).</td></tr>
+<tr><td><b>Token</b></td><td>One small piece of text: a word or part of a word.</td></tr>
+<tr><td><b>Layer</b></td><td>The model is a stack of processing stages. Llama-2-7B has <b>32 layers</b>. Text enters at the bottom; the next-word prediction comes out of the top.</td></tr>
+<tr><td><b>Hidden state / embedding</b></td><td>At every layer and every token, the model keeps a list of <b>4,096 numbers</b> describing what it currently “understands”. Answers with similar meaning get similar lists. This is the <b>internal representation</b> we read.</td></tr>
+<tr><td><b>Sampling</b></td><td>Generating with some randomness so the same question can give different answers. Controlled by <b>temperature</b> (0.5 = moderate randomness) and <b>top-p</b> (0.99 = ignore the least likely 1% of words).</td></tr>
+<tr><td><b>K</b></td><td>Number of answers sampled per question. We use <b>K = 10</b>.</td></tr>
+<tr><td><b>Covariance matrix</b></td><td>A table describing how a set of items vary together. For our 10 answers it is a 10 × 10 table.</td></tr>
+<tr><td><b>Eigenvalues / eigenvectors</b></td><td>For a cloud of points: eigenvectors are its main directions of spread; eigenvalues are how much spread there is along each one (like the length, width and height of the cloud).</td></tr>
+<tr><td><b>Activation / neuron</b></td><td>One of the 4,096 numbers inside a layer. An “extreme activation” is one that is unusually large.</td></tr>
+<tr><td><b>4-bit quantisation (NF4)</b></td><td>Storing each model weight with 4 bits instead of 16 so the model needs about a quarter of the memory. Done with the <code>bitsandbytes</code> library.</td></tr>
+<tr><td><b>CoQA</b></td><td>The question-answering dataset we test on: a short story followed by questions about it (Stanford, 2019).</td></tr>
+<tr><td><b>ROUGE-L</b></td><td>A 0–1 score for how much two texts overlap in words (longest common word sequence). We count an answer as correct if its ROUGE-L with the reference answer is <b>above 0.5</b>.</td></tr>
+<tr><td><b>AUROC</b></td><td>How we grade a detector: the probability that, given one wrong and one correct answer, the detector gives the wrong one the more suspicious score. <b>50% = coin toss, 100% = perfect.</b></td></tr>
+<tr><td><b>Bootstrap / 95% CI</b></td><td>A way to check if a difference is real: re-sample our questions 10,000 times and see how much the result moves. The middle 95% of results is the confidence interval.</td></tr>
+</table>
+</div>
+
+<!-- ================= 3 ================= -->
+<div class="chapter">
+<h2><span class="n">3</span>The method in detail</h2>
+<h3>3.1 EigenScore, step by step</h3>
+<ol>
+  <li><b>Sample 10 answers.</b> Give the model the question and generate K = 10 answers with temperature 0.5 and top-p 0.99.</li>
+  <li><b>Read one vector per answer.</b> For each answer, take the hidden state at <b>layer 16</b> (the middle of 32) at the <b>last generated token</b>. That is 4,096 numbers.</li>
+  <li><b>Stack them.</b> Put the 10 vectors in a matrix <b>Z</b> of size 10 × 4,096.</li>
+  <li><b>Covariance.</b> Compute <b>C = cov(Z)</b>, a 10 × 10 matrix of how the answers vary together.</li>
+  <li><b>Eigenvalues.</b> Add a tiny constant α = 0.001 to the diagonal (C + αI) and take its 10 eigenvalues λ₁…λ₁₀.</li>
+  <li><b>Score.</b> EigenScore = the average of log₁₀(λᵢ). <b>Higher = answers disagree = likely hallucination.</b></li>
+</ol>
+<div class="eq">EigenScore = (1/K) · log det(C + αI) = (1/K) · Σ<sub>i</sub> log λ<sub>i</sub></div>
+<p class="small" style="text-align:center">det = determinant = product of eigenvalues = the “volume” of the cloud of answers. Taking log and averaging turns the product into an average.</p>
+<figure>
+<svg width="78%" viewBox="0 0 560 360" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#1A1A1A"/></marker></defs>
+<rect x="0" y="0" width="260" height="236" fill="#FFFFFF" stroke="#C9CED6"/>
+<line x1="12" y1="118" x2="248" y2="118" stroke="#E3E7ED"/><line x1="130" y1="14" x2="130" y2="222" stroke="#E3E7ED"/>
+<ellipse cx="130" cy="118" rx="24.1" ry="9.8" transform="rotate(135.6 130 118)" fill="#24405F" fill-opacity="0.10" stroke="#24405F" stroke-width="2" stroke-dasharray="6 4"/>
+<circle cx="135.7" cy="114.0" r="5" fill="#24405F" fill-opacity="0.85"/>
+<circle cx="114.8" cy="127.5" r="5" fill="#24405F" fill-opacity="0.85"/>
+<circle cx="142.8" cy="106.3" r="5" fill="#24405F" fill-opacity="0.85"/>
+<circle cx="134.3" cy="113.0" r="5" fill="#24405F" fill-opacity="0.85"/>
+<circle cx="141.7" cy="105.6" r="5" fill="#24405F" fill-opacity="0.85"/>
+<circle cx="122.8" cy="113.9" r="5" fill="#24405F" fill-opacity="0.85"/>
+<circle cx="125.8" cy="118.4" r="5" fill="#24405F" fill-opacity="0.85"/>
+<circle cx="134.0" cy="99.0" r="5" fill="#24405F" fill-opacity="0.85"/>
+<circle cx="141.2" cy="100.2" r="5" fill="#24405F" fill-opacity="0.85"/>
+<circle cx="135.6" cy="118.9" r="5" fill="#24405F" fill-opacity="0.85"/>
+<line x1="130" y1="118" x2="154.3" y2="94.2" stroke="#1A1A1A" stroke-width="2.4" marker-end="url(#ar)"/>
+<text x="164.3" y="89.4" text-anchor="middle" font-size="14" font-weight="700" fill="#1A1A1A">v₁</text>
+<line x1="130" y1="118" x2="148.2" y2="136.6" stroke="#1A1A1A" stroke-width="2.4" marker-end="url(#ar)"/>
+<text x="158.0" y="151.6" text-anchor="middle" font-size="14" font-weight="700" fill="#1A1A1A">v₂</text>
+<text x="130" y="258" text-anchor="middle" font-size="15" font-weight="700" fill="#24405F">Answers agree</text>
+<text x="130" y="277" text-anchor="middle" font-size="12.5" fill="#5E6470">small cloud → small eigenvalues</text>
+<text x="0" y="300" font-size="12.5" fill="#1A1A1A" font-weight="700">Eigenvalues (spread along v₁, v₂)</text>
+<rect x="0" y="312" width="6.0" height="16" fill="#24405F"/>
+<text x="12.0" y="325" font-size="12.5" fill="#1A1A1A">λ1 = 0.04</text>
+<rect x="0" y="338" width="2.0" height="16" fill="#24405F"/>
+<text x="8.0" y="351" font-size="12.5" fill="#1A1A1A">λ2 = 0.01</text>
+<rect x="300" y="0" width="260" height="236" fill="#FFFFFF" stroke="#C9CED6"/>
+<line x1="312" y1="118" x2="548" y2="118" stroke="#E3E7ED"/><line x1="430" y1="14" x2="430" y2="222" stroke="#E3E7ED"/>
+<ellipse cx="430" cy="118" rx="97.3" ry="32.8" transform="rotate(-54.6 430 118)" fill="#C46A1D" fill-opacity="0.10" stroke="#C46A1D" stroke-width="2" stroke-dasharray="6 4"/>
+<circle cx="466.2" cy="113.7" r="5" fill="#C46A1D" fill-opacity="0.85"/>
+<circle cx="415.0" cy="130.2" r="5" fill="#C46A1D" fill-opacity="0.85"/>
+<circle cx="388.5" cy="192.9" r="5" fill="#C46A1D" fill-opacity="0.85"/>
+<circle cx="440.9" cy="135.3" r="5" fill="#C46A1D" fill-opacity="0.85"/>
+<circle cx="422.2" cy="179.8" r="5" fill="#C46A1D" fill-opacity="0.85"/>
+<circle cx="442.2" cy="104.8" r="5" fill="#C46A1D" fill-opacity="0.85"/>
+<circle cx="481.7" cy="59.5" r="5" fill="#C46A1D" fill-opacity="0.85"/>
+<circle cx="410.2" cy="103.1" r="5" fill="#C46A1D" fill-opacity="0.85"/>
+<circle cx="400.7" cy="162.5" r="5" fill="#C46A1D" fill-opacity="0.85"/>
+<circle cx="466.6" cy="100.8" r="5" fill="#C46A1D" fill-opacity="0.85"/>
+<line x1="430" y1="118" x2="486.4" y2="38.7" stroke="#1A1A1A" stroke-width="2.4" marker-end="url(#ar)"/>
+<text x="494.5" y="32.3" text-anchor="middle" font-size="14" font-weight="700" fill="#1A1A1A">v₁</text>
+<line x1="430" y1="118" x2="456.8" y2="137.0" stroke="#1A1A1A" stroke-width="2.4" marker-end="url(#ar)"/>
+<text x="468.2" y="150.1" text-anchor="middle" font-size="14" font-weight="700" fill="#1A1A1A">v₂</text>
+<text x="430" y="258" text-anchor="middle" font-size="15" font-weight="700" fill="#C46A1D">Answers disagree</text>
+<text x="430" y="277" text-anchor="middle" font-size="12.5" fill="#5E6470">large cloud → large eigenvalues</text>
+<text x="300" y="300" font-size="12.5" fill="#1A1A1A" font-weight="700">Eigenvalues (spread along v₁, v₂)</text>
+<rect x="300" y="312" width="98.6" height="16" fill="#C46A1D"/>
+<text x="404.6" y="325" font-size="12.5" fill="#1A1A1A">λ1 = 0.66</text>
+<rect x="300" y="338" width="11.2" height="16" fill="#C46A1D"/>
+<text x="317.2" y="351" font-size="12.5" fill="#1A1A1A">λ2 = 0.07</text>
+</svg>
+<figcaption>Figure 2. Illustrative 2-D view. Each dot is one answer’s representation; arrows are eigenvectors; bars are eigenvalues. A tight cloud has small eigenvalues (low score); a spread cloud has large ones (high score).</figcaption>
+</figure>
+
+<h3>3.2 Worked numeric example (same formula as the code)</h3>
+<p>Three answers (K = 3), each with 4 numbers (d = 4), using synthetic values:</p>
+<div class="grid2">
+<div class="box" style="margin:0"><span class="t">Case A: answers agree</span>
+<pre style="margin:1mm 0">Z = [1.0 0.2 0.6 0.4]
+    [1.1 0.2 0.6 0.4]
+    [1.0 0.3 0.6 0.4]</pre>
+Eigenvalues of C + 0.001·I: <b>0.362, 0.0017, 0.0011</b><br>Score = mean(log₁₀) = <b style="color:#2C5D8F">−2.05 → low → trust</b></div>
+<div class="box amber" style="margin:0"><span class="t">Case B: answers disagree</span>
+<pre style="margin:1mm 0">Z = [1.0 0.2 0.6 0.4]
+    [0.1 0.9 0.3 0.7]
+    [0.5 0.4 1.0 0.0]</pre>
+Eigenvalues of C + 0.001·I: <b>0.306, 0.114, 0.0022</b><br>Score = mean(log₁₀) = <b style="color:#C46A1D">−1.37 → higher → flag</b></div>
+</div>
+<p style="margin-top:2.5mm">When answers agree, one eigenvalue dominates and the rest collapse to about α = 0.001, which drags the average log down. In the real system everything is the same except the sizes: Z is 10 × 4,096, C is 10 × 10, and there are 10 eigenvalues.</p>
+
+<h3>3.3 Why these design choices</h3>
+<ul>
+  <li><b>Why the middle layer (16 of 32)?</b> Early layers mostly hold surface word information; the last layers specialise in choosing the next word. Middle layers carry the most <b>meaning</b>. The paper tested every layer and found the middle best.</li>
+  <li><b>Why the last token?</b> The model reads left to right, so the last token has “seen” the whole answer.</li>
+  <li><b>Why α = 0.001?</b> If answers are identical, eigenvalues are 0 and log(0) is undefined. α prevents that.</li>
+  <li><b>Why 10 × 10 and not 4,096 × 4,096?</b> We compare answers with each other, so the matrix is answers × answers: small and cheap.</li>
+  <li><b>Why is this “uncertainty”?</b> For a bell-shaped cloud, log-volume is (up to a constant) its <b>differential entropy</b>, a standard measure of uncertainty.</li>
+  <li><b>Why log₁₀ and not natural log?</b> The code uses log₁₀. It changes all scores by the same factor, so rankings (and AUROC) are identical.</li>
+</ul>
+
+<h3>3.4 Feature clipping (the second half of the method)</h3>
+<p><b>The blind spot:</b> if the model is <i>confidently wrong</i>, it repeats the same wrong answer 10 times. The answers agree, so EigenScore is low and the error is trusted. These are called <b>self-consistent hallucinations</b>.</p>
+<p><b>The fix:</b> the paper observed that a few neurons in the <b>penultimate layer (layer 31)</b> sometimes take extreme values, which it links to over-confidence. Feature clipping caps them <b>while the model is generating</b>:</p>
+<ul>
+  <li>Keep a <b>memory bank</b> of the layer-31 values of the last <b>3,000 tokens</b>.</li>
+  <li>For each of the 4,096 neurons, compute its <b>0.2nd and 99.8th percentile</b>: its normal range.</li>
+  <li>Any value outside that range is pulled back to the limit (<code>torch.clamp</code>). Values inside are untouched.</li>
+  <li>No clipping until at least <b>256 tokens</b> are in the bank (warm-up), so limits are never guessed from too little data.</li>
+</ul>
+<div class="eq">FC(h) = min( max(h, h<sub>min</sub>), h<sub>max</sub> )</div>
+
+<h3>3.5 Other detectors we also computed (baselines)</h3>
+<table>
+<tr><th style="width:22%">Method</th><th>What it measures</th><th style="width:30%">Weakness</th></tr>
+<tr><td>Perplexity</td><td>How unsure the model was about each word of one answer</td><td>Sure of each word ≠ correct</td></tr>
+<tr><td>LN-Entropy</td><td>Average uncertainty over the 10 answers, divided by length</td><td>Word-level only, not meaning</td></tr>
+<tr><td>Energy</td><td>A score from raw model outputs, built for detecting unusual inputs</td><td>Not designed for this task</td></tr>
+<tr><td>Lexical Similarity</td><td>Word overlap (ROUGE-L) between the 10 answers</td><td>Compares words, not meaning</td></tr>
+</table>
+</div>
+
+<!-- ================= 4 ================= -->
+<div class="chapter">
+<h2><span class="n">4</span>What we built</h2>
+<h3>4.1 Starting point</h3>
+<p>The authors published their code on GitHub (<code>alibaba/eigenscore</code>, commit <code>ea8062a</code>). It <b>could not run</b>: its setup instructions were empty, file paths pointed to the authors’ own machine, and several errors stopped it at start-up. The feature-clipping part of the paper was <b>not in the code at all</b>. We kept every original file next to our fixed version with the suffix <code>.orig</code>.</p>
+<h3>4.2 The 12 blocking bugs we fixed</h3>
+<table>
+<tr><th style="width:4%">#</th><th style="width:22%">File</th><th>Problem</th><th style="width:28%">Fix</th></tr>
+<tr><td>1</td><td><code>pipeline/generate.py</code></td><td>Imports a module (<code>dataeval.TruthfulQA</code>) that does not exist: crash at start</td><td>Import removed</td></tr>
+<tr><td>2</td><td><code>func/metric.py</code></td><td><code>np.float</code> (removed in NumPy 1.24) used 14 times: every EigenScore function crashed</td><td>Replaced by <code>np.float64</code></td></tr>
+<tr><td>3</td><td><code>_settings.py</code></td><td>Data path hard-coded to the authors’ disk (<code>/disk1/chenchao/…</code>)</td><td>Repo-relative paths, overridable by environment variables</td></tr>
+<tr><td>4</td><td><code>pipeline/generate.py</code></td><td>Opens the log file before its folder exists</td><td>Folder created first</td></tr>
+<tr><td>5</td><td><code>func/evalFunc.py</code></td><td>Imports only work when run from inside <code>func/</code></td><td>Package-qualified imports</td></tr>
+<tr><td>6</td><td><code>func/metric.py</code></td><td>Loads a heavy library (selfcheckgpt) only used by dead code</td><td>Import moved inside the function</td></tr>
+<tr><td>7</td><td><code>pipeline/generate.py</code></td><td>Builds a BERTScore model from a missing path for a disabled metric</td><td>Removed</td></tr>
+<tr><td>8</td><td><code>dataeval/*</code></td><td>Debugger <code>ipdb</code> imported at the top of files</td><td>Commented out</td></tr>
+<tr><td>9</td><td><code>func/plot.py</code></td><td>Saves to a missing folder, then freezes waiting for a screen</td><td>No pop-up, folder created</td></tr>
+<tr><td>10</td><td><code>func/evalFunc.py</code></td><td>File-name parsing crashes on normal paths</td><td>Whole path passed through</td></tr>
+<tr><td>11</td><td><code>func/metric.py</code></td><td><code>.to("cuda")</code> hard-coded 16 times, ignoring the device option</td><td>Device taken from the data</td></tr>
+<tr><td>12</td><td><code>dataeval/load.py</code></td><td><code>DEFAULT_DEVICE = 'cuda:7'</code> (a GPU we don’t have)</td><td>Left as is: file not used by our pipeline</td></tr>
+</table>
+<div class="box amber"><span class="t">Hidden bug found while running</span>To save memory we generate the 10 answers in small batches. The original code computed EigenScore <b>inside</b> the batch loop, so only the <b>last batch (2 of the 10 answers)</b> was scored. We collect all 10 vectors first and compute the score once; a test checks this matches the original when there is only one batch.</div>
+
+<h3>4.3 Feature clipping, written from scratch</h3>
+<p>File <code>func/feature_clip.py</code>, class <code>FeatureClipper</code>: a <b>ring buffer</b> of the last 3,000 tokens (when full, the oldest row is overwritten), per-neuron percentile thresholds recomputed whenever the bank changes, a 256-token warm-up, and a PyTorch <b>forward hook</b> attached to layer 31. A forward hook is a function PyTorch calls every time that layer produces output; ours replaces the output with its clipped version, so clipping changes what the model generates.</p>
+
+<h3>4.4 Making a 7B model fit an 8 GB laptop GPU</h3>
+<table>
+<tr><th style="width:36%">Problem</th><th>Solution</th></tr>
+<tr><td>Llama-2-7B needs ~13.5 GB in 16-bit</td><td><b>4-bit NF4</b> weights (<code>--load_in_4bit</code>): ~3.9 GB</td></tr>
+<tr><td>Keeping all 33 hidden-state tensors for every token ran out of memory on long CoQA stories</td><td><code>--low_memory</code>: a hook (<code>MiddleLayerCapture</code>) keeps only layer 16; a test proves results are identical</td></tr>
+<tr><td>Generating many answers per pass is memory-heavy</td><td><code>--num_return_sequences</code>: e.g. 2 answers per pass × 5 passes, still K = 10 in total</td></tr>
+</table>
+
+<h3>4.5 The 8 automated tests (all pass)</h3>
+<ol>
+  <li><code>test_imports</code>: every module imports.</li>
+  <li><code>test_thresholds_match_numpy</code>: clip limits equal <code>numpy.percentile</code>.</li>
+  <li><code>test_clip_is_eq8</code>: clipping matches the paper’s equation exactly.</li>
+  <li><code>test_ring_buffer_and_warmup</code>: memory bank wraps around correctly; no clipping before warm-up.</li>
+  <li><code>test_eigenscore_pooling_equivalence</code>: batched scoring = original scoring.</li>
+  <li><code>test_eigenscore_separates_consistent_from_diverse</code>: similar answers score lower than diverse ones.</li>
+  <li><code>test_low_memory_capture_equivalence</code>: the memory-saving hook gives identical vectors.</li>
+  <li><code>test_layer_discovery</code>: finds the right layers for LLaMA, OPT, Falcon and GPT-2.</li>
+</ol>
+</div>
+
+<!-- ================= 5 ================= -->
+<div class="chapter">
+<h2><span class="n">5</span>Code walkthrough</h2>
+<h3>5.1 Repository layout</h3>
+<pre>cs367-inside-eigenscore/
+├── INSIDE_paper_...pdf         the research paper
+├── report/                    mid-semester report (LaTeX + PDF)
+├── source_code/
+│   ├── pipeline/generate.py    MAIN SCRIPT: sample answers, compute scores
+│   ├── func/metric.py          EigenScore + the 4 baseline scores
+│   ├── func/feature_clip.py    OURS: FeatureClipper + MiddleLayerCapture hooks
+│   ├── func/evalFunc.py        labels answers right/wrong, computes AUROC
+│   ├── func/plot.py            ROC curve plots
+│   ├── models/_load_model.py   model loading (incl. 4-bit)
+│   ├── dataeval/               dataset loaders (CoQA, SQuAD, NQ, TriviaQA)
+│   ├── tests/test_setup.py     the 8 tests
+│   ├── extension/              FUTURE WORK: run_extension.py + PLAN.md
+│   ├── run.sh                  one-command generation + evaluation
+│   ├── README.md · CHANGES.md · RESULTS.md · requirements.txt
+└── presentation/               video, slides, viva guide, posters, handbook</pre>
+
+<h3>5.2 What happens for one question</h3>
+<ol>
+  <li><b>Prompt:</b> CoQA story + previous question/answer turns + the current question (<code>dataeval/coqa.py</code>).</li>
+  <li><b>Most-likely answer:</b> one greedy answer is generated; this is the answer later judged correct or wrong.</li>
+  <li><b>10 sampled answers:</b> <code>model.generate(do_sample=True, temperature=0.5, top_p=0.99, top_k=10, num_return_sequences=…)</code>, repeated until there are 10. If clipping is on, the layer-31 hook clips activations at every step.</li>
+  <li><b>Word-probability scores:</b> perplexity, energy, LN-entropy from the generation scores.</li>
+  <li><b>Text score:</b> lexical similarity (pairwise ROUGE-L of the 10 texts).</li>
+  <li><b>EigenScore:</b> 10 × 4,096 vectors from layer 16 → covariance → eigenvalues → mean log₁₀.</li>
+  <li><b>Save</b> everything to a <code>.pkl</code> file; afterwards <code>func/evalFunc.py</code> labels each answer (ROUGE-L &gt; 0.5) and computes AUROC for every method.</li>
+</ol>
+
+<h3>5.3 The EigenScore code (<code>func/metric.py</code>)</h3>
+<pre># one vector per answer: middle layer, last generated token
+selected_layer = int(len(hidden_states[0]) / 2)   # 33 entries -> 16
+embeddings[ind, :] = hidden_states[tok][selected_layer][ind, 0, :]
+# embeddings: shape (10, 4096)
+
+def getEigenScoreFromEmbeddings(embeddings, alpha=1e-3):
+    CovMatrix = torch.cov(embeddings.float()).cpu().numpy().astype(np.float64)
+    # CovMatrix: shape (10, 10)
+    u, s, vT = np.linalg.svd(CovMatrix + alpha*np.eye(CovMatrix.shape[0]))
+    # s: the 10 eigenvalues
+    return np.mean(np.log10(s)), s</pre>
+<p class="small">For a symmetric covariance matrix, the singular values from SVD are exactly its eigenvalues, which is why the code uses <code>svd</code>.</p>
+
+<h3>5.4 The feature-clipping code (<code>func/feature_clip.py</code>)</h3>
+<pre>def clip(self, h):                        # h: (..., 4096) activations of layer 31
+    self.update(h)                        # push into the 3,000-token ring buffer
+    if not (self.enabled and self.ready): # warm-up: fewer than 256 tokens seen
+        return h
+    if self._stale:
+        self._recompute_thresholds()      # per-neuron 0.2% / 99.8% percentiles
+    return torch.clamp(h, min=self._h_min, max=self._h_max)
+
+def attach(self, model):
+    penultimate = _get_decoder_layers(model)[-2]                # layer 31 of 32
+    def hook(module, args, output):
+        if isinstance(output, tuple):
+            return (self.clip(output[0]),) + tuple(output[1:])
+        return self.clip(output)
+    return penultimate.register_forward_hook(hook)</pre>
+
+<h3>5.5 Model loading (<code>models/_load_model.py</code>)</h3>
+<p>Short names map to HuggingFace models, e.g. <code>llama2-7b-hf → NousResearch/Llama-2-7b-hf</code> (an ungated copy of Meta’s Llama-2-7B). With <code>--load_in_4bit</code> the model is loaded through <code>bitsandbytes</code> with <code>bnb_4bit_quant_type='nf4'</code>.</p>
+<h3>5.6 Libraries used</h3>
+<p>Python 3.11 · PyTorch · HuggingFace <code>transformers</code> · <code>bitsandbytes</code> (4-bit) · NumPy · scikit-learn (<code>roc_curve</code>, <code>auc</code>) · <code>rouge_score</code> · matplotlib (plots).</p>
+</div>
+
+<!-- ================= 6 ================= -->
+<div class="chapter">
+<h2><span class="n">6</span>How to run it</h2>
+<h3>6.1 Setup (needs an NVIDIA GPU)</h3>
+<pre>cd source_code
+uv venv --python 3.11 .venv &amp;&amp; source .venv/bin/activate
+uv pip install torch --index-url https://download.pytorch.org/whl/cu124
+uv pip install -r requirements.txt
+python -m tests.test_setup            # should print 8 x [ok]</pre>
+<p>CoQA (<code>coqa-dev-v1.0.json</code>) goes in <code>data/datasets/</code>. Paths can be changed with <code>EIGENSCORE_DATA_DIR</code>, <code>EIGENSCORE_MODEL_PATH</code> and <code>EIGENSCORE_OUTPUT_DIR</code>.</p>
+<h3>6.2 The exact command of our reported experiment</h3>
+<pre>python -m pipeline.generate --model llama2-7b-hf --dataset coqa \
+    --load_in_4bit --low_memory --feature_clip --no_sentsim \
+    --num_generations_per_prompt 10 --num_return_sequences 2 \
+    --fraction_of_data_to_use 0.03132 --seed 2023 --project_ind 10
+python -m func.evalFunc data/output/llama2-7b-hf_coqa_10/0.pkl --correctness rouge</pre>
+<p class="small"><code>0.03132 × 7,983 ≈ 250</code> questions. The no-clipping run is the same command without <code>--feature_clip</code>. <code>run.sh</code> wraps the same steps (it defaults to 5 answers per pass).</p>
+<h3>6.3 Most important options</h3>
+<table>
+<tr><th style="width:34%">Flag</th><th style="width:18%">Our value</th><th>Meaning</th></tr>
+<tr><td><code>--num_generations_per_prompt</code></td><td>10</td><td>K, answers per question</td></tr>
+<tr><td><code>--num_return_sequences</code></td><td>2</td><td>answers generated per GPU pass (memory saver)</td></tr>
+<tr><td><code>--temperature / --top_p / --top_k</code></td><td>0.5 / 0.99 / 10</td><td>sampling randomness</td></tr>
+<tr><td><code>--load_in_4bit</code></td><td>on</td><td>4-bit NF4 weights</td></tr>
+<tr><td><code>--low_memory</code></td><td>on</td><td>capture only layer 16</td></tr>
+<tr><td><code>--feature_clip</code></td><td>on / off</td><td>enable clipping on layer 31</td></tr>
+<tr><td><code>--clip_percentile / --memory_bank_size</code></td><td>0.2 / 3000</td><td>clipping limits and memory bank size</td></tr>
+<tr><td><code>--no_sentsim</code></td><td>on</td><td>skip the sentence-similarity model (unavailable to us)</td></tr>
+<tr><td><code>--max_new_tokens</code></td><td>256</td><td>maximum answer length</td></tr>
+<tr><td><code>--seed</code></td><td>2023</td><td>random seed (same questions in both runs)</td></tr>
+</table>
+<p>Hardware used: <b>NVIDIA RTX 4060 laptop GPU, 8 GB</b>. Speed: about <b>6 seconds per question</b>. A full CoQA run (7,983 questions) would take about 13 hours per setting.</p>
+</div>
+
+<!-- ================= 7 ================= -->
+<div class="chapter">
+<h2><span class="n">7</span>Experiment and results</h2>
+<h3>7.1 Setup</h3>
+<table>
+<tr><th style="width:34%">Item</th><th>Value</th></tr>
+<tr><td>Model</td><td>Llama-2-7B, 4-bit NF4</td></tr>
+<tr><td>Dataset</td><td>CoQA, 250 questions (seed 2023)</td></tr>
+<tr><td>Answers per question</td><td>K = 10 (temperature 0.5, top-p 0.99, top-k 10)</td></tr>
+<tr><td>Correct if</td><td>ROUGE-L with the reference &gt; 0.5</td></tr>
+<tr><td>Runs</td><td>two runs on identical questions: without and with feature clipping</td></tr>
+<tr><td>Model’s own accuracy</td><td><b>36.8%</b>: 92 of 250 answers correct, 158 wrong</td></tr>
+</table>
+<h3>7.2 Main result</h3>
+<div class="box"><span class="t">Headline</span><b>EigenScore AUROC = 83.5%</b>. If you take one wrong and one correct answer at random, our score is higher for the wrong one in 83.5% of cases (50% would be random guessing). With feature clipping switched on: <b>82.5%</b>.</div>
+<h3>7.3 All detectors (AUROC, %)</h3>
+<p>These numbers are for internal understanding and the CS307 course, where comparing with the paper was the point. <b>The design-project poster shows only our own numbers.</b></p>
+<table>
+<tr><th>Method</th><th class="num">Paper (LLaMA-7B)</th><th class="num">Ours</th><th class="num">Ours + clipping</th></tr>
+<tr class="hl"><td>EigenScore</td><td class="num">80.8</td><td class="num">83.5</td><td class="num">82.5</td></tr>
+<tr><td>Lexical Similarity</td><td class="num">77.8</td><td class="num">80.5</td><td class="num">79.3</td></tr>
+<tr><td>LN-Entropy</td><td class="num">73.6</td><td class="num">77.5</td><td class="num">77.3</td></tr>
+<tr><td>Perplexity</td><td class="num">68.3</td><td class="num">72.3</td><td class="num">71.4</td></tr>
+<tr><td>Energy</td><td class="num">54.7</td><td class="num">54.7</td><td class="num">53.1</td></tr>
+</table>
+<p>The <b>ranking is identical to the paper’s</b>: EigenScore &gt; Lexical Similarity &gt; LN-Entropy &gt; Perplexity &gt; Energy. The paper’s 80.8 already includes clipping, so the like-for-like comparison is our 82.5.</p>
+<figure><img src="../../report/figures/auroc_nofc.png" style="width:62%" alt="ROC curves"><figcaption>Figure 3. ROC curves of all detectors on our 250 questions (without clipping). Higher and further left is better. The two lines at 0.5 are placeholders for a metric we could not run.</figcaption></figure>
+<h3>7.4 Statistical checks (paired bootstrap, 10,000 resamples)</h3>
+<table>
+<tr><th>Comparison</th><th class="num">Difference</th><th class="num">95% CI</th><th>Meaning</th></tr>
+<tr><td>EigenScore − Lexical Similarity</td><td class="num">+2.9</td><td class="num">[−0.6, +6.5]</td><td>EigenScore better in 95% of resamples; paper reports ~+3</td></tr>
+<tr><td>Effect of feature clipping on EigenScore</td><td class="num">−1.0</td><td class="num">[−4.7, +2.6]</td><td>Inconclusive: interval contains 0 and the paper’s +1.1</td></tr>
+</table>
+<p><b>Clipping was verified to be active:</b> 13,749,839 of 1,159,186 × 4,096 activations were clipped = <b>0.29%</b> (at most ~0.4% expected from 0.2% per side). Its effect is simply too small to measure with 250 questions; the paper used 7,983.</p>
+<h3>7.5 Limitations of our experiment</h3>
+<ul>
+  <li>250 questions give confidence intervals of about ±4 points.</li>
+  <li>Llama-2-7B in 4-bit instead of the paper’s LLaMA-7B in 16-bit.</li>
+  <li>Only ROUGE-L correctness (the paper also used a sentence-similarity model we could not run).</li>
+  <li>top-k 10 instead of the paper’s 5.</li>
+  <li>The method itself: needs 10 answers per question, needs access to the model’s layers (open models only), and detects errors without correcting them.</li>
+</ul>
+</div>
+
+<!-- ================= 8 ================= -->
+<div class="chapter">
+<h2><span class="n">8</span>Deliverables so far</h2>
+<p>The project is used for <b>two courses</b>, and they frame it differently:</p>
+<table>
+<tr><th style="width:22%">Course</th><th>Framing</th><th style="width:36%">Delivered</th></tr>
+<tr><td><b>CS307</b> (AI course, research paper)</td><td>Implement and reproduce a recent AI paper by mid-sem; propose an improvement for end-sem. Comparing with the paper is expected.</td><td>IEEE report, explainer video with voiceover, viva preparation guide</td></tr>
+<tr><td><b>Design Project</b></td><td>Presented as <b>our system</b>: problem → our solution → our results. Single-layer EigenScore only; no paper comparison; the method is credited in References.</td><td>Formal A2 landscape poster for the poster session</td></tr>
+</table>
+<h3>8.1 Files</h3>
+<table>
+<tr><th style="width:40%">Deliverable</th><th>Location (repo)</th></tr>
+<tr><td>Mid-sem report (IEEE format)</td><td><code>report/report.pdf</code> (source <code>report/report.tex</code>)</td></tr>
+<tr><td>Explainer video (4:00, all three voices)</td><td>generated from <code>presentation/video/</code>; final file <code>inside_final_trimmed.mp4</code> (sent in chat; not stored in git because of size)</td></tr>
+<tr><td>Voiceover script and cue sheet</td><td><code>presentation/video/SCRIPT.md</code></td></tr>
+<tr><td>Viva preparation guide</td><td><code>presentation/viva/INSIDE_viva_guide.pdf</code></td></tr>
+<tr><td>Design-project poster (final)</td><td><code>presentation/poster/formal_poster_A2.pdf</code></td></tr>
+<tr><td>Earlier slide deck draft</td><td><code>presentation/deck/</code></td></tr>
+<tr><td>This handbook</td><td><code>presentation/handbook/project_handbook.pdf</code></td></tr>
+</table>
+<h3>8.2 The video, briefly</h3>
+<p>An animated, white-theme explainer (problem → idea → maths → clipping → our code vs. theirs → setup → results → clipping result → end-sem plan), with a caption under every animation and split-screen paper-vs-ours comparisons. The voiceover order is <b>Prapti → Aayaan → Shlok</b>. Each recorded line was transcribed and placed at its exact cue time automatically (scripts <code>voice_align.py</code>, <code>voice_build.py</code>). The final cut starts directly at the problem slide.</p>
+<h3>8.3 The design-project poster, briefly</h3>
+<p>Sections: Problem Statement · The Idea · Intuition (eigenvalue figure) · Why Internal States, Not Words · Illustrative Example (K = 3, d = 4) · Illustrative vs. Full-Scale Experiment · Which Layer We Read, and Why · Engineering Challenges We Solved · Python Workflow · Results · Conclusion &amp; Limitations · References. Every number on it was verified against the code and results files.</p>
+</div>
+
+<!-- ================= 9 ================= -->
+<div class="chapter">
+<h2><span class="n">9</span>Future plan (end-semester extension)</h2>
+<h3>9.1 Weaknesses we found in EigenScore</h3>
+<ol>
+  <li><b>One hand-picked layer.</b> It always reads layer 16, but the paper’s own test shows the score changes by several points depending on the layer, and the best layer differs between models.</li>
+  <li><b>Loud dimensions.</b> A few very large activation dimensions can dominate the covariance, adding noise unrelated to meaning.</li>
+  <li><b>Blind to confident mistakes.</b> Repeated wrong answers look consistent; clipping helped only slightly (+1.1 in the paper, inconclusive for us).</li>
+</ol>
+<h3>9.2 Proposed improvements (all training-free)</h3>
+<table>
+<tr><th style="width:26%">Method</th><th>Idea</th><th style="width:28%">Fixes</th></tr>
+<tr class="hl"><td>M1. Multi-layer EigenScore (main)</td><td>Compute EigenScore at every layer in a band of middle layers, <b>layers 8–24</b> of 32 (floor(L/4) to floor(3L/4)), and average them.</td><td>Removes the hand-picked layer; averages out per-layer noise</td></tr>
+<tr><td>M2a. L2-normalised</td><td>Scale each answer vector to length 1 before the covariance.</td><td>Loud dimensions dominating</td></tr>
+<tr><td>M2b. Standardised (secondary)</td><td>Standardise each dimension using statistics from <i>previous</i> questions only (like the clipping memory bank).</td><td>Loud dimensions dominating</td></tr>
+<tr><td>M3. Confidence-aware hybrid</td><td>Average the <i>rankings</i> of multi-layer EigenScore and LN-Entropy (equal weight).</td><td>Confident mistakes: word-level confidence still carries signal when answers agree</td></tr>
+<tr><td>Stretch: adaptive K</td><td>Sample answers one at a time and stop once the score is clearly low or high.</td><td>Cost of 10 answers per question</td></tr>
+</table>
+<h3>9.3 Experiment protocol (fixed in advance)</h3>
+<table>
+<tr><th style="width:30%">Item</th><th>Setting</th></tr>
+<tr><td>Model</td><td>Llama-2-7B, 4-bit, RTX 4060 8 GB</td></tr>
+<tr><td>Datasets</td><td>CoQA, TriviaQA, NQ-Open: <b>1,000 questions each</b> (seed 2023)</td></tr>
+<tr><td>Sampling</td><td>K = 10, temperature 0.5, top-p 0.99, top-k 5 (the paper’s value)</td></tr>
+<tr><td>Features saved</td><td>last-token hidden state at <b>every</b> layer for every sample, so all methods are computed from the <b>same</b> answers</td></tr>
+<tr><td>Primary test</td><td>M1 vs. original EigenScore, paired bootstrap 10,000 resamples; claim an improvement only if the 95% CI is above 0</td></tr>
+<tr><td>Extra analyses</td><td>per-layer AUROC curve; detection rate on consistently-wrong answers</td></tr>
+</table>
+<h3>9.4 Current status</h3>
+<ul>
+  <li><span class="status done">DONE</span> Plan written: <code>source_code/extension/PLAN.md</code>.</li>
+  <li><span class="status done">DONE</span> Generation script that saves all-layer features: <code>source_code/extension/run_extension.py</code> (smoke-tested on CPU only).</li>
+  <li><span class="status done">DONE</span> Both pushed to the GitHub branch <code>extension</code>, and handed to the Claude session on the RTX 4060 laptop.</li>
+  <li><span class="status todo">TO DO</span> Adapt the script to GPU + 4-bit Llama-2-7B, add a CoQA loader.</li>
+  <li><span class="status todo">TO DO</span> Smoke test on 5 questions per dataset, then full runs (~1.5–2 h for CoQA).</li>
+  <li><span class="status todo">TO DO</span> Analysis script (all methods, AUROC, bootstrap, per-layer plot) and write-up.</li>
+</ul>
+<div class="box amber"><span class="t">Honest expectation</span>Multi-layer: a small but steady gain (+1 to +3 AUROC) and more stability across datasets. Normalisation: uncertain, may be neutral. Hybrid: most likely to help, especially on TriviaQA and NQ. <b>No extension results exist yet</b>; do not quote numbers for them.</div>
+</div>
+
+<!-- ================= 10 ================= -->
+<div class="chapter">
+<h2><span class="n">10</span>Likely questions and answers</h2>
+<div class="qa"><div class="q">What does your project do, in one line?</div>It gives a score for how likely an LLM’s answer is wrong, by asking the model 10 times and measuring how much its internal representations of the answers disagree.</div>
+<div class="qa"><div class="q">Why look inside the model instead of at the words?</div>Different words can mean the same thing (“1932” vs “nineteen thirty-two”). Internal representations capture meaning, so they compare answers more fairly.</div>
+<div class="qa"><div class="q">What is an eigenvalue here?</div>The amount of spread of the 10 answers along one main direction. Small eigenvalues = answers bunched together = the model is consistent.</div>
+<div class="qa"><div class="q">Which layer do you read and why?</div>Layer 16 of 32, at the last token. Middle layers carry the most meaning; the last token has seen the whole answer.</div>
+<div class="qa"><div class="q">Why add 0.001?</div>Identical answers make eigenvalues 0, and log(0) is undefined. α keeps everything finite.</div>
+<div class="qa"><div class="q">What is feature clipping and did it help?</div>It caps extreme activations in layer 31 during generation, to stop over-confident repeated errors. In our 250-question run the effect was −1.0 points with a 95% interval of [−4.7, +2.6], so it is inconclusive; we verified it was active (0.29% of values clipped).</div>
+<div class="qa"><div class="q">What does 83.5% mean?</div>Take one wrong and one correct answer at random: in 83.5% of cases our score is higher for the wrong one. Random guessing gives 50%.</div>
+<div class="qa"><div class="q">How do you know if an answer is wrong?</div>Only for evaluation: we compare it with the dataset’s reference answer using ROUGE-L &gt; 0.5. The detector itself never sees the reference.</div>
+<div class="qa"><div class="q">How did a 7B model fit in 8 GB?</div>4-bit weights (13.5 GB → 3.9 GB), keeping only layer 16 instead of all layers, and generating 2 answers at a time.</div>
+<div class="qa"><div class="q">Why only 250 questions?</div>At about 6 seconds per question on a laptop GPU, the full 7,983 would take about 13 hours per setting. The extension plan uses 1,000 per dataset.</div>
+<div class="qa"><div class="q">What were the main problems with the original code?</div>12 blocking bugs (missing module, removed NumPy type, the authors’ disk paths, hard-coded GPU, …), feature clipping missing entirely, and a bug that scored only 2 of the 10 answers.</div>
+<div class="qa"><div class="q">Can this work with ChatGPT?</div>Not directly: it needs the model’s internal layers, which closed APIs do not expose. It works with open models like Llama.</div>
+<div class="qa"><div class="q">What will you add next?</div>Multi-layer EigenScore (average over layers 8–24), normalised embeddings, and a hybrid with token confidence, tested on 3 datasets with 1,000 questions each.</div>
+</div>
+
+<!-- ================= 11 ================= -->
+<div class="chapter">
+<h2><span class="n">11</span>Where everything is</h2>
+<table>
+<tr><th style="width:32%">What</th><th>Where</th></tr>
+<tr><td>GitHub repository</td><td><code>github.com/Akay-74/cs367-inside-eigenscore</code></td></tr>
+<tr><td>Branch: original submission</td><td><code>main</code></td></tr>
+<tr><td>Branch: all presentation work</td><td><code>claude/cs307-presentation-video-plan-4dgcht</code></td></tr>
+<tr><td>Branch: extension study</td><td><code>extension</code></td></tr>
+<tr><td>The paper</td><td><code>INSIDE_paper_Chen_et_al_ICLR2024.pdf</code></td></tr>
+<tr><td>Every bug fix explained</td><td><code>source_code/CHANGES.md</code></td></tr>
+<tr><td>Results with statistics</td><td><code>source_code/RESULTS.md</code></td></tr>
+<tr><td>Setup and run guide</td><td><code>source_code/README.md</code></td></tr>
+<tr><td>Extension plan and script</td><td><code>source_code/extension/PLAN.md</code>, <code>run_extension.py</code></td></tr>
+<tr><td>Report</td><td><code>report/report.pdf</code></td></tr>
+<tr><td>Video sources and scripts</td><td><code>presentation/video/</code></td></tr>
+<tr><td>Viva guide</td><td><code>presentation/viva/INSIDE_viva_guide.pdf</code></td></tr>
+<tr><td>Posters</td><td><code>presentation/poster/</code> (final: <code>formal_poster_A2.pdf</code>)</td></tr>
+</table>
+<p class="small">Original paper: C. Chen, K. Liu, Z. Chen, Y. Gu, Y. Wu, M. Tao, Z. Fu, J. Ye, “INSIDE: LLMs’ Internal States Retain the Power of Hallucination Detection,” ICLR 2024. Official code: <code>github.com/alibaba/eigenscore</code>.</p>
+
+<h2 style="margin-top:9mm"><span class="n">A</span>Number sheet</h2>
+<div class="grid2">
+<table>
+<tr><th colspan="2">Method</th></tr>
+<tr><td>Answers per question (K)</td><td class="num">10</td></tr>
+<tr><td>Temperature / top-p / top-k</td><td class="num">0.5 / 0.99 / 10</td></tr>
+<tr><td>Layer read</td><td class="num">16 of 32</td></tr>
+<tr><td>Vector size</td><td class="num">4,096</td></tr>
+<tr><td>Matrix Z / covariance</td><td class="num">10×4,096 / 10×10</td></tr>
+<tr><td>α</td><td class="num">0.001</td></tr>
+<tr><td>Clipping layer</td><td class="num">31 of 32</td></tr>
+<tr><td>Clipping percentiles</td><td class="num">0.2% / 99.8%</td></tr>
+<tr><td>Memory bank / warm-up</td><td class="num">3,000 / 256 tokens</td></tr>
+<tr><td>Correct if ROUGE-L</td><td class="num">&gt; 0.5</td></tr>
+</table>
+<table>
+<tr><th colspan="2">Experiment</th></tr>
+<tr><td>Model</td><td class="num">Llama-2-7B, 4-bit</td></tr>
+<tr><td>Questions</td><td class="num">250 CoQA</td></tr>
+<tr><td>Seed</td><td class="num">2023</td></tr>
+<tr><td>Model accuracy</td><td class="num">36.8% (92 / 250)</td></tr>
+<tr><td>EigenScore AUROC</td><td class="num"><b>83.5%</b></td></tr>
+<tr><td>With clipping</td><td class="num">82.5%</td></tr>
+<tr><td>Values clipped</td><td class="num">0.29%</td></tr>
+<tr><td>Memory: 16-bit → 4-bit</td><td class="num">13.5 → 3.9 GB</td></tr>
+<tr><td>Speed</td><td class="num">≈ 6 s / question</td></tr>
+<tr><td>Bugs fixed / tests</td><td class="num">12 (+1) / 8 of 8</td></tr>
+</table>
+</div>
+</div>
+
+</body>
+</html>
