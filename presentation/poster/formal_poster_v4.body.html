@@ -67,7 +67,7 @@
 <!-- ============ column 2: toy -> real scale -> layer ============ -->
 <div class="col">
   <div class="sec">
-    <h2><span class="n">5.</span>Toy Example (3 answers × 4 numbers)</h2>
+    <h2><span class="n">5.</span>Illustrative Example (K = 3, d = 4)</h2>
     <div class="ex">
       <div class="card g">
         <h4>Case A: answers agree</h4>
@@ -80,17 +80,17 @@
         <div class="res">C = cov(Z), 3×3 matrix<br>eigenvalues of C + 0.001·I:<br><b style="font-size:11.5pt">0.306, 0.114, 0.0022</b><br>score = mean(log<sub>10</sub>) = <b style="color:#C46A1D">−1.37 → flag</b></div>
       </div>
     </div>
-    <p class="eqnote" style="margin-top:1.2mm">When answers agree, only one eigenvalue is large and the rest collapse to ~0.001, so the score is low. Same formula as our real system.</p>
+    <p class="eqnote" style="margin-top:1.2mm">When responses agree, one eigenvalue dominates and the rest collapse to ≈ 0.001, giving a low score. The computation is identical to the full-scale system.</p>
   </div>
 
   <div class="sec">
-    <h2><span class="n">6.</span>From Toy to Our Real Experiment</h2>
+    <h2><span class="n">6.</span>Illustrative vs. Full-Scale Experiment</h2>
     <table class="scale">
-      <tr><th style="width:38%">Quantity</th><th>Toy example</th><th>Our experiment</th></tr>
+      <tr><th style="width:38%">Quantity</th><th>Illustrative</th><th>Full-scale experiment</th></tr>
       <tr><td>Answers per question (K)</td><td class="toy">3</td><td class="real">10</td></tr>
-      <tr><td>Numbers per answer</td><td class="toy">4</td><td class="real">4,096</td></tr>
-      <tr><td>Where numbers come from</td><td class="toy">made up</td><td class="real">layer 16 of 32, last token</td></tr>
-      <tr><td>Matrix Z (answers × numbers)</td><td class="toy">3 × 4</td><td class="real">10 × 4,096</td></tr>
+      <tr><td>Embedding dimension (d)</td><td class="toy">4</td><td class="real">4,096</td></tr>
+      <tr><td>Where numbers come from</td><td class="toy">synthetic values</td><td class="real">layer 16 of 32, last token</td></tr>
+      <tr><td>Matrix Z (K × d)</td><td class="toy">3 × 4</td><td class="real">10 × 4,096</td></tr>
       <tr><td>Covariance C</td><td class="toy">3 × 3</td><td class="real">10 × 10</td></tr>
       <tr><td>Eigenvalues</td><td class="toy">3</td><td class="real">10</td></tr>
     </table>
