@@ -1,0 +1,51 @@
+<svg width="100%" viewBox="0 0 560 360" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#1A1A1A"/></marker></defs>
+<rect x="0" y="0" width="260" height="236" fill="#FFFFFF" stroke="#C9CED6"/>
+<line x1="12" y1="118" x2="248" y2="118" stroke="#E3E7ED"/><line x1="130" y1="14" x2="130" y2="222" stroke="#E3E7ED"/>
+<ellipse cx="130" cy="118" rx="24.1" ry="9.8" transform="rotate(135.6 130 118)" fill="#24405F" fill-opacity="0.10" stroke="#24405F" stroke-width="2" stroke-dasharray="6 4"/>
+<circle cx="135.7" cy="114.0" r="5" fill="#24405F" fill-opacity="0.85"/>
+<circle cx="114.8" cy="127.5" r="5" fill="#24405F" fill-opacity="0.85"/>
+<circle cx="142.8" cy="106.3" r="5" fill="#24405F" fill-opacity="0.85"/>
+<circle cx="134.3" cy="113.0" r="5" fill="#24405F" fill-opacity="0.85"/>
+<circle cx="141.7" cy="105.6" r="5" fill="#24405F" fill-opacity="0.85"/>
+<circle cx="122.8" cy="113.9" r="5" fill="#24405F" fill-opacity="0.85"/>
+<circle cx="125.8" cy="118.4" r="5" fill="#24405F" fill-opacity="0.85"/>
+<circle cx="134.0" cy="99.0" r="5" fill="#24405F" fill-opacity="0.85"/>
+<circle cx="141.2" cy="100.2" r="5" fill="#24405F" fill-opacity="0.85"/>
+<circle cx="135.6" cy="118.9" r="5" fill="#24405F" fill-opacity="0.85"/>
+<line x1="130" y1="118" x2="154.3" y2="94.2" stroke="#1A1A1A" stroke-width="2.4" marker-end="url(#ar)"/>
+<text x="164.3" y="89.4" text-anchor="middle" font-size="14" font-weight="700" fill="#1A1A1A">v₁</text>
+<line x1="130" y1="118" x2="148.2" y2="136.6" stroke="#1A1A1A" stroke-width="2.4" marker-end="url(#ar)"/>
+<text x="158.0" y="151.6" text-anchor="middle" font-size="14" font-weight="700" fill="#1A1A1A">v₂</text>
+<text x="130" y="258" text-anchor="middle" font-size="15" font-weight="700" fill="#24405F">Answers agree</text>
+<text x="130" y="277" text-anchor="middle" font-size="12.5" fill="#5E6470">small cloud → small eigenvalues</text>
+<text x="0" y="300" font-size="12.5" fill="#1A1A1A" font-weight="700">Eigenvalues (spread along v₁, v₂)</text>
+<rect x="0" y="312" width="6.0" height="16" fill="#24405F"/>
+<text x="12.0" y="325" font-size="12.5" fill="#1A1A1A">λ1 = 0.04</text>
+<rect x="0" y="338" width="2.0" height="16" fill="#24405F"/>
+<text x="8.0" y="351" font-size="12.5" fill="#1A1A1A">λ2 = 0.01</text>
+<rect x="300" y="0" width="260" height="236" fill="#FFFFFF" stroke="#C9CED6"/>
+<line x1="312" y1="118" x2="548" y2="118" stroke="#E3E7ED"/><line x1="430" y1="14" x2="430" y2="222" stroke="#E3E7ED"/>
+<ellipse cx="430" cy="118" rx="97.3" ry="32.8" transform="rotate(-54.6 430 118)" fill="#C46A1D" fill-opacity="0.10" stroke="#C46A1D" stroke-width="2" stroke-dasharray="6 4"/>
+<circle cx="466.2" cy="113.7" r="5" fill="#C46A1D" fill-opacity="0.85"/>
+<circle cx="415.0" cy="130.2" r="5" fill="#C46A1D" fill-opacity="0.85"/>
+<circle cx="388.5" cy="192.9" r="5" fill="#C46A1D" fill-opacity="0.85"/>
+<circle cx="440.9" cy="135.3" r="5" fill="#C46A1D" fill-opacity="0.85"/>
+<circle cx="422.2" cy="179.8" r="5" fill="#C46A1D" fill-opacity="0.85"/>
+<circle cx="442.2" cy="104.8" r="5" fill="#C46A1D" fill-opacity="0.85"/>
+<circle cx="481.7" cy="59.5" r="5" fill="#C46A1D" fill-opacity="0.85"/>
+<circle cx="410.2" cy="103.1" r="5" fill="#C46A1D" fill-opacity="0.85"/>
+<circle cx="400.7" cy="162.5" r="5" fill="#C46A1D" fill-opacity="0.85"/>
+<circle cx="466.6" cy="100.8" r="5" fill="#C46A1D" fill-opacity="0.85"/>
+<line x1="430" y1="118" x2="486.4" y2="38.7" stroke="#1A1A1A" stroke-width="2.4" marker-end="url(#ar)"/>
+<text x="494.5" y="32.3" text-anchor="middle" font-size="14" font-weight="700" fill="#1A1A1A">v₁</text>
+<line x1="430" y1="118" x2="456.8" y2="137.0" stroke="#1A1A1A" stroke-width="2.4" marker-end="url(#ar)"/>
+<text x="468.2" y="150.1" text-anchor="middle" font-size="14" font-weight="700" fill="#1A1A1A">v₂</text>
+<text x="430" y="258" text-anchor="middle" font-size="15" font-weight="700" fill="#C46A1D">Answers disagree</text>
+<text x="430" y="277" text-anchor="middle" font-size="12.5" fill="#5E6470">large cloud → large eigenvalues</text>
+<text x="300" y="300" font-size="12.5" fill="#1A1A1A" font-weight="700">Eigenvalues (spread along v₁, v₂)</text>
+<rect x="300" y="312" width="98.6" height="16" fill="#C46A1D"/>
+<text x="404.6" y="325" font-size="12.5" fill="#1A1A1A">λ1 = 0.66</text>
+<rect x="300" y="338" width="11.2" height="16" fill="#C46A1D"/>
+<text x="317.2" y="351" font-size="12.5" fill="#1A1A1A">λ2 = 0.07</text>
+</svg>
