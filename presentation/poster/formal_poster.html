@@ -6,52 +6,49 @@
 <link rel="stylesheet" href="fonts_formal/fonts.css">
 <style>
 @page { size: 594mm 420mm; margin: 0; }
-:root{ --navy:#0B2A5B; --navy2:#1F4E8C; --ink:#1A1A1A; --text:#2B2B2B; --muted:#5E6470; --rule:#C9CED6; --tint:#F2F5FA; --accent:#B22234; }
+:root{ --navy:#0B2A5B; --navy2:#1F4E8C; --ink:#1A1A1A; --text:#2B2B2B; --muted:#5E6470; --rule:#C9CED6; --tint:#F2F5FA; --red:#B22234; --green:#2E7D4F; }
 *{ box-sizing:border-box; margin:0; padding:0 }
 html{ -webkit-print-color-adjust:exact; print-color-adjust:exact }
-body{ width:594mm; height:420mm; overflow:hidden; background:#FFFFFF; color:var(--text); font-family:'Lato',Arial,sans-serif; font-size:12.6pt; line-height:1.4; display:flex; flex-direction:column }
-/* ---------- header ---------- */
-header{ padding:8mm 16mm 5.5mm; text-align:center; border-bottom:1.4mm solid var(--navy); position:relative }
-header .course{ font-size:12.5pt; letter-spacing:2.5px; text-transform:uppercase; color:var(--navy2); font-weight:700 }
-header h1{ font-family:'Merriweather',Georgia,serif; font-weight:900; font-size:40pt; color:var(--navy); line-height:1.15; margin:2.5mm 0 2.5mm }
-header .names{ font-size:16pt; color:var(--ink) }
-header .names b{ font-weight:700 }
-header .names .id{ color:var(--muted); font-size:13pt }
-header .names .sep{ color:var(--rule); margin:0 4mm }
-header .inst{ font-size:13.5pt; color:var(--muted); margin-top:1.5mm; font-style:italic }
-header .presented{ font-size:11pt; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-top:3mm; margin-bottom:1mm }
-.thin{ height:.5mm; background:var(--navy2); margin:0 16mm }
-/* ---------- body ---------- */
-main{ flex:1; display:grid; grid-template-columns:1fr 1.12fr 1fr; gap:9mm; padding:6mm 16mm 4mm }
-.col{ display:flex; flex-direction:column; gap:4.5mm }
-.sec h2{ background:var(--navy); color:#fff; font-family:'Merriweather',Georgia,serif; font-weight:700; font-size:15.5pt; padding:2mm 4mm; margin-bottom:3mm; letter-spacing:.3px }
+body{ width:594mm; height:420mm; overflow:hidden; background:#FFFFFF; color:var(--text); font-family:'Lato',Arial,sans-serif; font-size:12.4pt; line-height:1.38; display:flex; flex-direction:column }
+header{ padding:7mm 16mm 5mm; text-align:center; border-bottom:1.4mm solid var(--navy) }
+header .course{ font-size:12pt; letter-spacing:2.5px; text-transform:uppercase; color:var(--navy2); font-weight:700 }
+header h1{ font-family:'Merriweather',Georgia,serif; font-weight:900; font-size:38pt; color:var(--navy); line-height:1.15; margin:2mm 0 2mm }
+header .presented{ font-size:10.5pt; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:.8mm }
+header .names{ font-size:15.5pt; color:var(--ink) } header .names b{ font-weight:700 }
+header .names .id{ color:var(--muted); font-size:12.5pt } header .names .sep{ color:var(--rule); margin:0 4mm }
+header .inst{ font-size:13pt; color:var(--muted); margin-top:1mm; font-style:italic }
+.thin{ height:.5mm; background:var(--navy2); margin:1mm 16mm 0 }
+main{ flex:1; display:grid; grid-template-columns:1fr 1.08fr 1fr; gap:8mm; padding:5.5mm 16mm 3mm }
+.col{ display:flex; flex-direction:column; gap:4mm }
+.sec h2{ background:var(--navy); color:#fff; font-family:'Merriweather',Georgia,serif; font-weight:700; font-size:15pt; padding:1.8mm 4mm; margin-bottom:2.6mm }
 .sec h2 .n{ opacity:.75; margin-right:2.5mm }
-.sec p{ margin-bottom:2.2mm; text-align:justify; hyphens:auto }
-.sec ul{ padding-left:5.5mm; margin-bottom:2mm } .sec li{ margin-bottom:1.3mm }
-.sec b{ color:var(--ink) }
-h3{ font-family:'Merriweather',Georgia,serif; font-size:13pt; color:var(--navy); margin:2.5mm 0 1.2mm }
-.box{ background:var(--tint); border-left:1.2mm solid var(--navy2); padding:2.8mm 4mm; margin:2mm 0 2.5mm }
-.eq{ font-family:'Merriweather',Georgia,serif; font-size:15pt; text-align:center; color:var(--ink); margin:2.5mm 0 1mm }
-.eqnote{ text-align:center; font-size:11pt; color:var(--muted); margin-bottom:2mm }
-figure{ margin:1.5mm 0 2mm; text-align:center }
-figcaption{ font-size:10.5pt; color:var(--muted); font-style:italic; margin-top:1mm }
-table{ width:100%; border-collapse:collapse; font-size:12.5pt; margin:1mm 0 2.5mm }
-caption{ caption-side:top; text-align:left; font-size:11pt; color:var(--muted); font-style:italic; padding-bottom:1.2mm }
-th{ text-align:left; border-top:.45mm solid var(--ink); border-bottom:.3mm solid var(--ink); padding:1.6mm 2.5mm; color:var(--ink) }
-td{ padding:1.2mm 2.5mm; border-bottom:.2mm solid var(--rule) }
-tr:last-child td{ border-bottom:.45mm solid var(--ink) }
-td.num{ text-align:right; font-variant-numeric:tabular-nums; font-weight:700; color:var(--ink) }
-.key{ display:grid; grid-template-columns:auto 1fr; gap:3mm 5mm; align-items:center; margin:2mm 0 3mm; border:.3mm solid var(--rule); padding:4mm 5mm }
-.key .big{ font-family:'Merriweather',Georgia,serif; font-weight:900; font-size:44pt; color:var(--navy); line-height:1 }
-.key .lab{ font-size:13pt; color:var(--ink); font-weight:700 }
-.key .lab span{ display:block; font-weight:400; color:var(--muted); font-size:11.5pt; margin-top:.8mm }
-.refs{ font-size:10.5pt; color:var(--muted) } .refs p{ text-align:left; margin-bottom:1.2mm }
-footer{ margin-top:auto; padding:3.5mm 16mm; border-top:.5mm solid var(--navy); display:flex; justify-content:space-between; font-size:10.5pt; color:var(--muted) }
+.sec p{ margin-bottom:2mm } .sec b{ color:var(--ink) }
+h3{ font-family:'Merriweather',Georgia,serif; font-size:12.5pt; color:var(--navy); margin:2mm 0 1mm }
+.box{ background:var(--tint); border-left:1.2mm solid var(--navy2); padding:2.6mm 4mm; margin:1mm 0 1mm }
+.eq{ font-family:'Merriweather',Georgia,serif; font-size:14pt; text-align:center; color:var(--ink); margin:2mm 0 .5mm }
+.eqnote{ text-align:center; font-size:10.8pt; color:var(--muted) }
+figure{ margin:1mm 0 1.5mm; text-align:center } figcaption{ font-size:10.3pt; color:var(--muted); font-style:italic; margin-top:.8mm }
+table{ width:100%; border-collapse:collapse; font-size:12pt; margin:1mm 0 1.5mm }
+th{ text-align:left; border-top:.45mm solid var(--ink); border-bottom:.3mm solid var(--ink); padding:1.3mm 2.5mm; color:var(--ink) }
+td{ padding:1.2mm 2.5mm; border-bottom:.2mm solid var(--rule) } tr:last-child td{ border-bottom:.45mm solid var(--ink) }
+td.num{ text-align:right; font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums }
+.chips{ display:flex; gap:1.5mm; justify-content:center; flex-wrap:wrap; margin:1mm 0 }
+.chip{ font-size:11.5pt; padding:.6mm 2.6mm; border:.3mm solid var(--rule); border-radius:1mm; background:#fff }
+.chip.g{ border-color:#9FC3AE; background:#EEF6F1; color:var(--green) } .chip.r{ border-color:#E2A9B0; background:#FBEFF1; color:var(--red) }
+.ex{ display:grid; grid-template-columns:1fr 1fr; gap:3mm }
+.ex .card{ border:.3mm solid var(--rule); padding:2.5mm 3mm }
+.ex .card h4{ font-size:12pt; margin-bottom:1mm } .ex .g h4{ color:var(--navy) } .ex .r h4{ color:var(--red) }
+.ex table{ font-size:11pt; margin:0 0 1mm } .ex td,.ex th{ padding:.6mm 1.5mm } .ex th{ border-top:none }
+.ex .res{ font-size:11.3pt } .ex .res b{ font-size:13pt }
+.big-result{ border:.4mm solid var(--navy); padding:3.5mm 4.5mm; display:grid; grid-template-columns:auto 1fr; gap:4mm; align-items:center }
+.big-result .v{ font-family:'Merriweather',Georgia,serif; font-weight:900; font-size:40pt; color:var(--navy); line-height:1 }
+.big-result .t{ font-size:13.5pt; color:var(--ink) } .big-result .t b{ color:var(--navy) }
+.refs{ font-size:10pt; color:var(--muted) } .refs p{ margin-bottom:.8mm }
+footer{ padding:3mm 16mm; border-top:.5mm solid var(--navy); display:flex; justify-content:space-between; font-size:10.3pt; color:var(--muted) }
 svg text{ font-family:'Lato',Arial,sans-serif }
 </style>
 </head>
 <body>
-
 <header>
   <div class="course">Design Project</div>
   <h1>LLM Hallucination Detection using Multi-Layer EigenScore</h1>
@@ -59,147 +56,246 @@ svg text{ font-family:'Lato',Arial,sans-serif }
   <div class="names"><b>Aayaan Ali Khan</b> <span class="id">(202411001)</span><span class="sep">|</span><b>Shlok Bhavsar</b> <span class="id">(202411018)</span><span class="sep">|</span><b>Prapti Chotaliya</b> <span class="id">(202411030)</span></div>
   <div class="inst">Indian Institute of Information Technology Vadodara</div>
 </header>
-<div class="thin" style="margin-top:1mm"></div>
+<div class="thin"></div>
 
 <main>
-<!-- ================= column 1 ================= -->
+<!-- ============ column 1 ============ -->
 <div class="col">
   <div class="sec">
-    <h2><span class="n">1.</span>Introduction</h2>
-    <p>Large Language Models (LLMs) are increasingly used in education, search and decision support. However, they frequently <b>hallucinate</b>: they generate fluent, confident answers that are factually incorrect. Because a hallucinated answer is written in the same tone as a correct one, users cannot tell them apart by reading the output.</p>
-    <p>A reliable way to <b>estimate when a model is likely to be wrong</b> is therefore essential for deploying LLMs safely.</p>
+    <h2><span class="n">1.</span>Problem Statement</h2>
+    <p>Large Language Models often <b>hallucinate</b>: they give confident answers that are wrong, in the same tone as correct ones.</p>
+    <div class="box"><b>Goal:</b> for every answer, output a <b>hallucination score</b> that says how likely it is to be wrong, <b>without knowing the correct answer</b>, and running on an <b>8 GB laptop GPU</b>.</div>
   </div>
 
   <div class="sec">
-    <h2><span class="n">2.</span>Problem Statement</h2>
-    <div class="box">Design a system that, for any question posed to an LLM, produces a <b>hallucination score</b> indicating how likely the answer is to be incorrect, <b>without access to the correct answer</b> and <b>without external fact-checking</b>, while running on a <b>consumer GPU with 8 GB of memory</b>.</div>
-    <p>Existing approaches inspect only output word probabilities or the surface text of answers, and discard the rich semantic information that remains inside the model.</p>
-  </div>
-
-  <div class="sec">
-    <h2><span class="n">3.</span>Objectives</h2>
-    <ul>
-      <li>Detect hallucinations using the model’s <b>internal hidden states</b>.</li>
-      <li>Measure <b>semantic consistency</b> across multiple sampled answers.</li>
-      <li>Reduce <b>over-confident</b> generations at inference time.</li>
-      <li>Run a 7-billion-parameter model on an <b>8 GB GPU</b>.</li>
-      <li>Validate the system quantitatively on a question-answering benchmark.</li>
-    </ul>
-  </div>
-
-  <div class="sec">
-    <h2><span class="n">4.</span>Key Idea</h2>
-    <p>If a model knows the answer, repeated answers to the same question are <b>consistent in meaning</b>; if it is guessing, they <b>diverge</b>.</p>
+    <h2><span class="n">2.</span>Key Idea: Ask Again, Check Agreement</h2>
     <figure>
-      <svg width="100%" viewBox="0 0 440 150">
-        <rect x="1" y="1" width="208" height="112" fill="#F2F5FA" stroke="#C9CED6"/>
-        <rect x="231" y="1" width="208" height="112" fill="#FFFFFF" stroke="#C9CED6"/>
-        <g fill="#0B2A5B"><circle cx="98" cy="52" r="5.5"/><circle cx="108" cy="59" r="5.5"/><circle cx="103" cy="45" r="5.5"/><circle cx="113" cy="50" r="5.5"/><circle cx="94" cy="61" r="5.5"/><circle cx="106" cy="67" r="5.5"/><circle cx="116" cy="60" r="5.5"/><circle cx="99" cy="39" r="5.5"/><circle cx="91" cy="51" r="5.5"/><circle cx="112" cy="40" r="5.5"/></g>
-        <g fill="#B22234"><circle cx="258" cy="24" r="5.5"/><circle cx="396" cy="32" r="5.5"/><circle cx="330" cy="58" r="5.5"/><circle cx="420" cy="88" r="5.5"/><circle cx="252" cy="92" r="5.5"/><circle cx="380" cy="98" r="5.5"/><circle cx="296" cy="42" r="5.5"/><circle cx="424" cy="18" r="5.5"/><circle cx="356" cy="16" r="5.5"/><circle cx="282" cy="80" r="5.5"/></g>
-        <text x="105" y="134" text-anchor="middle" font-size="13" font-weight="700" fill="#0B2A5B">Consistent → low score</text>
-        <text x="335" y="134" text-anchor="middle" font-size="13" font-weight="700" fill="#B22234">Divergent → high score</text>
+      <svg width="100%" viewBox="0 0 520 132">
+        <rect x="1" y="1" width="518" height="130" fill="#FFFFFF" stroke="#C9CED6"/>
+        <text x="260" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#1A1A1A">Q: “In which year did the bridge open?”, asked 5 times</text>
+        <text x="16" y="62" font-size="13" font-weight="700" fill="#0B2A5B">Model knows</text>
+        <g font-size="13" fill="#2E7D4F">
+          <rect x="130" y="45" width="60" height="24" fill="#EEF6F1" stroke="#9FC3AE"/><text x="160" y="62" text-anchor="middle">1932</text>
+          <rect x="198" y="45" width="60" height="24" fill="#EEF6F1" stroke="#9FC3AE"/><text x="228" y="62" text-anchor="middle">1932</text>
+          <rect x="266" y="45" width="60" height="24" fill="#EEF6F1" stroke="#9FC3AE"/><text x="296" y="62" text-anchor="middle">1932</text>
+          <rect x="334" y="45" width="60" height="24" fill="#EEF6F1" stroke="#9FC3AE"/><text x="364" y="62" text-anchor="middle">1932</text>
+          <rect x="402" y="45" width="60" height="24" fill="#EEF6F1" stroke="#9FC3AE"/><text x="432" y="62" text-anchor="middle">1932</text>
+        </g>
+        <text x="16" y="104" font-size="13" font-weight="700" fill="#B22234">Model guesses</text>
+        <g font-size="13" fill="#B22234">
+          <rect x="130" y="87" width="60" height="24" fill="#FBEFF1" stroke="#E2A9B0"/><text x="160" y="104" text-anchor="middle">1932</text>
+          <rect x="198" y="87" width="60" height="24" fill="#FBEFF1" stroke="#E2A9B0"/><text x="228" y="104" text-anchor="middle">1928</text>
+          <rect x="266" y="87" width="60" height="24" fill="#FBEFF1" stroke="#E2A9B0"/><text x="296" y="104" text-anchor="middle">1936</text>
+          <rect x="334" y="87" width="60" height="24" fill="#FBEFF1" stroke="#E2A9B0"/><text x="364" y="104" text-anchor="middle">1941</text>
+          <rect x="402" y="87" width="60" height="24" fill="#FBEFF1" stroke="#E2A9B0"/><text x="432" y="104" text-anchor="middle">1930</text>
+        </g>
+        <text x="478" y="62" font-size="12" fill="#2E7D4F" font-weight="700">✓ trust</text>
+        <text x="478" y="104" font-size="12" fill="#B22234" font-weight="700">⚠ flag</text>
       </svg>
-      <figcaption>Fig. 1. Internal representations of 10 sampled answers (2-D projection, illustrative).</figcaption>
+      <figcaption>Fig. 1. Answers that agree signal knowledge; answers that scatter signal guessing.</figcaption>
     </figure>
+    <p>We measure agreement not on the words but on the model’s <b>internal representation</b> of each answer: 4096 numbers read from its hidden layers.</p>
+  </div>
+
+  <div class="sec">
+    <h2><span class="n">3.</span>Measuring Spread with Eigenvalues</h2>
+    <figure>
+      <svg width="100%" viewBox="0 0 560 360" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#1A1A1A"/></marker></defs>
+<rect x="0" y="0" width="260" height="236" fill="#FFFFFF" stroke="#C9CED6"/>
+<line x1="12" y1="118" x2="248" y2="118" stroke="#E3E7ED"/><line x1="130" y1="14" x2="130" y2="222" stroke="#E3E7ED"/>
+<ellipse cx="130" cy="118" rx="24.1" ry="9.8" transform="rotate(135.6 130 118)" fill="#0B2A5B" fill-opacity="0.10" stroke="#0B2A5B" stroke-width="2" stroke-dasharray="6 4"/>
+<circle cx="135.7" cy="114.0" r="5" fill="#0B2A5B" fill-opacity="0.85"/>
+<circle cx="114.8" cy="127.5" r="5" fill="#0B2A5B" fill-opacity="0.85"/>
+<circle cx="142.8" cy="106.3" r="5" fill="#0B2A5B" fill-opacity="0.85"/>
+<circle cx="134.3" cy="113.0" r="5" fill="#0B2A5B" fill-opacity="0.85"/>
+<circle cx="141.7" cy="105.6" r="5" fill="#0B2A5B" fill-opacity="0.85"/>
+<circle cx="122.8" cy="113.9" r="5" fill="#0B2A5B" fill-opacity="0.85"/>
+<circle cx="125.8" cy="118.4" r="5" fill="#0B2A5B" fill-opacity="0.85"/>
+<circle cx="134.0" cy="99.0" r="5" fill="#0B2A5B" fill-opacity="0.85"/>
+<circle cx="141.2" cy="100.2" r="5" fill="#0B2A5B" fill-opacity="0.85"/>
+<circle cx="135.6" cy="118.9" r="5" fill="#0B2A5B" fill-opacity="0.85"/>
+<line x1="130" y1="118" x2="154.3" y2="94.2" stroke="#1A1A1A" stroke-width="2.4" marker-end="url(#ar)"/>
+<text x="164.3" y="89.4" text-anchor="middle" font-size="14" font-weight="700" fill="#1A1A1A">v₁</text>
+<line x1="130" y1="118" x2="148.2" y2="136.6" stroke="#1A1A1A" stroke-width="2.4" marker-end="url(#ar)"/>
+<text x="158.0" y="151.6" text-anchor="middle" font-size="14" font-weight="700" fill="#1A1A1A">v₂</text>
+<text x="130" y="258" text-anchor="middle" font-size="15" font-weight="700" fill="#0B2A5B">Answers agree</text>
+<text x="130" y="277" text-anchor="middle" font-size="12.5" fill="#5E6470">small cloud → small eigenvalues</text>
+<text x="0" y="300" font-size="12.5" fill="#1A1A1A" font-weight="700">Eigenvalues (spread along v₁, v₂)</text>
+<rect x="0" y="312" width="6.0" height="16" fill="#0B2A5B"/>
+<text x="12.0" y="325" font-size="12.5" fill="#1A1A1A">λ1 = 0.04</text>
+<rect x="0" y="338" width="2.0" height="16" fill="#0B2A5B"/>
+<text x="8.0" y="351" font-size="12.5" fill="#1A1A1A">λ2 = 0.01</text>
+<rect x="300" y="0" width="260" height="236" fill="#FFFFFF" stroke="#C9CED6"/>
+<line x1="312" y1="118" x2="548" y2="118" stroke="#E3E7ED"/><line x1="430" y1="14" x2="430" y2="222" stroke="#E3E7ED"/>
+<ellipse cx="430" cy="118" rx="97.3" ry="32.8" transform="rotate(-54.6 430 118)" fill="#B22234" fill-opacity="0.10" stroke="#B22234" stroke-width="2" stroke-dasharray="6 4"/>
+<circle cx="466.2" cy="113.7" r="5" fill="#B22234" fill-opacity="0.85"/>
+<circle cx="415.0" cy="130.2" r="5" fill="#B22234" fill-opacity="0.85"/>
+<circle cx="388.5" cy="192.9" r="5" fill="#B22234" fill-opacity="0.85"/>
+<circle cx="440.9" cy="135.3" r="5" fill="#B22234" fill-opacity="0.85"/>
+<circle cx="422.2" cy="179.8" r="5" fill="#B22234" fill-opacity="0.85"/>
+<circle cx="442.2" cy="104.8" r="5" fill="#B22234" fill-opacity="0.85"/>
+<circle cx="481.7" cy="59.5" r="5" fill="#B22234" fill-opacity="0.85"/>
+<circle cx="410.2" cy="103.1" r="5" fill="#B22234" fill-opacity="0.85"/>
+<circle cx="400.7" cy="162.5" r="5" fill="#B22234" fill-opacity="0.85"/>
+<circle cx="466.6" cy="100.8" r="5" fill="#B22234" fill-opacity="0.85"/>
+<line x1="430" y1="118" x2="486.4" y2="38.7" stroke="#1A1A1A" stroke-width="2.4" marker-end="url(#ar)"/>
+<text x="494.5" y="32.3" text-anchor="middle" font-size="14" font-weight="700" fill="#1A1A1A">v₁</text>
+<line x1="430" y1="118" x2="456.8" y2="137.0" stroke="#1A1A1A" stroke-width="2.4" marker-end="url(#ar)"/>
+<text x="468.2" y="150.1" text-anchor="middle" font-size="14" font-weight="700" fill="#1A1A1A">v₂</text>
+<text x="430" y="258" text-anchor="middle" font-size="15" font-weight="700" fill="#B22234">Answers disagree</text>
+<text x="430" y="277" text-anchor="middle" font-size="12.5" fill="#5E6470">large cloud → large eigenvalues</text>
+<text x="300" y="300" font-size="12.5" fill="#1A1A1A" font-weight="700">Eigenvalues (spread along v₁, v₂)</text>
+<rect x="300" y="312" width="98.6" height="16" fill="#B22234"/>
+<text x="404.6" y="325" font-size="12.5" fill="#1A1A1A">λ1 = 0.66</text>
+<rect x="300" y="338" width="11.2" height="16" fill="#B22234"/>
+<text x="317.2" y="351" font-size="12.5" fill="#1A1A1A">λ2 = 0.07</text>
+</svg>
+      <figcaption>Fig. 2. Each dot is one answer’s internal representation. Arrows are the eigenvectors (main directions of spread); bar lengths are the eigenvalues (amount of spread).</figcaption>
+    </figure>
+    <div class="eq">EigenScore = average of log(eigenvalues)</div>
+    <div class="eqnote">Small eigenvalues → answers agree → <b style="color:#0B2A5B">low score</b> · Large eigenvalues → answers disagree → <b style="color:#B22234">high score</b></div>
   </div>
 </div>
 
-<!-- ================= column 2 ================= -->
+<!-- ============ column 2 ============ -->
 <div class="col">
   <div class="sec">
-    <h2><span class="n">5.</span>Methodology</h2>
+    <h2><span class="n">4.</span>Worked Example</h2>
+    <p style="margin-bottom:1.5mm">Toy case: <b>3 answers</b>, each represented by <b>2 numbers</b> (real system: 10 answers × 4096 numbers).</p>
+    <div class="ex">
+      <div class="card g">
+        <h4>Case A: answers agree</h4>
+        <table><tr><th>Answer</th><th>x</th><th>y</th></tr><tr><td>1</td><td>2.0</td><td>1.0</td></tr><tr><td>2</td><td>2.1</td><td>1.1</td></tr><tr><td>3</td><td>1.9</td><td>0.9</td></tr></table>
+        <div class="res">Covariance = [0.01 0.01; 0.01 0.01]<br>Eigenvalues = 0.021, 0.001<br>Score = ½(log 0.021 + log 0.001)<br>= <b style="color:#0B2A5B">−2.34 (low → trust)</b></div>
+      </div>
+      <div class="card r">
+        <h4>Case B: answers disagree</h4>
+        <table><tr><th>Answer</th><th>x</th><th>y</th></tr><tr><td>1</td><td>2.0</td><td>1.0</td></tr><tr><td>2</td><td>0.5</td><td>2.5</td></tr><tr><td>3</td><td>3.0</td><td>2.0</td></tr></table>
+        <div class="res">Covariance = [1.58 −0.42; −0.42 0.58]<br>Eigenvalues = 1.735, 0.434<br>Score = ½(log 1.735 + log 0.434)<br>= <b style="color:#B22234">−0.06 (high → flag)</b></div>
+      </div>
+    </div>
+    <p class="eqnote" style="margin-top:1.5mm">log = log₁₀; a small constant α = 0.001 is added to the covariance so the log is always defined.</p>
+  </div>
+
+  <div class="sec">
+    <h2><span class="n">5.</span>Method</h2>
     <figure>
-      <svg width="100%" viewBox="0 0 520 96">
+      <svg width="100%" viewBox="0 0 540 80">
         <g font-size="12.5" text-anchor="middle">
-          <rect x="1" y="14" width="88" height="60" fill="#F2F5FA" stroke="#0B2A5B" stroke-width="1.4"/><text x="45" y="38" font-weight="700" fill="#0B2A5B">Question</text><text x="45" y="56" fill="#5E6470">input prompt</text>
-          <rect x="108" y="14" width="88" height="60" fill="#F2F5FA" stroke="#0B2A5B" stroke-width="1.4"/><text x="152" y="38" font-weight="700" fill="#0B2A5B">Sampling</text><text x="152" y="56" fill="#5E6470">K = 10 answers</text>
-          <rect x="215" y="14" width="88" height="60" fill="#F2F5FA" stroke="#0B2A5B" stroke-width="1.4"/><text x="259" y="34" font-weight="700" fill="#0B2A5B">Hidden</text><text x="259" y="49" font-weight="700" fill="#0B2A5B">states</text><text x="259" y="65" fill="#5E6470">middle layers</text>
-          <rect x="322" y="14" width="88" height="60" fill="#F2F5FA" stroke="#0B2A5B" stroke-width="1.4"/><text x="366" y="38" font-weight="700" fill="#0B2A5B">Covariance</text><text x="366" y="56" fill="#5E6470">eigenvalues</text>
-          <rect x="429" y="14" width="90" height="60" fill="#0B2A5B"/><text x="474" y="38" font-weight="700" fill="#FFFFFF">EigenScore</text><text x="474" y="56" fill="#DCE4F0">hallucination</text>
+          <rect x="1" y="10" width="92" height="56" fill="#F2F5FA" stroke="#0B2A5B" stroke-width="1.4"/><text x="47" y="33" font-weight="700" fill="#0B2A5B">Question</text><text x="47" y="51" fill="#5E6470">to the LLM</text>
+          <rect x="112" y="10" width="92" height="56" fill="#F2F5FA" stroke="#0B2A5B" stroke-width="1.4"/><text x="158" y="33" font-weight="700" fill="#0B2A5B">10 answers</text><text x="158" y="51" fill="#5E6470">sampled</text>
+          <rect x="223" y="10" width="92" height="56" fill="#F2F5FA" stroke="#0B2A5B" stroke-width="1.4"/><text x="269" y="33" font-weight="700" fill="#0B2A5B">Hidden states</text><text x="269" y="51" fill="#5E6470">middle layers</text>
+          <rect x="334" y="10" width="92" height="56" fill="#F2F5FA" stroke="#0B2A5B" stroke-width="1.4"/><text x="380" y="33" font-weight="700" fill="#0B2A5B">Eigenvalues</text><text x="380" y="51" fill="#5E6470">of covariance</text>
+          <rect x="445" y="10" width="94" height="56" fill="#0B2A5B"/><text x="492" y="33" font-weight="700" fill="#FFFFFF">Score</text><text x="492" y="51" fill="#DCE4F0">high = flag</text>
         </g>
-        <g fill="#0B2A5B"><polygon points="92,38 104,44 92,50"/><polygon points="199,38 211,44 199,50"/><polygon points="306,38 318,44 306,50"/><polygon points="413,38 425,44 413,50"/></g>
+        <g fill="#0B2A5B"><polygon points="96,32 108,38 96,44"/><polygon points="207,32 219,38 207,44"/><polygon points="318,32 330,38 318,44"/><polygon points="429,32 441,38 429,44"/></g>
       </svg>
-      <figcaption>Fig. 2. Processing pipeline of the proposed detector.</figcaption>
+      <figcaption>Fig. 3. Detection pipeline.</figcaption>
     </figure>
-
-    <h3>5.1 Semantic consistency score (EigenScore)</h3>
-    <p>For a question, the LLM generates <b>K = 10</b> answers by sampling. For each answer we extract the hidden state of its last token, a 4096-dimensional vector <i>z<sub>i</sub></i>. The covariance matrix Σ of these vectors captures how the answers vary; its eigenvalues λ<sub>i</sub> measure the spread along each direction.</p>
-    <div class="eq">E = (1/K) · log det(Σ + αI) = (1/K) Σ<sub>i</sub> log λ<sub>i</sub></div>
-    <div class="eqnote">α = 10<sup>−3</sup> ensures numerical stability. A higher E indicates a likely hallucination.</div>
-
-    <h3>5.2 Multi-layer aggregation</h3>
-    <p>Rather than relying on a single, hand-picked layer, the score is computed over a <b>band of middle layers</b> (layers 8–24 of 32) and averaged, giving a more stable and model-independent signal:</p>
-    <div class="eq" style="font-size:13.5pt">E<sub>ML</sub> = mean<sub>ℓ ∈ [L/4, 3L/4]</sub> E<sub>ℓ</sub></div>
-
-    <h3>5.3 Test-time feature clipping</h3>
-    <p>A model that is confidently wrong repeats the same answer, so its answers appear consistent. To counter this, each neuron in the penultimate layer is <b>clipped to its 0.2–99.8 percentile range</b>, estimated from a memory bank of the last 3,000 tokens. This suppresses extreme activations that drive over-confident generation.</p>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:4mm; margin-top:1mm">
+      <figure style="margin:0">
+        <svg width="100%" viewBox="0 0 250 190">
+          <g>
+            <rect x="20" y="8" width="120" height="7" fill="#D6DCE5"/><rect x="20" y="18" width="120" height="7" fill="#D6DCE5"/><rect x="20" y="28" width="120" height="7" fill="#D6DCE5"/><rect x="20" y="38" width="120" height="7" fill="#D6DCE5"/>
+            <rect x="20" y="48" width="120" height="7" fill="#1F4E8C"/><rect x="20" y="58" width="120" height="7" fill="#1F4E8C"/><rect x="20" y="68" width="120" height="7" fill="#1F4E8C"/><rect x="20" y="78" width="120" height="7" fill="#1F4E8C"/><rect x="20" y="88" width="120" height="7" fill="#1F4E8C"/><rect x="20" y="98" width="120" height="7" fill="#1F4E8C"/><rect x="20" y="108" width="120" height="7" fill="#1F4E8C"/><rect x="20" y="118" width="120" height="7" fill="#1F4E8C"/><rect x="20" y="128" width="120" height="7" fill="#1F4E8C"/>
+            <rect x="20" y="138" width="120" height="7" fill="#D6DCE5"/><rect x="20" y="148" width="120" height="7" fill="#D6DCE5"/><rect x="20" y="158" width="120" height="7" fill="#D6DCE5"/>
+          </g>
+          <g stroke="#1F4E8C" stroke-width="1.6" fill="none"><path d="M142 51 C180 51,190 90,212 92"/><path d="M142 71 C180 71,190 91,212 92"/><path d="M142 91 C180 91,190 92,212 92"/><path d="M142 111 C180 111,190 93,212 92"/><path d="M142 131 C180 131,190 94,212 92"/></g>
+          <circle cx="222" cy="92" r="10" fill="#0B2A5B"/><text x="222" y="96" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">avg</text>
+          <text x="80" y="182" text-anchor="middle" font-size="11.5" fill="#1A1A1A">layers 8–24 of 32</text>
+        </svg>
+        <figcaption>Fig. 4. Multi-layer: average the score over the middle layers instead of one layer.</figcaption>
+      </figure>
+      <figure style="margin:0">
+        <svg width="100%" viewBox="0 0 250 190">
+          <line x1="8" y1="150" x2="242" y2="150" stroke="#5E6470"/>
+          <g fill="#1F4E8C"><rect x="72" y="140" width="9" height="10"/><rect x="83" y="128" width="9" height="22"/><rect x="94" y="108" width="9" height="42"/><rect x="105" y="78" width="9" height="72"/><rect x="116" y="52" width="9" height="98"/><rect x="127" y="52" width="9" height="98"/><rect x="138" y="78" width="9" height="72"/><rect x="149" y="108" width="9" height="42"/><rect x="160" y="128" width="9" height="22"/><rect x="171" y="140" width="9" height="10"/></g>
+          <g fill="#B22234"><rect x="14" y="132" width="9" height="18"/><rect x="30" y="138" width="9" height="12"/><rect x="214" y="134" width="9" height="16"/><rect x="228" y="126" width="9" height="24"/></g>
+          <line x1="58" y1="30" x2="58" y2="150" stroke="#0B2A5B" stroke-width="2" stroke-dasharray="5 4"/><line x1="194" y1="30" x2="194" y2="150" stroke="#0B2A5B" stroke-width="2" stroke-dasharray="5 4"/>
+          <text x="58" y="24" text-anchor="middle" font-size="11" fill="#0B2A5B">0.2%</text><text x="194" y="24" text-anchor="middle" font-size="11" fill="#0B2A5B">99.8%</text>
+          <text x="125" y="172" text-anchor="middle" font-size="11.5" fill="#1A1A1A">neuron activation values</text>
+        </svg>
+        <figcaption>Fig. 5. Feature clipping: extreme values (red) are capped at the dashed limits.</figcaption>
+      </figure>
+    </div>
   </div>
 
   <div class="sec">
-    <h2><span class="n">6.</span>System Implementation</h2>
-    <ul>
-      <li><b>Model:</b> Llama-2-7B in <b>4-bit</b> precision (≈3.9 GB instead of 13.5 GB), PyTorch and HuggingFace Transformers.</li>
-      <li><b>Memory-efficient capture:</b> forward hooks store only the required layers instead of all hidden states.</li>
-      <li><b>Feature clipping module:</b> ring-buffer memory bank with per-neuron thresholds, applied during generation.</li>
-      <li><b>Verification:</b> 8 automated unit tests (all passing).</li>
-    </ul>
+    <h2><span class="n">6.</span>Implementation</h2>
+    <figure>
+      <svg width="100%" viewBox="0 0 540 92">
+        <text x="0" y="26" font-size="12.5" fill="#1A1A1A">Full model (16-bit)</text>
+        <rect x="150" y="12" width="371" height="20" fill="#C9CED6"/><text x="515" y="27" text-anchor="end" font-size="12.5" font-weight="700" fill="#1A1A1A">13.5 GB</text>
+        <text x="0" y="62" font-size="12.5" fill="#1A1A1A" font-weight="700">Our 4-bit model</text>
+        <rect x="150" y="48" width="107" height="20" fill="#0B2A5B"/><text x="263" y="63" font-size="12.5" font-weight="700" fill="#0B2A5B">3.9 GB</text>
+        <line x1="370" y1="4" x2="370" y2="76" stroke="#B22234" stroke-width="2" stroke-dasharray="5 3"/><text x="376" y="88" font-size="11.5" fill="#B22234">8 GB GPU limit</text>
+      </svg>
+      <figcaption>Fig. 6. 4-bit weights let a 7-billion-parameter model fit a laptop GPU.</figcaption>
+    </figure>
+    <p>Python, PyTorch and HuggingFace · Llama-2-7B · hooks capture only the needed layers · <b>8 / 8</b> automated tests pass.</p>
   </div>
+</div>
+
+<!-- ============ column 3 ============ -->
+<div class="col">
   <div class="sec">
-    <h2><span class="n">7.</span>Experimental Setup</h2>
+    <h2><span class="n">7.</span>Experiment</h2>
     <table>
-      <tr><th style="width:42%">Parameter</th><th>Value</th></tr>
-      <tr><td>Dataset</td><td>CoQA (conversational QA), 250 questions</td></tr>
-      <tr><td>Samples per question</td><td>K = 10</td></tr>
-      <tr><td>Sampling</td><td>temperature 0.5, top-p 0.99</td></tr>
-      <tr><td>Correctness label</td><td>ROUGE-L &gt; 0.5 vs. reference</td></tr>
-      <tr><td>Evaluation metric</td><td>AUROC</td></tr>
-      <tr><td>Hardware</td><td>NVIDIA RTX 4060 Laptop, 8 GB</td></tr>
+      <tr><td>Questions tested</td><td class="num">250 (CoQA reading comprehension)</td></tr>
+      <tr><td>Answers sampled per question</td><td class="num">10</td></tr>
+      <tr><td>Answer counted correct if</td><td class="num">matches reference (ROUGE-L &gt; 0.5)</td></tr>
+      <tr><td>Hardware</td><td class="num">RTX 4060 laptop GPU, 8 GB</td></tr>
     </table>
   </div>
 
-</div>
-
-<!-- ================= column 3 ================= -->
-<div class="col">
   <div class="sec">
     <h2><span class="n">8.</span>Results</h2>
-    <div class="key">
-      <div class="big">83.5%</div>
-      <div class="lab">AUROC for hallucination detection<span>Probability that an incorrect answer receives a higher score than a correct one (50% = random).</span></div>
-    </div>
     <figure>
-      <svg width="100%" viewBox="0 0 440 74">
-        <rect x="0" y="22" width="440" height="16" fill="#EEF1F5" stroke="#C9CED6"/>
-        <rect x="0" y="22" width="295" height="16" fill="#0B2A5B"/>
-        <line x1="0" y1="16" x2="0" y2="44" stroke="#5E6470"/><line x1="440" y1="16" x2="440" y2="44" stroke="#5E6470"/>
-        <g font-size="12" fill="#5E6470"><text x="0" y="60">50% (random)</text><text x="440" y="60" text-anchor="end">100% (perfect)</text></g>
-        <text x="295" y="13" text-anchor="middle" font-size="13" font-weight="700" fill="#0B2A5B">83.5%</text>
+      <svg width="100%" viewBox="0 0 540 74">
+        <text x="0" y="14" font-size="12.5" font-weight="700" fill="#1A1A1A">The LLM’s own answers (250 questions)</text>
+        <rect x="0" y="24" width="199" height="28" fill="#2E7D4F"/><rect x="199" y="24" width="341" height="28" fill="#B22234"/>
+        <text x="99" y="43" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">92 correct (37%)</text>
+        <text x="370" y="43" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">158 wrong (63%): need to be caught</text>
+        <text x="0" y="70" font-size="11.5" fill="#5E6470">Our system must tell these two groups apart without knowing which is which.</text>
       </svg>
-      <figcaption>Fig. 3. Detection performance on the 50–100% AUROC scale.</figcaption>
+    </figure>
+    <div class="big-result">
+      <div class="v">83.5%</div>
+      <div class="t">Take one <b style="color:#B22234">wrong</b> answer and one <b style="color:#2E7D4F">correct</b> answer at random. In <b>83.5% of cases</b>, our system gives the wrong one the higher hallucination score.</div>
+    </div>
+    <figure style="margin-top:2.5mm">
+      <svg width="100%" viewBox="0 0 540 162">
+        <g transform="scale(0.635)"><rect x="1" y="1" width="22" height="22" fill="#0B2A5B"/><rect x="25" y="1" width="22" height="22" fill="#0B2A5B"/><rect x="49" y="1" width="22" height="22" fill="#0B2A5B"/><rect x="73" y="1" width="22" height="22" fill="#0B2A5B"/><rect x="97" y="1" width="22" height="22" fill="#0B2A5B"/><rect x="121" y="1" width="22" height="22" fill="#0B2A5B"/><rect x="145" y="1" width="22" height="22" fill="#0B2A5B"/><rect x="169" y="1" width="22" height="22" fill="#0B2A5B"/><rect x="193" y="1" width="22" height="22" fill="#0B2A5B"/><rect x="217" y="1" width="22" height="22" fill="#0B2A5B"/><rect x="1" y="25" width="22" height="22" fill="#0B2A5B"/><rect x="25" y="25" width="22" height="22" fill="#0B2A5B"/><rect x="49" y="25" width="22" height="22" fill="#0B2A5B"/><rect x="73" y="25" width="22" height="22" fill="#0B2A5B"/><rect x="97" y="25" width="22" height="22" fill="#0B2A5B"/><rect x="121" y="25" width="22" height="22" fill="#0B2A5B"/><rect x="145" y="25" width="22" height="22" fill="#0B2A5B"/><rect x="169" y="25" width="22" height="22" fill="#0B2A5B"/><rect x="193" y="25" width="22" height="22" fill="#0B2A5B"/><rect x="217" y="25" width="22" height="22" fill="#0B2A5B"/><rect x="1" y="49" width="22" height="22" fill="#0B2A5B"/><rect x="25" y="49" width="22" height="22" fill="#0B2A5B"/><rect x="49" y="49" width="22" height="22" fill="#0B2A5B"/><rect x="73" y="49" width="22" height="22" fill="#0B2A5B"/><rect x="97" y="49" width="22" height="22" fill="#0B2A5B"/><rect x="121" y="49" width="22" height="22" fill="#0B2A5B"/><rect x="145" y="49" width="22" height="22" fill="#0B2A5B"/><rect x="169" y="49" width="22" height="22" fill="#0B2A5B"/><rect x="193" y="49" width="22" height="22" fill="#0B2A5B"/><rect x="217" y="49" width="22" height="22" fill="#0B2A5B"/><rect x="1" y="73" width="22" height="22" fill="#0B2A5B"/><rect x="25" y="73" width="22" height="22" fill="#0B2A5B"/><rect x="49" y="73" width="22" height="22" fill="#0B2A5B"/><rect x="73" y="73" width="22" height="22" fill="#0B2A5B"/><rect x="97" y="73" width="22" height="22" fill="#0B2A5B"/><rect x="121" y="73" width="22" height="22" fill="#0B2A5B"/><rect x="145" y="73" width="22" height="22" fill="#0B2A5B"/><rect x="169" y="73" width="22" height="22" fill="#0B2A5B"/><rect x="193" y="73" width="22" height="22" fill="#0B2A5B"/><rect x="217" y="73" width="22" height="22" fill="#0B2A5B"/><rect x="1" y="97" width="22" height="22" fill="#0B2A5B"/><rect x="25" y="97" width="22" height="22" fill="#0B2A5B"/><rect x="49" y="97" width="22" height="22" fill="#0B2A5B"/><rect x="73" y="97" width="22" height="22" fill="#0B2A5B"/><rect x="97" y="97" width="22" height="22" fill="#0B2A5B"/><rect x="121" y="97" width="22" height="22" fill="#0B2A5B"/><rect x="145" y="97" width="22" height="22" fill="#0B2A5B"/><rect x="169" y="97" width="22" height="22" fill="#0B2A5B"/><rect x="193" y="97" width="22" height="22" fill="#0B2A5B"/><rect x="217" y="97" width="22" height="22" fill="#0B2A5B"/><rect x="1" y="121" width="22" height="22" fill="#0B2A5B"/><rect x="25" y="121" width="22" height="22" fill="#0B2A5B"/><rect x="49" y="121" width="22" height="22" fill="#0B2A5B"/><rect x="73" y="121" width="22" height="22" fill="#0B2A5B"/><rect x="97" y="121" width="22" height="22" fill="#0B2A5B"/><rect x="121" y="121" width="22" height="22" fill="#0B2A5B"/><rect x="145" y="121" width="22" height="22" fill="#0B2A5B"/><rect x="169" y="121" width="22" height="22" fill="#0B2A5B"/><rect x="193" y="121" width="22" height="22" fill="#0B2A5B"/><rect x="217" y="121" width="22" height="22" fill="#0B2A5B"/><rect x="1" y="145" width="22" height="22" fill="#0B2A5B"/><rect x="25" y="145" width="22" height="22" fill="#0B2A5B"/><rect x="49" y="145" width="22" height="22" fill="#0B2A5B"/><rect x="73" y="145" width="22" height="22" fill="#0B2A5B"/><rect x="97" y="145" width="22" height="22" fill="#0B2A5B"/><rect x="121" y="145" width="22" height="22" fill="#0B2A5B"/><rect x="145" y="145" width="22" height="22" fill="#0B2A5B"/><rect x="169" y="145" width="22" height="22" fill="#0B2A5B"/><rect x="193" y="145" width="22" height="22" fill="#0B2A5B"/><rect x="217" y="145" width="22" height="22" fill="#0B2A5B"/><rect x="1" y="169" width="22" height="22" fill="#0B2A5B"/><rect x="25" y="169" width="22" height="22" fill="#0B2A5B"/><rect x="49" y="169" width="22" height="22" fill="#0B2A5B"/><rect x="73" y="169" width="22" height="22" fill="#0B2A5B"/><rect x="97" y="169" width="22" height="22" fill="#0B2A5B"/><rect x="121" y="169" width="22" height="22" fill="#0B2A5B"/><rect x="145" y="169" width="22" height="22" fill="#0B2A5B"/><rect x="169" y="169" width="22" height="22" fill="#0B2A5B"/><rect x="193" y="169" width="22" height="22" fill="#0B2A5B"/><rect x="217" y="169" width="22" height="22" fill="#0B2A5B"/><rect x="1" y="193" width="22" height="22" fill="#0B2A5B"/><rect x="25" y="193" width="22" height="22" fill="#0B2A5B"/><rect x="49" y="193" width="22" height="22" fill="#0B2A5B"/><rect x="73" y="193" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="73" y="193" width="11.0" height="22" fill="#0B2A5B"/><rect x="97" y="193" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="121" y="193" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="145" y="193" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="169" y="193" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="193" y="193" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="217" y="193" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="1" y="217" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="25" y="217" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="49" y="217" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="73" y="217" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="97" y="217" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="121" y="217" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="145" y="217" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="169" y="217" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="193" y="217" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="217" y="217" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/></g>
+        <g font-size="12.5">
+          <rect x="262" y="22" width="14" height="14" fill="#0B2A5B"/><text x="284" y="34" fill="#1A1A1A"><tspan font-weight="700">83.5 pairs</tspan> ranked correctly</text>
+          <rect x="262" y="48" width="14" height="14" fill="#FFFFFF" stroke="#9AA3AF"/><text x="284" y="60" fill="#1A1A1A"><tspan font-weight="700">16.5 pairs</tspan> ranked wrongly</text>
+          <text x="262" y="92" fill="#5E6470">Random guessing would score 50.</text>
+          <text x="262" y="112" fill="#5E6470">A perfect detector would score 100.</text>
+          <text x="262" y="134" fill="#5E6470">(This measure is called AUROC.)</text>
+        </g>
+      </svg>
+      <figcaption>Fig. 7. Out of every 100 (wrong, correct) answer pairs.</figcaption>
     </figure>
     <table>
-      <caption>Table 1. Summary of results</caption>
-      <tr><th>Measure</th><th style="text-align:right">Value</th></tr>
-      <tr><td>AUROC (EigenScore)</td><td class="num">83.5%</td></tr>
-      <tr><td>AUROC (with feature clipping)</td><td class="num">82.5%</td></tr>
-      <tr><td>Activations clipped</td><td class="num">0.29%</td></tr>
-      <tr><td>Processing time per question</td><td class="num">≈ 6 s</td></tr>
-      <tr><td>GPU memory for model weights</td><td class="num">≈ 3.9 GB</td></tr>
-      <tr><td>Unit tests passed</td><td class="num">8 / 8</td></tr>
+      <tr><th>Result</th><th style="text-align:right">Value</th></tr>
+      <tr><td>Detection score (AUROC)</td><td class="num">83.5%</td></tr>
+      <tr><td>With feature clipping on</td><td class="num">82.5%</td></tr>
+      <tr><td>Time per question</td><td class="num">≈ 6 seconds</td></tr>
+      <tr><td>GPU memory used by model</td><td class="num">≈ 3.9 GB</td></tr>
     </table>
   </div>
 
   <div class="sec">
     <h2><span class="n">9.</span>Conclusion &amp; Future Work</h2>
-    <p>The system detects hallucinated answers from the model’s internal states with an <b>AUROC of 83.5%</b>, needs no reference answers or external tools, and runs entirely on an 8 GB laptop GPU.</p>
-    <p><b>Ongoing:</b> full evaluation of multi-layer aggregation, scale-normalised embeddings and a confidence-aware hybrid score on 1,000 questions each from CoQA, TriviaQA and Natural Questions.</p>
+    <p>Our system flags likely-wrong LLM answers using only the model’s internal states: <b>83.5% detection score</b>, no answer key, on an 8 GB laptop GPU.</p>
+    <p><b>Next:</b> full multi-layer evaluation on 3 datasets (1,000 questions each).</p>
   </div>
 
   <div class="sec refs">
     <h2><span class="n">10.</span>References</h2>
-    <p>[1] C. Chen et al., “INSIDE: LLMs’ Internal States Retain the Power of Hallucination Detection,” ICLR, 2024.</p>
-    <p>[2] S. Reddy, D. Chen, C. D. Manning, “CoQA: A Conversational Question Answering Challenge,” TACL, 2019.</p>
-    <p>[3] H. Touvron et al., “Llama 2: Open Foundation and Fine-Tuned Chat Models,” arXiv:2307.09288, 2023.</p>
+    <p>[1] C. Chen et al., “INSIDE: LLMs’ Internal States Retain the Power of Hallucination Detection,” ICLR 2024.</p>
+    <p>[2] S. Reddy et al., “CoQA: A Conversational Question Answering Challenge,” TACL 2019. [3] H. Touvron et al., “Llama 2,” arXiv:2307.09288, 2023.</p>
   </div>
 </div>
 </main>
