@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hallucination Detection Poster</title>
+<link rel="stylesheet" href="fonts_formal/fonts.css">
+<style>
+@page { size: 594mm 420mm; margin: 0; }
+:root{ --navy:#0B2A5B; --navy2:#1F4E8C; --ink:#1A1A1A; --text:#2B2B2B; --muted:#5E6470; --rule:#C9CED6; --tint:#F2F5FA; --red:#B22234; --green:#2E7D4F; }
+*{ box-sizing:border-box; margin:0; padding:0 }
+html{ -webkit-print-color-adjust:exact; print-color-adjust:exact }
+body{ width:594mm; height:420mm; overflow:hidden; background:#FFFFFF; color:var(--text); font-family:'Lato',Arial,sans-serif; font-size:12.4pt; line-height:1.38; display:flex; flex-direction:column }
+header{ padding:7mm 16mm 5mm; text-align:center; border-bottom:1.4mm solid var(--navy) }
+header .course{ font-size:12pt; letter-spacing:2.5px; text-transform:uppercase; color:var(--navy2); font-weight:700 }
+header h1{ font-family:'Merriweather',Georgia,serif; font-weight:900; font-size:38pt; color:var(--navy); line-height:1.15; margin:2mm 0 2mm }
+header .presented{ font-size:10.5pt; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:.8mm }
+header .names{ font-size:15.5pt; color:var(--ink) } header .names b{ font-weight:700 }
+header .names .id{ color:var(--muted); font-size:12.5pt } header .names .sep{ color:var(--rule); margin:0 4mm }
+header .inst{ font-size:13pt; color:var(--muted); margin-top:1mm; font-style:italic }
+.thin{ height:.5mm; background:var(--navy2); margin:1mm 16mm 0 }
+main{ flex:1; display:grid; grid-template-columns:1fr 1.08fr 1fr; gap:8mm; padding:5.5mm 16mm 3mm }
+.col{ display:flex; flex-direction:column; gap:4mm }
+.sec h2{ background:var(--navy); color:#fff; font-family:'Merriweather',Georgia,serif; font-weight:700; font-size:15pt; padding:1.8mm 4mm; margin-bottom:2.6mm }
+.sec h2 .n{ opacity:.75; margin-right:2.5mm }
+.sec p{ margin-bottom:2mm } .sec b{ color:var(--ink) }
+h3{ font-family:'Merriweather',Georgia,serif; font-size:12.5pt; color:var(--navy); margin:2mm 0 1mm }
+.box{ background:var(--tint); border-left:1.2mm solid var(--navy2); padding:2.6mm 4mm; margin:1mm 0 1mm }
+.eq{ font-family:'Merriweather',Georgia,serif; font-size:14pt; text-align:center; color:var(--ink); margin:2mm 0 .5mm }
+.eqnote{ text-align:center; font-size:10.8pt; color:var(--muted) }
+figure{ margin:1mm 0 1.5mm; text-align:center } figcaption{ font-size:10.3pt; color:var(--muted); font-style:italic; margin-top:.8mm }
+table{ width:100%; border-collapse:collapse; font-size:12pt; margin:1mm 0 1.5mm }
+th{ text-align:left; border-top:.45mm solid var(--ink); border-bottom:.3mm solid var(--ink); padding:1.3mm 2.5mm; color:var(--ink) }
+td{ padding:1.2mm 2.5mm; border-bottom:.2mm solid var(--rule) } tr:last-child td{ border-bottom:.45mm solid var(--ink) }
+td.num{ text-align:right; font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums }
+.chips{ display:flex; gap:1.5mm; justify-content:center; flex-wrap:wrap; margin:1mm 0 }
+.chip{ font-size:11.5pt; padding:.6mm 2.6mm; border:.3mm solid var(--rule); border-radius:1mm; background:#fff }
+.chip.g{ border-color:#9FC3AE; background:#EEF6F1; color:var(--green) } .chip.r{ border-color:#E2A9B0; background:#FBEFF1; color:var(--red) }
+.ex{ display:grid; grid-template-columns:1fr 1fr; gap:3mm }
+.ex .card{ border:.3mm solid var(--rule); padding:2.5mm 3mm }
+.ex .card h4{ font-size:12pt; margin-bottom:1mm } .ex .g h4{ color:var(--navy) } .ex .r h4{ color:var(--red) }
+.ex table{ font-size:11pt; margin:0 0 1mm } .ex td,.ex th{ padding:.6mm 1.5mm } .ex th{ border-top:none }
+.ex .res{ font-size:11.3pt } .ex .res b{ font-size:13pt }
+.big-result{ border:.4mm solid var(--navy); padding:3.5mm 4.5mm; display:grid; grid-template-columns:auto 1fr; gap:4mm; align-items:center }
+.big-result .v{ font-family:'Merriweather',Georgia,serif; font-weight:900; font-size:40pt; color:var(--navy); line-height:1 }
+.big-result .t{ font-size:13.5pt; color:var(--ink) } .big-result .t b{ color:var(--navy) }
+.refs{ font-size:10pt; color:var(--muted) } .refs p{ margin-bottom:.8mm }
+footer{ padding:3mm 16mm; border-top:.5mm solid var(--navy); display:flex; justify-content:space-between; font-size:10.3pt; color:var(--muted) }
+svg text{ font-family:'Lato',Arial,sans-serif }
+.wf{ display:flex; flex-direction:column; gap:0 }
+.wf .st{ display:grid; grid-template-columns:9mm 1fr auto; gap:3mm; align-items:center; border:.3mm solid var(--rule); border-left:1.2mm solid var(--navy); padding:1.8mm 3mm; background:#fff }
+.wf .st .k{ width:7.5mm; height:7.5mm; border-radius:50%; background:var(--navy); color:#fff; font-weight:700; font-size:11pt; display:flex; align-items:center; justify-content:center }
+.wf .st .d{ font-size:11.3pt; line-height:1.3 } .wf .st .d code{ font-family:'Courier New',monospace; font-size:10.6pt; color:var(--navy); font-weight:700 }
+.wf .st .sh{ font-family:'Courier New',monospace; font-size:10.5pt; color:#fff; background:var(--navy2); padding:.6mm 2mm; white-space:nowrap }
+.wf .ar{ height:3.2mm; display:flex; justify-content:center } .wf .ar::before{ content:""; width:0; height:0; border-left:2.2mm solid transparent; border-right:2.2mm solid transparent; border-top:2.6mm solid var(--navy) }
+.wf .st.ev{ border-left-color:var(--green) } .wf .st.ev .k{ background:var(--green) } .wf .st.fc{ border-left-color:var(--red) } .wf .st.fc .k{ background:var(--red) }
+.mat{ font-family:'Courier New',monospace; font-size:10.4pt; color:var(--ink); line-height:1.25; background:var(--tint); padding:1.2mm 2mm; margin:1mm 0 }
+.scale td:first-child{ color:var(--ink); font-weight:700 } .scale td{ font-size:11.3pt } .scale th{ font-size:11.3pt }
+.scale td.toy{ color:var(--muted) } .scale td.real{ color:var(--navy); font-weight:700 }
+</style>
+</head>
+<body>
+<header>
+  <div class="course">Design Project</div>
+  <h1>LLM Hallucination Detection using EigenScore</h1>
+  <div class="presented">Presented by</div>
+  <div class="names"><b>Aayaan Ali Khan</b> <span class="id">(202411001)</span><span class="sep">|</span><b>Shlok Bhavsar</b> <span class="id">(202411018)</span><span class="sep">|</span><b>Prapti Chotaliya</b> <span class="id">(202411030)</span></div>
+  <div class="inst">Indian Institute of Information Technology Vadodara</div>
+</header>
+<div class="thin"></div>
+

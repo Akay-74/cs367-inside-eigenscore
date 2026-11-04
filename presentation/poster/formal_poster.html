@@ -46,12 +46,22 @@ td.num{ text-align:right; font-weight:700; color:var(--ink); font-variant-numeri
 .refs{ font-size:10pt; color:var(--muted) } .refs p{ margin-bottom:.8mm }
 footer{ padding:3mm 16mm; border-top:.5mm solid var(--navy); display:flex; justify-content:space-between; font-size:10.3pt; color:var(--muted) }
 svg text{ font-family:'Lato',Arial,sans-serif }
+.wf{ display:flex; flex-direction:column; gap:0 }
+.wf .st{ display:grid; grid-template-columns:9mm 1fr auto; gap:3mm; align-items:center; border:.3mm solid var(--rule); border-left:1.2mm solid var(--navy); padding:1.8mm 3mm; background:#fff }
+.wf .st .k{ width:7.5mm; height:7.5mm; border-radius:50%; background:var(--navy); color:#fff; font-weight:700; font-size:11pt; display:flex; align-items:center; justify-content:center }
+.wf .st .d{ font-size:11.3pt; line-height:1.3 } .wf .st .d code{ font-family:'Courier New',monospace; font-size:10.6pt; color:var(--navy); font-weight:700 }
+.wf .st .sh{ font-family:'Courier New',monospace; font-size:10.5pt; color:#fff; background:var(--navy2); padding:.6mm 2mm; white-space:nowrap }
+.wf .ar{ height:3.2mm; display:flex; justify-content:center } .wf .ar::before{ content:""; width:0; height:0; border-left:2.2mm solid transparent; border-right:2.2mm solid transparent; border-top:2.6mm solid var(--navy) }
+.wf .st.ev{ border-left-color:var(--green) } .wf .st.ev .k{ background:var(--green) } .wf .st.fc{ border-left-color:var(--red) } .wf .st.fc .k{ background:var(--red) }
+.mat{ font-family:'Courier New',monospace; font-size:10.4pt; color:var(--ink); line-height:1.25; background:var(--tint); padding:1.2mm 2mm; margin:1mm 0 }
+.scale td:first-child{ color:var(--ink); font-weight:700 } .scale td{ font-size:11.3pt } .scale th{ font-size:11.3pt }
+.scale td.toy{ color:var(--muted) } .scale td.real{ color:var(--navy); font-weight:700 }
 </style>
 </head>
 <body>
 <header>
   <div class="course">Design Project</div>
-  <h1>LLM Hallucination Detection using Multi-Layer EigenScore</h1>
+  <h1>LLM Hallucination Detection using EigenScore</h1>
   <div class="presented">Presented by</div>
   <div class="names"><b>Aayaan Ali Khan</b> <span class="id">(202411001)</span><span class="sep">|</span><b>Shlok Bhavsar</b> <span class="id">(202411018)</span><span class="sep">|</span><b>Prapti Chotaliya</b> <span class="id">(202411030)</span></div>
   <div class="inst">Indian Institute of Information Technology Vadodara</div>
@@ -59,16 +69,16 @@ svg text{ font-family:'Lato',Arial,sans-serif }
 <div class="thin"></div>
 
 <main>
-<!-- ============ column 1 ============ -->
+<!-- ============ column 1: problem, idea, intuition ============ -->
 <div class="col">
   <div class="sec">
     <h2><span class="n">1.</span>Problem Statement</h2>
     <p>Large Language Models often <b>hallucinate</b>: they give confident answers that are wrong, in the same tone as correct ones.</p>
-    <div class="box"><b>Goal:</b> for every answer, output a <b>hallucination score</b> that says how likely it is to be wrong, <b>without knowing the correct answer</b>, and running on an <b>8 GB laptop GPU</b>.</div>
+    <div class="box"><b>Goal:</b> for every answer, output a <b>hallucination score</b> that says how likely it is to be wrong, <b>without knowing the correct answer</b>, on an <b>8 GB laptop GPU</b>.</div>
   </div>
 
   <div class="sec">
-    <h2><span class="n">2.</span>Key Idea: Ask Again, Check Agreement</h2>
+    <h2><span class="n">2.</span>The Idea: Ask Again, Check Agreement</h2>
     <figure>
       <svg width="100%" viewBox="0 0 520 132">
         <rect x="1" y="1" width="518" height="130" fill="#FFFFFF" stroke="#C9CED6"/>
@@ -94,11 +104,11 @@ svg text{ font-family:'Lato',Arial,sans-serif }
       </svg>
       <figcaption>Fig. 1. Answers that agree signal knowledge; answers that scatter signal guessing.</figcaption>
     </figure>
-    <p>We measure agreement not on the words but on the model’s <b>internal representation</b> of each answer: 4096 numbers read from its hidden layers.</p>
+    <p>We compare the answers not by their words but by the model’s <b>internal representation</b> of each answer: a list of numbers read from inside the network.</p>
   </div>
 
   <div class="sec">
-    <h2><span class="n">3.</span>Measuring Spread with Eigenvalues</h2>
+    <h2><span class="n">3.</span>Intuition: Spread = Eigenvalues</h2>
     <figure>
       <svg width="100%" viewBox="0 0 560 360" xmlns="http://www.w3.org/2000/svg">
 <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#1A1A1A"/></marker></defs>
@@ -151,155 +161,162 @@ svg text{ font-family:'Lato',Arial,sans-serif }
 <rect x="300" y="338" width="11.2" height="16" fill="#B22234"/>
 <text x="317.2" y="351" font-size="12.5" fill="#1A1A1A">λ2 = 0.07</text>
 </svg>
-      <figcaption>Fig. 2. Each dot is one answer’s internal representation. Arrows are the eigenvectors (main directions of spread); bar lengths are the eigenvalues (amount of spread).</figcaption>
+      <figcaption>Fig. 2. Each dot is one answer’s internal representation. Arrows v₁, v₂ are eigenvectors (main directions of spread); bar lengths are eigenvalues (amount of spread).</figcaption>
     </figure>
-    <div class="eq">EigenScore = average of log(eigenvalues)</div>
-    <div class="eqnote">Small eigenvalues → answers agree → <b style="color:#0B2A5B">low score</b> · Large eigenvalues → answers disagree → <b style="color:#B22234">high score</b></div>
+    <div class="eq">EigenScore = average of log<sub>10</sub>(eigenvalues)</div>
+    <div class="eqnote">Answers agree → small eigenvalues → <b style="color:#0B2A5B">low score</b> · disagree → large eigenvalues → <b style="color:#B22234">high score</b></div>
   </div>
 </div>
 
-<!-- ============ column 2 ============ -->
+<!-- ============ column 2: toy -> real scale -> layer ============ -->
 <div class="col">
   <div class="sec">
-    <h2><span class="n">4.</span>Worked Example</h2>
-    <p style="margin-bottom:1.5mm">Toy case: <b>3 answers</b>, each represented by <b>2 numbers</b> (real system: 10 answers × 4096 numbers).</p>
+    <h2><span class="n">4.</span>Toy Example (3 answers × 4 numbers)</h2>
     <div class="ex">
       <div class="card g">
         <h4>Case A: answers agree</h4>
-        <table><tr><th>Answer</th><th>x</th><th>y</th></tr><tr><td>1</td><td>2.0</td><td>1.0</td></tr><tr><td>2</td><td>2.1</td><td>1.1</td></tr><tr><td>3</td><td>1.9</td><td>0.9</td></tr></table>
-        <div class="res">Covariance = [0.01 0.01; 0.01 0.01]<br>Eigenvalues = 0.021, 0.001<br>Score = ½(log 0.021 + log 0.001)<br>= <b style="color:#0B2A5B">−2.34 (low → trust)</b></div>
+        <div class="mat">Z = [1.0 0.2 0.6 0.4]  ← answer 1<br>&nbsp;&nbsp;&nbsp;&nbsp;[1.1 0.2 0.6 0.4]  ← answer 2<br>&nbsp;&nbsp;&nbsp;&nbsp;[1.0 0.3 0.6 0.4]  ← answer 3</div>
+        <div class="res">C = cov(Z), 3×3 matrix<br>eigenvalues of C + 0.001·I:<br><b style="font-size:11.5pt">0.362, 0.0017, 0.0011</b><br>score = mean(log<sub>10</sub>) = <b style="color:#0B2A5B">−2.05 → trust</b></div>
       </div>
       <div class="card r">
         <h4>Case B: answers disagree</h4>
-        <table><tr><th>Answer</th><th>x</th><th>y</th></tr><tr><td>1</td><td>2.0</td><td>1.0</td></tr><tr><td>2</td><td>0.5</td><td>2.5</td></tr><tr><td>3</td><td>3.0</td><td>2.0</td></tr></table>
-        <div class="res">Covariance = [1.58 −0.42; −0.42 0.58]<br>Eigenvalues = 1.735, 0.434<br>Score = ½(log 1.735 + log 0.434)<br>= <b style="color:#B22234">−0.06 (high → flag)</b></div>
+        <div class="mat">Z = [1.0 0.2 0.6 0.4]  ← answer 1<br>&nbsp;&nbsp;&nbsp;&nbsp;[0.1 0.9 0.3 0.7]  ← answer 2<br>&nbsp;&nbsp;&nbsp;&nbsp;[0.5 0.4 1.0 0.0]  ← answer 3</div>
+        <div class="res">C = cov(Z), 3×3 matrix<br>eigenvalues of C + 0.001·I:<br><b style="font-size:11.5pt">0.306, 0.114, 0.0022</b><br>score = mean(log<sub>10</sub>) = <b style="color:#B22234">−1.37 → flag</b></div>
       </div>
     </div>
-    <p class="eqnote" style="margin-top:1.5mm">log = log₁₀; a small constant α = 0.001 is added to the covariance so the log is always defined.</p>
+    <p class="eqnote" style="margin-top:1.2mm">When answers agree, only one eigenvalue is large and the rest collapse to ~0.001, so the score is low. Same formula as our real system.</p>
   </div>
 
   <div class="sec">
-    <h2><span class="n">5.</span>Method</h2>
-    <figure>
-      <svg width="100%" viewBox="0 0 540 80">
-        <g font-size="12.5" text-anchor="middle">
-          <rect x="1" y="10" width="92" height="56" fill="#F2F5FA" stroke="#0B2A5B" stroke-width="1.4"/><text x="47" y="33" font-weight="700" fill="#0B2A5B">Question</text><text x="47" y="51" fill="#5E6470">to the LLM</text>
-          <rect x="112" y="10" width="92" height="56" fill="#F2F5FA" stroke="#0B2A5B" stroke-width="1.4"/><text x="158" y="33" font-weight="700" fill="#0B2A5B">10 answers</text><text x="158" y="51" fill="#5E6470">sampled</text>
-          <rect x="223" y="10" width="92" height="56" fill="#F2F5FA" stroke="#0B2A5B" stroke-width="1.4"/><text x="269" y="33" font-weight="700" fill="#0B2A5B">Hidden states</text><text x="269" y="51" fill="#5E6470">middle layers</text>
-          <rect x="334" y="10" width="92" height="56" fill="#F2F5FA" stroke="#0B2A5B" stroke-width="1.4"/><text x="380" y="33" font-weight="700" fill="#0B2A5B">Eigenvalues</text><text x="380" y="51" fill="#5E6470">of covariance</text>
-          <rect x="445" y="10" width="94" height="56" fill="#0B2A5B"/><text x="492" y="33" font-weight="700" fill="#FFFFFF">Score</text><text x="492" y="51" fill="#DCE4F0">high = flag</text>
-        </g>
-        <g fill="#0B2A5B"><polygon points="96,32 108,38 96,44"/><polygon points="207,32 219,38 207,44"/><polygon points="318,32 330,38 318,44"/><polygon points="429,32 441,38 429,44"/></g>
-      </svg>
-      <figcaption>Fig. 3. Detection pipeline.</figcaption>
-    </figure>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:4mm; margin-top:1mm">
+    <h2><span class="n">5.</span>From Toy to Our Real Experiment</h2>
+    <table class="scale">
+      <tr><th style="width:38%">Quantity</th><th>Toy example</th><th>Our experiment</th></tr>
+      <tr><td>Answers per question (K)</td><td class="toy">3</td><td class="real">10</td></tr>
+      <tr><td>Numbers per answer</td><td class="toy">4</td><td class="real">4,096</td></tr>
+      <tr><td>Where numbers come from</td><td class="toy">made up</td><td class="real">layer 16 of 32, last token</td></tr>
+      <tr><td>Matrix Z (answers × numbers)</td><td class="toy">3 × 4</td><td class="real">10 × 4,096</td></tr>
+      <tr><td>Covariance C</td><td class="toy">3 × 3</td><td class="real">10 × 10</td></tr>
+      <tr><td>Eigenvalues</td><td class="toy">3</td><td class="real">10</td></tr>
+      <tr><td>Stabiliser α</td><td class="toy">0.001</td><td class="real">0.001</td></tr>
+      <tr><td>Questions scored</td><td class="toy">1</td><td class="real">250</td></tr>
+    </table>
+  </div>
+
+  <div class="sec">
+    <h2><span class="n">6.</span>Which Layer We Read, and Why</h2>
+    <div style="display:grid; grid-template-columns:47% 1fr; gap:4mm; align-items:center">
       <figure style="margin:0">
-        <svg width="100%" viewBox="0 0 250 190">
+        <svg width="100%" viewBox="0 0 250 262">
+          <text x="70" y="12" text-anchor="middle" font-size="11" fill="#5E6470">output: next word</text>
           <g>
-            <rect x="20" y="8" width="120" height="7" fill="#D6DCE5"/><rect x="20" y="18" width="120" height="7" fill="#D6DCE5"/><rect x="20" y="28" width="120" height="7" fill="#D6DCE5"/><rect x="20" y="38" width="120" height="7" fill="#D6DCE5"/>
-            <rect x="20" y="48" width="120" height="7" fill="#1F4E8C"/><rect x="20" y="58" width="120" height="7" fill="#1F4E8C"/><rect x="20" y="68" width="120" height="7" fill="#1F4E8C"/><rect x="20" y="78" width="120" height="7" fill="#1F4E8C"/><rect x="20" y="88" width="120" height="7" fill="#1F4E8C"/><rect x="20" y="98" width="120" height="7" fill="#1F4E8C"/><rect x="20" y="108" width="120" height="7" fill="#1F4E8C"/><rect x="20" y="118" width="120" height="7" fill="#1F4E8C"/><rect x="20" y="128" width="120" height="7" fill="#1F4E8C"/>
-            <rect x="20" y="138" width="120" height="7" fill="#D6DCE5"/><rect x="20" y="148" width="120" height="7" fill="#D6DCE5"/><rect x="20" y="158" width="120" height="7" fill="#D6DCE5"/>
+            <!-- 32 layers, top = 32 -->
+            <rect x="10" y="20.0" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="27.1" width="120" height="6.2" fill="#B22234"/>
+<line x1="132" y1="30.2" x2="142" y2="30.2" stroke="#B22234"/><text x="145" y="34.2" font-size="11.5" font-weight="700" fill="#B22234">layer 31: clipping</text>
+<rect x="10" y="34.2" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="41.3" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="48.4" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="55.5" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="62.6" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="69.7" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="76.8" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="83.9" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="91.0" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="98.1" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="105.2" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="112.3" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="119.4" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="126.5" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="133.6" width="120" height="6.2" fill="#1F4E8C"/>
+<line x1="132" y1="136.7" x2="142" y2="136.7" stroke="#1F4E8C"/><text x="145" y="140.7" font-size="11.5" font-weight="700" fill="#1F4E8C">layer 16: read here</text>
+<rect x="10" y="140.7" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="147.8" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="154.9" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="162.0" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="169.1" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="176.2" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="183.3" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="190.4" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="197.5" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="204.6" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="211.7" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="218.8" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="225.9" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="233.0" width="120" height="6.2" fill="#D6DCE5"/>
+<rect x="10" y="240.1" width="120" height="6.2" fill="#D6DCE5"/>
+<line x1="132" y1="243.2" x2="142" y2="243.2" stroke="#5E6470"/><text x="145" y="247.2" font-size="11.5" font-weight="400" fill="#5E6470">layer 1</text>
           </g>
-          <g stroke="#1F4E8C" stroke-width="1.6" fill="none"><path d="M142 51 C180 51,190 90,212 92"/><path d="M142 71 C180 71,190 91,212 92"/><path d="M142 91 C180 91,190 92,212 92"/><path d="M142 111 C180 111,190 93,212 92"/><path d="M142 131 C180 131,190 94,212 92"/></g>
-          <circle cx="222" cy="92" r="10" fill="#0B2A5B"/><text x="222" y="96" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">avg</text>
-          <text x="80" y="182" text-anchor="middle" font-size="11.5" fill="#1A1A1A">layers 8–24 of 32</text>
+          <text x="70" y="258" text-anchor="middle" font-size="11" fill="#5E6470">input: question + answer</text>
         </svg>
-        <figcaption>Fig. 4. Multi-layer: average the score over the middle layers instead of one layer.</figcaption>
       </figure>
-      <figure style="margin:0">
-        <svg width="100%" viewBox="0 0 250 190">
-          <line x1="8" y1="150" x2="242" y2="150" stroke="#5E6470"/>
-          <g fill="#1F4E8C"><rect x="72" y="140" width="9" height="10"/><rect x="83" y="128" width="9" height="22"/><rect x="94" y="108" width="9" height="42"/><rect x="105" y="78" width="9" height="72"/><rect x="116" y="52" width="9" height="98"/><rect x="127" y="52" width="9" height="98"/><rect x="138" y="78" width="9" height="72"/><rect x="149" y="108" width="9" height="42"/><rect x="160" y="128" width="9" height="22"/><rect x="171" y="140" width="9" height="10"/></g>
-          <g fill="#B22234"><rect x="14" y="132" width="9" height="18"/><rect x="30" y="138" width="9" height="12"/><rect x="214" y="134" width="9" height="16"/><rect x="228" y="126" width="9" height="24"/></g>
-          <line x1="58" y1="30" x2="58" y2="150" stroke="#0B2A5B" stroke-width="2" stroke-dasharray="5 4"/><line x1="194" y1="30" x2="194" y2="150" stroke="#0B2A5B" stroke-width="2" stroke-dasharray="5 4"/>
-          <text x="58" y="24" text-anchor="middle" font-size="11" fill="#0B2A5B">0.2%</text><text x="194" y="24" text-anchor="middle" font-size="11" fill="#0B2A5B">99.8%</text>
-          <text x="125" y="172" text-anchor="middle" font-size="11.5" fill="#1A1A1A">neuron activation values</text>
-        </svg>
-        <figcaption>Fig. 5. Feature clipping: extreme values (red) are capped at the dashed limits.</figcaption>
-      </figure>
+      <div style="font-size:11.6pt; line-height:1.38">
+        <p><b style="color:#1F4E8C">Layer 16 (middle):</b> we read the vector of the <b>last token</b> of each answer: 4,096 numbers.</p>
+        <p><b>Why the middle?</b> Early layers encode surface word patterns; the final layers focus on predicting the next word. The middle layers carry the most <b>meaning</b>.</p>
+        <p><b>Why the last token?</b> The model reads left to right, so the last token has “seen” the whole answer.</p>
+        <p><b style="color:#B22234">Layer 31:</b> where <b>feature clipping</b> caps each of its 4,096 neurons to its normal range (0.2–99.8 percentile of the last 3,000 tokens).</p>
+      </div>
     </div>
-  </div>
-
-  <div class="sec">
-    <h2><span class="n">6.</span>Implementation</h2>
-    <figure>
-      <svg width="100%" viewBox="0 0 540 92">
-        <text x="0" y="26" font-size="12.5" fill="#1A1A1A">Full model (16-bit)</text>
-        <rect x="150" y="12" width="371" height="20" fill="#C9CED6"/><text x="515" y="27" text-anchor="end" font-size="12.5" font-weight="700" fill="#1A1A1A">13.5 GB</text>
-        <text x="0" y="62" font-size="12.5" fill="#1A1A1A" font-weight="700">Our 4-bit model</text>
-        <rect x="150" y="48" width="107" height="20" fill="#0B2A5B"/><text x="263" y="63" font-size="12.5" font-weight="700" fill="#0B2A5B">3.9 GB</text>
-        <line x1="370" y1="4" x2="370" y2="76" stroke="#B22234" stroke-width="2" stroke-dasharray="5 3"/><text x="376" y="88" font-size="11.5" fill="#B22234">8 GB GPU limit</text>
-      </svg>
-      <figcaption>Fig. 6. 4-bit weights let a 7-billion-parameter model fit a laptop GPU.</figcaption>
-    </figure>
-    <p>Python, PyTorch and HuggingFace · Llama-2-7B · hooks capture only the needed layers · <b>8 / 8</b> automated tests pass.</p>
   </div>
 </div>
 
-<!-- ============ column 3 ============ -->
+<!-- ============ column 3: workflow, results ============ -->
 <div class="col">
   <div class="sec">
-    <h2><span class="n">7.</span>Experiment</h2>
-    <table>
-      <tr><td>Questions tested</td><td class="num">250 (CoQA reading comprehension)</td></tr>
-      <tr><td>Answers sampled per question</td><td class="num">10</td></tr>
-      <tr><td>Answer counted correct if</td><td class="num">matches reference (ROUGE-L &gt; 0.5)</td></tr>
-      <tr><td>Hardware</td><td class="num">RTX 4060 laptop GPU, 8 GB</td></tr>
-    </table>
+    <h2><span class="n">7.</span>Python Workflow</h2>
+    <div class="wf">
+      <div class="st"><div class="k">1</div><div class="d">Load <b>Llama-2-7B</b> in 4-bit (<code>transformers</code> + <code>bitsandbytes</code> NF4): 13.5 GB → 3.9 GB</div><div class="sh">32 layers</div></div>
+      <div class="ar"></div>
+      <div class="st"><div class="k">2</div><div class="d"><code>model.generate()</code> samples <b>10 answers</b> (temperature 0.5, top-p 0.99)</div><div class="sh">K = 10</div></div>
+      <div class="ar"></div>
+      <div class="st"><div class="k">3</div><div class="d"><b>Forward hook on layer 16</b> stores the last-token vector of each answer</div><div class="sh">Z: 10 × 4096</div></div>
+      <div class="ar"></div>
+      <div class="st"><div class="k">4</div><div class="d"><code>torch.cov(Z)</code>: covariance between the 10 answers</div><div class="sh">C: 10 × 10</div></div>
+      <div class="ar"></div>
+      <div class="st"><div class="k">5</div><div class="d"><code>np.linalg.svd(C + 0.001·I)</code>: eigenvalues</div><div class="sh">10 values</div></div>
+      <div class="ar"></div>
+      <div class="st"><div class="k">6</div><div class="d"><code>np.mean(np.log10(λ))</code>: hallucination score</div><div class="sh">1 number</div></div>
+      <div class="ar"></div>
+      <div class="st fc"><div class="k">+</div><div class="d"><b>Feature clipping</b> (optional): hook on layer 31 clamps extreme activations during generation</div><div class="sh">4096 limits</div></div>
+      <div class="ar"></div>
+      <div class="st ev"><div class="k">✓</div><div class="d"><b>Evaluation:</b> <code>rouge_score</code> marks each answer right/wrong (ROUGE-L &gt; 0.5); <code>sklearn</code> computes AUROC</div><div class="sh">250 questions</div></div>
+    </div>
   </div>
 
   <div class="sec">
     <h2><span class="n">8.</span>Results</h2>
-    <figure>
-      <svg width="100%" viewBox="0 0 540 74">
-        <text x="0" y="14" font-size="12.5" font-weight="700" fill="#1A1A1A">The LLM’s own answers (250 questions)</text>
-        <rect x="0" y="24" width="199" height="28" fill="#2E7D4F"/><rect x="199" y="24" width="341" height="28" fill="#B22234"/>
-        <text x="99" y="43" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">92 correct (37%)</text>
-        <text x="370" y="43" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">158 wrong (63%): need to be caught</text>
-        <text x="0" y="70" font-size="11.5" fill="#5E6470">Our system must tell these two groups apart without knowing which is which.</text>
+    <figure style="margin-top:0">
+      <svg width="100%" viewBox="0 0 540 60">
+        <text x="0" y="13" font-size="12.5" font-weight="700" fill="#1A1A1A">The LLM’s own answers on 250 test questions (CoQA)</text>
+        <rect x="0" y="22" width="199" height="26" fill="#2E7D4F"/><rect x="199" y="22" width="341" height="26" fill="#B22234"/>
+        <text x="99" y="40" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">92 correct (37%)</text>
+        <text x="370" y="40" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">158 wrong (63%)</text>
       </svg>
     </figure>
     <div class="big-result">
       <div class="v">83.5%</div>
-      <div class="t">Take one <b style="color:#B22234">wrong</b> answer and one <b style="color:#2E7D4F">correct</b> answer at random. In <b>83.5% of cases</b>, our system gives the wrong one the higher hallucination score.</div>
+      <div class="t">Take one <b style="color:#B22234">wrong</b> and one <b style="color:#2E7D4F">correct</b> answer at random: in <b>83.5% of cases</b> our score is higher for the wrong one. (Random guessing: 50%. Perfect: 100%. Metric name: AUROC.)</div>
     </div>
-    <figure style="margin-top:2.5mm">
-      <svg width="100%" viewBox="0 0 540 162">
-        <g transform="scale(0.635)"><rect x="1" y="1" width="22" height="22" fill="#0B2A5B"/><rect x="25" y="1" width="22" height="22" fill="#0B2A5B"/><rect x="49" y="1" width="22" height="22" fill="#0B2A5B"/><rect x="73" y="1" width="22" height="22" fill="#0B2A5B"/><rect x="97" y="1" width="22" height="22" fill="#0B2A5B"/><rect x="121" y="1" width="22" height="22" fill="#0B2A5B"/><rect x="145" y="1" width="22" height="22" fill="#0B2A5B"/><rect x="169" y="1" width="22" height="22" fill="#0B2A5B"/><rect x="193" y="1" width="22" height="22" fill="#0B2A5B"/><rect x="217" y="1" width="22" height="22" fill="#0B2A5B"/><rect x="1" y="25" width="22" height="22" fill="#0B2A5B"/><rect x="25" y="25" width="22" height="22" fill="#0B2A5B"/><rect x="49" y="25" width="22" height="22" fill="#0B2A5B"/><rect x="73" y="25" width="22" height="22" fill="#0B2A5B"/><rect x="97" y="25" width="22" height="22" fill="#0B2A5B"/><rect x="121" y="25" width="22" height="22" fill="#0B2A5B"/><rect x="145" y="25" width="22" height="22" fill="#0B2A5B"/><rect x="169" y="25" width="22" height="22" fill="#0B2A5B"/><rect x="193" y="25" width="22" height="22" fill="#0B2A5B"/><rect x="217" y="25" width="22" height="22" fill="#0B2A5B"/><rect x="1" y="49" width="22" height="22" fill="#0B2A5B"/><rect x="25" y="49" width="22" height="22" fill="#0B2A5B"/><rect x="49" y="49" width="22" height="22" fill="#0B2A5B"/><rect x="73" y="49" width="22" height="22" fill="#0B2A5B"/><rect x="97" y="49" width="22" height="22" fill="#0B2A5B"/><rect x="121" y="49" width="22" height="22" fill="#0B2A5B"/><rect x="145" y="49" width="22" height="22" fill="#0B2A5B"/><rect x="169" y="49" width="22" height="22" fill="#0B2A5B"/><rect x="193" y="49" width="22" height="22" fill="#0B2A5B"/><rect x="217" y="49" width="22" height="22" fill="#0B2A5B"/><rect x="1" y="73" width="22" height="22" fill="#0B2A5B"/><rect x="25" y="73" width="22" height="22" fill="#0B2A5B"/><rect x="49" y="73" width="22" height="22" fill="#0B2A5B"/><rect x="73" y="73" width="22" height="22" fill="#0B2A5B"/><rect x="97" y="73" width="22" height="22" fill="#0B2A5B"/><rect x="121" y="73" width="22" height="22" fill="#0B2A5B"/><rect x="145" y="73" width="22" height="22" fill="#0B2A5B"/><rect x="169" y="73" width="22" height="22" fill="#0B2A5B"/><rect x="193" y="73" width="22" height="22" fill="#0B2A5B"/><rect x="217" y="73" width="22" height="22" fill="#0B2A5B"/><rect x="1" y="97" width="22" height="22" fill="#0B2A5B"/><rect x="25" y="97" width="22" height="22" fill="#0B2A5B"/><rect x="49" y="97" width="22" height="22" fill="#0B2A5B"/><rect x="73" y="97" width="22" height="22" fill="#0B2A5B"/><rect x="97" y="97" width="22" height="22" fill="#0B2A5B"/><rect x="121" y="97" width="22" height="22" fill="#0B2A5B"/><rect x="145" y="97" width="22" height="22" fill="#0B2A5B"/><rect x="169" y="97" width="22" height="22" fill="#0B2A5B"/><rect x="193" y="97" width="22" height="22" fill="#0B2A5B"/><rect x="217" y="97" width="22" height="22" fill="#0B2A5B"/><rect x="1" y="121" width="22" height="22" fill="#0B2A5B"/><rect x="25" y="121" width="22" height="22" fill="#0B2A5B"/><rect x="49" y="121" width="22" height="22" fill="#0B2A5B"/><rect x="73" y="121" width="22" height="22" fill="#0B2A5B"/><rect x="97" y="121" width="22" height="22" fill="#0B2A5B"/><rect x="121" y="121" width="22" height="22" fill="#0B2A5B"/><rect x="145" y="121" width="22" height="22" fill="#0B2A5B"/><rect x="169" y="121" width="22" height="22" fill="#0B2A5B"/><rect x="193" y="121" width="22" height="22" fill="#0B2A5B"/><rect x="217" y="121" width="22" height="22" fill="#0B2A5B"/><rect x="1" y="145" width="22" height="22" fill="#0B2A5B"/><rect x="25" y="145" width="22" height="22" fill="#0B2A5B"/><rect x="49" y="145" width="22" height="22" fill="#0B2A5B"/><rect x="73" y="145" width="22" height="22" fill="#0B2A5B"/><rect x="97" y="145" width="22" height="22" fill="#0B2A5B"/><rect x="121" y="145" width="22" height="22" fill="#0B2A5B"/><rect x="145" y="145" width="22" height="22" fill="#0B2A5B"/><rect x="169" y="145" width="22" height="22" fill="#0B2A5B"/><rect x="193" y="145" width="22" height="22" fill="#0B2A5B"/><rect x="217" y="145" width="22" height="22" fill="#0B2A5B"/><rect x="1" y="169" width="22" height="22" fill="#0B2A5B"/><rect x="25" y="169" width="22" height="22" fill="#0B2A5B"/><rect x="49" y="169" width="22" height="22" fill="#0B2A5B"/><rect x="73" y="169" width="22" height="22" fill="#0B2A5B"/><rect x="97" y="169" width="22" height="22" fill="#0B2A5B"/><rect x="121" y="169" width="22" height="22" fill="#0B2A5B"/><rect x="145" y="169" width="22" height="22" fill="#0B2A5B"/><rect x="169" y="169" width="22" height="22" fill="#0B2A5B"/><rect x="193" y="169" width="22" height="22" fill="#0B2A5B"/><rect x="217" y="169" width="22" height="22" fill="#0B2A5B"/><rect x="1" y="193" width="22" height="22" fill="#0B2A5B"/><rect x="25" y="193" width="22" height="22" fill="#0B2A5B"/><rect x="49" y="193" width="22" height="22" fill="#0B2A5B"/><rect x="73" y="193" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="73" y="193" width="11.0" height="22" fill="#0B2A5B"/><rect x="97" y="193" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="121" y="193" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="145" y="193" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="169" y="193" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="193" y="193" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="217" y="193" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="1" y="217" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="25" y="217" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="49" y="217" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="73" y="217" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="97" y="217" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="121" y="217" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="145" y="217" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="169" y="217" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="193" y="217" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/><rect x="217" y="217" width="22" height="22" fill="#FFFFFF" stroke="#9AA3AF"/></g>
-        <g font-size="12.5">
-          <rect x="262" y="22" width="14" height="14" fill="#0B2A5B"/><text x="284" y="34" fill="#1A1A1A"><tspan font-weight="700">83.5 pairs</tspan> ranked correctly</text>
-          <rect x="262" y="48" width="14" height="14" fill="#FFFFFF" stroke="#9AA3AF"/><text x="284" y="60" fill="#1A1A1A"><tspan font-weight="700">16.5 pairs</tspan> ranked wrongly</text>
-          <text x="262" y="92" fill="#5E6470">Random guessing would score 50.</text>
-          <text x="262" y="112" fill="#5E6470">A perfect detector would score 100.</text>
-          <text x="262" y="134" fill="#5E6470">(This measure is called AUROC.)</text>
-        </g>
-      </svg>
-      <figcaption>Fig. 7. Out of every 100 (wrong, correct) answer pairs.</figcaption>
-    </figure>
-    <table>
+    <table style="margin-top:2mm">
       <tr><th>Result</th><th style="text-align:right">Value</th></tr>
       <tr><td>Detection score (AUROC)</td><td class="num">83.5%</td></tr>
       <tr><td>With feature clipping on</td><td class="num">82.5%</td></tr>
-      <tr><td>Time per question</td><td class="num">≈ 6 seconds</td></tr>
-      <tr><td>GPU memory used by model</td><td class="num">≈ 3.9 GB</td></tr>
+      <tr><td>Time per question (10 answers + score)</td><td class="num">≈ 6 s</td></tr>
+      <tr><td>GPU memory for the model</td><td class="num">≈ 3.9 GB of 8 GB</td></tr>
     </table>
   </div>
 
   <div class="sec">
-    <h2><span class="n">9.</span>Conclusion &amp; Future Work</h2>
-    <p>Our system flags likely-wrong LLM answers using only the model’s internal states: <b>83.5% detection score</b>, no answer key, on an 8 GB laptop GPU.</p>
-    <p><b>Next:</b> full multi-layer evaluation on 3 datasets (1,000 questions each).</p>
+    <h2><span class="n">9.</span>Conclusion</h2>
+    <p>Using only the model’s internal states (layer 16, 10 answers), our system flags likely-wrong answers with an <b>83.5% detection score</b>, needs no answer key, and runs on an 8 GB laptop GPU.</p>
   </div>
 
   <div class="sec refs">
     <h2><span class="n">10.</span>References</h2>
-    <p>[1] C. Chen et al., “INSIDE: LLMs’ Internal States Retain the Power of Hallucination Detection,” ICLR 2024.</p>
-    <p>[2] S. Reddy et al., “CoQA: A Conversational Question Answering Challenge,” TACL 2019. [3] H. Touvron et al., “Llama 2,” arXiv:2307.09288, 2023.</p>
+    <p>[1] C. Chen et al., “INSIDE: LLMs’ Internal States Retain the Power of Hallucination Detection,” ICLR 2024. [2] S. Reddy et al., “CoQA,” TACL 2019. [3] H. Touvron et al., “Llama 2,” arXiv:2307.09288, 2023.</p>
   </div>
 </div>
 </main>
 
-<footer><span>Design Project · Indian Institute of Information Technology Vadodara</span><span>LLM Hallucination Detection using Multi-Layer EigenScore</span></footer>
+<footer><span>Design Project · Indian Institute of Information Technology Vadodara</span><span>LLM Hallucination Detection using EigenScore</span></footer>
 </body>
 </html>
