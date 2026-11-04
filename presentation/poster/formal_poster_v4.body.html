@@ -32,7 +32,7 @@
         <text x="478" y="62" font-size="12" fill="#2C5D8F" font-weight="700">✓ trust</text>
         <text x="478" y="104" font-size="12" fill="#C46A1D" font-weight="700">⚠ flag</text>
       </svg>
-      <figcaption>Fig. 1. Answers that agree signal knowledge; answers that scatter signal guessing.</figcaption>
+      <figcaption>Fig. 1. Answers that agree signal knowledge; answers that scatter signal guessing (illustrative).</figcaption>
     </figure>
     <p>We compare the answers not by their words but by the model’s <b>internal representation</b> of each answer: a list of numbers read from inside the network.</p>
   </div>
@@ -41,7 +41,7 @@
     <h2><span class="n">3.</span>Intuition: Spread = Eigenvalues</h2>
     <figure>
       {{EIGEN}}
-      <figcaption>Fig. 2. Each dot is one answer’s internal representation. Arrows v₁, v₂ are eigenvectors (main directions of spread); bar lengths are eigenvalues (amount of spread).</figcaption>
+      <figcaption>Fig. 2. Illustrative 2-D view: each dot is one answer’s internal representation. Arrows v₁, v₂ are eigenvectors (main directions of spread); bar lengths are eigenvalues (amount of spread).</figcaption>
     </figure>
     <div class="eq">EigenScore = average of log<sub>10</sub>(eigenvalues)</div>
     <div class="eqnote">Answers agree → small eigenvalues → <b style="color:#24405F">low score</b> · disagree → large eigenvalues → <b style="color:#C46A1D">high score</b></div>
@@ -56,8 +56,8 @@
         <line x1="262" y1="10" x2="262" y2="86" stroke="#C9CED6"/>
         <text x="278" y="28" font-size="12.5" fill="#C46A1D" font-weight="700">Word overlap: 0%</text>
         <text x="278" y="44" font-size="11.5" fill="#5E6470">→ wrongly looks like disagreement</text>
-        <text x="278" y="66" font-size="12.5" fill="#2C5D8F" font-weight="700">Internal vectors: nearly identical</text>
-        <text x="278" y="82" font-size="11.5" fill="#5E6470">→ correctly seen as agreement</text>
+        <text x="278" y="66" font-size="12.5" fill="#2C5D8F" font-weight="700">Internal vectors: close together</text>
+        <text x="278" y="82" font-size="11.5" fill="#5E6470">→ treated as agreement (illustrative)</text>
         <text x="16" y="80" font-size="11.5" fill="#5E6470">Same meaning, different words.</text>
       </svg>
     </figure>
@@ -123,7 +123,7 @@
       <tr><th style="width:45%">Challenge</th><th>Our solution</th></tr>
       <tr><td>7B model needs 13.5 GB; the GPU has 8 GB</td><td>4-bit NF4 weights: <b>3.9 GB</b></td></tr>
       <tr><td>Saving all 33 layers for every token ran out of memory on long stories</td><td>Hook keeps <b>only layer 16’s last-token vector</b> (test: identical result)</td></tr>
-      <tr><td>10 answers at once do not fit in memory</td><td>Generate <b>2 at a time × 5</b>, pool all 10 before scoring</td></tr>
+      <tr><td>10 long answers in one pass is memory-heavy</td><td>Generate <b>2 at a time × 5</b>, pool all 10 before scoring</td></tr>
       <tr><td>Proving the maths is implemented correctly</td><td><b>8 unit tests</b>, e.g. clip limits vs. numpy.percentile (8/8 pass)</td></tr>
     </table>
   </div>
@@ -146,7 +146,7 @@
       <div class="ar"></div>
       <div class="st"><div class="k">6</div><div class="d"><code>np.mean(np.log10(λ))</code>: hallucination score</div><div class="sh">1 number</div></div>
       <div class="ar"></div>
-      <div class="st fc"><div class="k">+</div><div class="d"><b>Feature clipping</b> (optional): hook on layer 31 clamps extreme activations during generation</div><div class="sh">4096 limits</div></div>
+      <div class="st fc"><div class="k">+</div><div class="d"><b>Feature clipping</b> (optional): hook on layer 31 clamps extreme activations during generation</div><div class="sh">4096 neurons</div></div>
       <div class="ar"></div>
       <div class="st ev"><div class="k">✓</div><div class="d"><b>Evaluation:</b> <code>rouge_score</code> marks each answer right/wrong (ROUGE-L &gt; 0.5); <code>sklearn</code> computes AUROC</div><div class="sh">250 questions</div></div>
     </div>
