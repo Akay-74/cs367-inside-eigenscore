@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EigenScore Design Video</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+:root{
+  --bg:#FFFFFF; --line:#D9DEE5; --soft:#F4F6F9;
+  --ink:#1F2A37; --navy:#24405F; --slate:#3B5B7E; --muted:#5A6472; --dim:#7A8390;
+  --blue:#2C5D8F; --blueP:#E4ECF5; --blueM:#9DB6D3;
+  --amber:#C46A1D; --amberP:#F8EBDD; --amberM:#E2B48A;
+  --serif:'Merriweather', Georgia, serif; --sans:'Lato', Arial, sans-serif;
+  --mono:'DejaVu Sans Mono', 'Courier New', monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:#E7EAEE;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;background:var(--bg);color:var(--ink);font-family:var(--sans);transform-origin:0 0;overflow:hidden}
+.scene{position:absolute;inset:0;opacity:0}
+.abs{position:absolute}
+.mono{font-family:var(--mono)}
+.blue{color:var(--blue)} .amber{color:var(--amber)} .navy{color:var(--navy)} .muted{color:var(--muted)}
+/* scene heading */
+.head{position:absolute;left:120px;top:70px;display:flex;align-items:center;gap:26px}
+.head .n{width:64px;height:64px;border-radius:50%;background:var(--slate);color:#fff;font:700 32px var(--serif);display:flex;align-items:center;justify-content:center}
+.head .t{font:700 50px var(--serif);color:var(--slate);letter-spacing:.2px}
+.rule{position:absolute;left:120px;top:160px;width:1680px;height:2px;background:var(--line)}
+.card{background:#fff;border:1.5px solid var(--line);border-radius:14px}
+.lab{font-size:20px;letter-spacing:2.5px;text-transform:uppercase;color:var(--dim);font-weight:700}
+.chip{position:absolute;display:flex;align-items:center;justify-content:center;border-radius:10px;font:600 30px var(--mono)}
+.chip.b{background:var(--blueP);border:1.5px solid var(--blueM);color:var(--navy)}
+.chip.a{background:var(--amberP);border:1.5px solid var(--amberM);color:var(--navy)}
+.pill{display:inline-block;padding:6px 18px;border-radius:999px;font-weight:700;font-size:22px;letter-spacing:1px}
+.pill.b{background:var(--blueP);color:var(--blue)} .pill.a{background:var(--amberP);color:var(--amber)}
+/* caption under every animation */
+.cap{position:absolute;left:0;width:1920px;top:968px;text-align:center;font:italic 25px var(--serif);color:var(--muted)}
+#footer{position:absolute;left:0;top:1030px;width:1920px;height:50px;border-top:1.5px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:0 120px;font-size:20px;color:var(--dim);letter-spacing:.5px}
+#footer b{color:var(--slate)}
+.step{position:absolute;left:760px;width:1040px;height:112px;display:flex;align-items:center;gap:26px;padding:0 28px}
+.step .k{width:52px;height:52px;border-radius:50%;background:var(--slate);color:#fff;font:700 26px var(--serif);display:flex;align-items:center;justify-content:center;flex:none}
+.step .tt{font-size:31px;font-weight:700;color:var(--navy)}
+.step .cd{font:22px var(--mono);color:var(--muted);margin-top:6px}
+.step .dm{margin-left:auto;font:700 28px var(--mono);color:var(--blue);background:var(--blueP);padding:8px 18px;border-radius:10px;white-space:nowrap}
+.fcard{position:absolute;top:230px;width:530px;height:690px;padding:34px 34px}
+.fcard h3{font:700 33px var(--serif);color:var(--navy);margin:20px 0 14px}
+.fcard p{font-size:26px;line-height:1.45;color:var(--muted)}
+.res{position:absolute;top:760px;width:390px;height:150px;padding:22px 26px}
+.res .v{font:700 46px var(--serif);color:var(--navy)}
+.res .l{font-size:22px;color:var(--muted);margin-top:8px}
+#hud{position:fixed;left:0;right:0;bottom:0;height:4px;background:#d0d5dc}
+#hud i{display:block;height:100%;width:0;background:var(--slate)}
+</style>
+<script src="timeline.js"></script>
+</head>
+<body>
+<div id="stage">
+
+<!-- ============ S1 TITLE ============ -->
+<div class="scene" id="s1">
+  <div class="abs" style="left:0;top:0;width:1920px;height:16px;background:var(--navy)"></div>
+  <div class="abs lab" style="left:0;width:1920px;top:150px;text-align:center;color:var(--slate);font-size:24px;letter-spacing:5px" data-t="0.2">Design Project · Indian Institute of Information Technology Vadodara</div>
+  <div class="abs" style="left:0;width:1920px;top:228px;text-align:center;font:700 92px var(--serif);color:var(--navy)" data-t="0.4" data-a="rise" data-d="1">LLM Hallucination Detection</div>
+  <div class="abs" style="left:0;width:1920px;top:356px;text-align:center;font:700 64px var(--serif);color:var(--blue)" data-t="0.9" data-a="rise" data-d="1">using EigenScore</div>
+  <div class="abs" style="left:760px;top:478px;width:400px;height:4px;background:var(--amber)" data-t="1.4" data-a="wipe" data-d="1"></div>
+  <div class="abs" style="left:0;width:1920px;top:516px;text-align:center;font:italic 32px var(--serif);color:var(--muted)" data-t="1.7">Flagging likely-wrong answers of a language model from its internal states</div>
+  <div class="abs" style="left:300px;top:640px;display:flex;gap:40px">
+    <div class="card" style="width:400px;padding:28px 0;text-align:center;border-top:5px solid var(--slate)" data-t="P1+2.6" data-a="rise"><div style="font:700 36px var(--serif);color:var(--navy)">Prapti Chotaliya</div><div class="mono" style="font-size:26px;margin-top:10px;color:var(--amber)">202411030</div></div>
+    <div class="card" style="width:400px;padding:28px 0;text-align:center;border-top:5px solid var(--slate)" data-t="P1+4.2" data-a="rise"><div style="font:700 36px var(--serif);color:var(--navy)">Aayaan Ali Khan</div><div class="mono" style="font-size:26px;margin-top:10px;color:var(--amber)">202411001</div></div>
+    <div class="card" style="width:400px;padding:28px 0;text-align:center;border-top:5px solid var(--slate)" data-t="P1+5.4" data-a="rise"><div style="font:700 36px var(--serif);color:var(--navy)">Shlok Bhavsar</div><div class="mono" style="font-size:26px;margin-top:10px;color:var(--amber)">202411018</div></div>
+  </div>
+  <div class="abs" style="left:0;width:1920px;top:880px;text-align:center;font-size:26px;color:var(--dim);letter-spacing:1px" data-t="2.2">Llama-2-7B  ·  250 CoQA questions  ·  8 GB laptop GPU  ·  Python / PyTorch</div>
+</div>
+
+<!-- ============ S2 PROBLEM ============ -->
+<div class="scene" id="s2">
+  <div class="head" data-t="s2+0.1" data-a="left"><div class="n">1</div><div class="t">Problem Statement</div></div>
+  <div class="rule" data-t="s2+0.2" data-a="wipe"></div>
+  <div class="abs card" style="left:120px;top:230px;width:820px;height:600px;background:var(--soft)" data-t="P2-0.3" data-a="scale"></div>
+  <div class="abs lab" style="left:160px;top:258px" data-t="P2-0.1">A chat with the model (illustrative)</div>
+  <div class="abs" style="left:340px;top:320px;width:560px;padding:22px 28px;background:var(--blueP);border-radius:20px 20px 4px 20px;font-size:31px;color:var(--navy)" data-t="P2+0.3" data-a="right">In which year did the bridge open?</div>
+  <div class="abs" style="left:160px;top:470px;width:560px;padding:22px 28px;background:#fff;border:1.5px solid var(--line);border-radius:20px 20px 20px 4px;font-size:31px;color:var(--ink)" data-t="P2+1.4" data-a="left">The bridge opened in <b>1928</b>. It was a major event for the city.</div>
+  <div class="abs pill b" style="left:160px;top:640px" data-t="P2+3" data-a="rise">confident tone</div>
+  <div class="abs" style="left:370px;top:628px;padding:10px 20px;border:3px solid var(--amber);border-radius:10px;color:var(--amber);font:700 28px var(--sans);transform:rotate(-4deg)" data-t="P2+4.2" data-a="scale">but is it correct?</div>
+  <div class="abs" style="left:160px;top:730px;width:740px;font-size:25px;color:var(--muted);line-height:1.4" data-t="P2+4.8">Right and wrong answers read the same: nothing in the text says which is which.</div>
+
+  <div class="abs lab" style="left:1040px;top:258px;color:var(--slate)" data-t="P3-0.2">Our goal</div>
+  <div class="abs" style="left:1040px;top:300px;width:760px;font:700 40px var(--serif);color:var(--navy);line-height:1.3" data-t="P3" data-a="rise">A hallucination score for every answer</div>
+  <div class="abs card" style="left:1040px;top:450px;width:760px;height:110px;display:flex;align-items:center;gap:26px;padding:0 30px" data-t="P3+0.8" data-a="right"><div class="pill b">1</div><div style="font-size:30px">Flags <b>likely-wrong</b> answers (higher = riskier)</div></div>
+  <div class="abs card" style="left:1040px;top:580px;width:760px;height:110px;display:flex;align-items:center;gap:26px;padding:0 30px" data-t="P3+2.6" data-a="right"><div class="pill b">2</div><div style="font-size:30px">Needs <b>no answer key</b></div></div>
+  <div class="abs card" style="left:1040px;top:710px;width:760px;height:110px;display:flex;align-items:center;gap:26px;padding:0 30px" data-t="P3+4.2" data-a="right"><div class="pill b">3</div><div style="font-size:30px">Runs on an <b>8 GB laptop GPU</b></div></div>
+  <div class="cap" data-t="P2+0.5">Language models give wrong answers in the same confident tone as right ones.</div>
+</div>
+
+<!-- ============ S3 IDEA ============ -->
+<div class="scene" id="s3">
+  <div class="head" data-t="s3+0.1" data-a="left"><div class="n">2</div><div class="t">The Idea: Ask Again, Check Agreement</div></div>
+  <div class="rule" data-t="s3+0.2" data-a="wipe"></div>
+  <div class="abs card" style="left:510px;top:200px;width:900px;padding:18px 30px;text-align:center;font-size:32px" data-t="P4+0.3" data-a="scale"><b class="slate" style="color:var(--slate)">Q:</b> In which year did the bridge open? <span class="muted" style="font-size:24px">→ asked 10 times</span></div>
+  <div class="abs" style="left:120px;top:322px;width:820px;text-align:center;font:700 30px var(--sans);color:var(--blue)" data-t="P5-0.2">Model knows</div>
+  <div class="abs" style="left:980px;top:322px;width:820px;text-align:center;font:700 30px var(--sans);color:var(--amber)" data-t="P5+2.2">Model is guessing</div>
+  <div class="abs" style="left:959px;top:320px;width:2px;height:390px;background:var(--line)" data-t="P5-0.4" data-a="wipeY"></div>
+  <div id="s3chips"></div>
+  <div class="abs pill b" style="left:450px;top:640px;font-size:26px" data-t="P5+1.6" data-a="rise">answers agree → trust</div>
+  <div class="abs pill a" style="left:1290px;top:640px;font-size:26px" data-t="P5+3.8" data-a="rise">answers scatter → flag</div>
+  <!-- words vs internal states -->
+  <div class="abs card" style="left:120px;top:730px;width:1680px;height:210px;background:var(--soft)" data-t="P6-0.2" data-a="rise"></div>
+  <div class="abs lab" style="left:160px;top:752px" data-t="P6">Same meaning, different words</div>
+  <div class="abs chip b" style="left:160px;top:800px;width:180px;height:56px" data-t="P6+0.2">“1932”</div>
+  <div class="abs chip b" style="left:160px;top:870px;width:400px;height:56px;font-size:26px" data-t="P6+0.4">“in nineteen thirty-two”</div>
+  <div class="abs" style="left:640px;top:790px;width:470px" data-t="P6+1.2"><div class="lab">Compare words</div><div style="font-size:30px;margin-top:8px">Word overlap: <b class="amber">0%</b></div><div style="font-size:24px;color:var(--muted);margin-top:6px">→ wrongly looks like disagreement</div></div>
+  <div class="abs" style="left:1180px;top:790px;width:430px" data-t="P6+2.4"><div class="lab">Compare internal states</div><div style="font-size:30px;margin-top:8px">Vectors: <b class="blue">close together</b></div><div style="font-size:24px;color:var(--muted);margin-top:6px">→ treated as agreement</div></div>
+  <svg class="abs" style="left:1600px;top:775px" width="180" height="150" data-t="P6+2.6"><circle cx="90" cy="75" r="62" fill="#fff" stroke="#D9DEE5" stroke-width="2"/><circle cx="80" cy="70" r="12" fill="#2C5D8F"/><circle cx="102" cy="82" r="12" fill="#2C5D8F" opacity=".75"/></svg>
+  <div class="cap" data-t="P4+0.5">Agreeing answers signal knowledge; scattered answers signal guessing (illustrative).</div>
+</div>
+
+<!-- ============ S4 EIGEN ============ -->
+<div class="scene" id="s4">
+  <div class="head" data-t="s4+0.1" data-a="left"><div class="n">3</div><div class="t">Measuring the Spread with Eigenvalues</div></div>
+  <div class="rule" data-t="s4+0.2" data-a="wipe"></div>
+  <div class="abs card" style="left:120px;top:200px;width:820px;height:600px" data-t="A1" data-a="scale"></div>
+  <div class="abs card" style="left:980px;top:200px;width:820px;height:600px" data-t="A1+0.3" data-a="scale"></div>
+  <div class="abs lab" style="left:150px;top:222px;color:var(--blue)" data-t="A1+0.4">Answers agree</div>
+  <div class="abs lab" style="left:1010px;top:222px;color:var(--amber)" data-t="A1+0.6">Answers disagree</div>
+  <svg id="s4svg" class="abs" style="left:0;top:0" width="1920" height="1080"></svg>
+  <div id="s4lab"></div>
+  <div class="abs card" style="left:120px;top:822px;width:1680px;height:118px;display:flex;align-items:center;justify-content:center;gap:60px;background:var(--soft)" data-t="A3+3" data-a="rise">
+    <div style="font:700 36px var(--serif);color:var(--navy)">EigenScore = average of log<sub style="font-size:22px">10</sub>(eigenvalues)</div>
+    <div style="font-size:23px;color:var(--muted);line-height:1.4">Worked example (K = 3, d = 4):<br>agree → <b class="blue">−2.05</b> · disagree → <b class="amber">−1.37</b></div>
+  </div>
+  <div class="cap" data-t="A1+0.8">Each dot is one answer’s internal vector. Arrows are eigenvectors (directions of spread); bar heights are eigenvalues (amount of spread).</div>
+</div>
+
+<!-- ============ S5 PIPELINE ============ -->
+<div class="scene" id="s5">
+  <div class="head" data-t="s5+0.1" data-a="left"><div class="n">4</div><div class="t">From the Model to One Score</div></div>
+  <div class="rule" data-t="s5+0.2" data-a="wipe"></div>
+  <div class="abs lab" style="left:150px;top:196px;width:420px;text-align:center" data-t="A4+0.2">output: next word</div>
+  <div class="abs lab" style="left:150px;top:916px;width:420px;text-align:center" data-t="A4+0.2">input: question + answer</div>
+  <div class="abs" style="left:150px;top:236px;width:420px;text-align:center;font:700 26px var(--serif);color:var(--navy)" data-t="A4+0.4">Llama-2-7B · 32 layers</div>
+  <svg id="s5svg" class="abs" style="left:0;top:0" width="1920" height="1080"></svg>
+  <div class="abs" style="left:150px;top:590px;width:420px;text-align:center;font:700 22px var(--sans);color:#fff" data-t="A4+3.2">layer 16 · last token</div>
+  <div class="abs" style="left:150px;top:307px;width:420px;text-align:center;font:700 19px var(--sans);color:#fff" data-t="A5+5.6">layer 31 · feature clipping (optional)</div>
+  <div class="abs step card" style="top:206px" data-t="A4+1" data-a="right"><div class="k">1</div><div><div class="tt">Sample 10 answers to the question</div><div class="cd">model.generate(temperature=0.5, top_p=0.99)</div></div><div class="dm">K = 10</div></div>
+  <div class="abs step card" style="top:350px" data-t="A4+3.6" data-a="right"><div class="k">2</div><div><div class="tt">Read layer 16 at each answer’s last token</div><div class="cd">forward hook → 4,096 numbers per answer</div></div><div class="dm">Z: 10 × 4096</div></div>
+  <div class="abs step card" style="top:494px" data-t="A5+2.4" data-a="right"><div class="k">3</div><div><div class="tt">Covariance between the 10 answers</div><div class="cd">torch.cov(Z)</div></div><div class="dm">C: 10 × 10</div></div>
+  <div class="abs step card" style="top:638px" data-t="A5+3.8" data-a="right"><div class="k">4</div><div><div class="tt">Eigenvalues of the covariance</div><div class="cd">np.linalg.svd(C + 0.001·I)</div></div><div class="dm">10 values</div></div>
+  <div class="abs step card" style="top:782px;border:2px solid var(--blue)" data-t="A5+5.2" data-a="right"><div class="k" style="background:var(--blue)">5</div><div><div class="tt">Hallucination score</div><div class="cd">np.mean(np.log10(eigenvalues))</div></div><div class="dm">1 number</div></div>
+  <div class="cap" data-t="A4+0.6">Our Python pipeline, with the real sizes used in the experiment.</div>
+</div>
+
+<!-- ============ S6 ENGINEERING ============ -->
+<div class="scene" id="s6">
+  <div class="head" data-t="s6+0.1" data-a="left"><div class="n">5</div><div class="t">Making It Fit on an 8 GB GPU</div></div>
+  <div class="rule" data-t="s6+0.2" data-a="wipe"></div>
+  <div class="abs card" style="left:120px;top:210px;width:900px;height:720px" data-t="A6-0.3" data-a="scale"></div>
+  <div class="abs lab" style="left:160px;top:236px" data-t="A6">GPU memory for the model weights</div>
+  <svg id="s6svg" class="abs" style="left:0;top:0" width="1920" height="1080"></svg>
+  <div id="s6lab"></div>
+  <div class="abs card" style="left:1080px;top:210px;width:720px;height:220px;padding:30px 34px" data-t="S1+0.2" data-a="right"><div class="lab" style="color:var(--blue)">Memory</div><div style="font:700 30px var(--serif);color:var(--navy);margin:10px 0">Keep only what we need</div><div style="font-size:25px;color:var(--muted);line-height:1.4">A hook stores only layer 16’s last-token vector, not all 33 hidden states.</div></div>
+  <div class="abs card" style="left:1080px;top:460px;width:720px;height:220px;padding:30px 34px" data-t="S1+2.6" data-a="right"><div class="lab" style="color:var(--blue)">Generation</div><div style="font:700 30px var(--serif);color:var(--navy);margin:10px 0">2 answers at a time × 5</div><div style="font-size:25px;color:var(--muted);line-height:1.4">All 10 answers are pooled before scoring.</div></div>
+  <div class="abs card" style="left:1080px;top:710px;width:720px;height:220px;padding:30px 34px" data-t="S1+5" data-a="right"><div class="lab" style="color:var(--blue)">Correctness</div><div style="font:700 30px var(--serif);color:var(--navy);margin:10px 0">8 unit tests · 8 / 8 pass</div><div style="font-size:25px;color:var(--muted);line-height:1.4">e.g. clipping limits checked against numpy.percentile.</div></div>
+  <div class="cap" data-t="A6+0.5">4-bit (NF4) weights shrink the 7-billion-parameter model to fit a laptop GPU.</div>
+</div>
+
+<!-- ============ S7 RESULTS ============ -->
+<div class="scene" id="s7">
+  <div class="head" data-t="s7+0.1" data-a="left"><div class="n">6</div><div class="t">Results on 250 Test Questions</div></div>
+  <div class="rule" data-t="s7+0.2" data-a="wipe"></div>
+  <div class="abs lab" style="left:120px;top:206px" data-t="S2">The model’s own answers (CoQA)</div>
+  <div class="abs" style="left:120px;top:246px;width:1680px;height:84px;border-radius:12px;overflow:hidden;background:var(--soft)" data-t="S2"><div id="s7c" style="position:absolute;left:0;top:0;height:84px;background:var(--blue)"></div><div id="s7w" style="position:absolute;top:0;height:84px;background:var(--amber)"></div></div>
+  <div class="abs" style="left:150px;top:268px;font:700 32px var(--sans);color:#fff" data-t="S2+1.2">92 correct (37%)</div>
+  <div class="abs" style="left:1440px;top:268px;width:330px;text-align:right;font:700 32px var(--sans);color:#fff" data-t="S2+3">158 wrong (63%)</div>
+  <div class="abs card" style="left:120px;top:370px;width:1680px;height:360px" data-t="S3-0.3" data-a="scale"></div>
+  <div class="abs lab" style="left:160px;top:396px" data-t="S3">Detection score (AUROC)</div>
+  <div id="s7num" class="abs" style="left:160px;top:440px;font:700 130px var(--serif);color:var(--blue)" data-t="S3+0.2">0.0%</div>
+  <div class="abs" style="left:160px;top:610px;width:600px;font-size:25px;color:var(--muted);line-height:1.45" data-t="S3+2.4">Take one wrong and one correct answer: our score is higher for the wrong one in 83.5% of cases.</div>
+  <svg id="s7svg" class="abs" style="left:0;top:0" width="1920" height="1080"></svg>
+  <div id="s7lab"></div>
+  <div class="abs card res" style="left:120px" data-t="S3+3.6" data-a="rise"><div class="v">83.5%</div><div class="l">AUROC (detection score)</div></div>
+  <div class="abs card res" style="left:550px" data-t="S3+4.1" data-a="rise"><div class="v">82.5%</div><div class="l">with feature clipping on</div></div>
+  <div class="abs card res" style="left:980px" data-t="S3+4.6" data-a="rise"><div class="v">≈ 6 s</div><div class="l">per question (10 answers + score)</div></div>
+  <div class="abs card res" style="left:1410px" data-t="S3+5.1" data-a="rise"><div class="v">≈ 3.9 GB</div><div class="l">GPU memory, of 8 GB</div></div>
+  <div class="cap" data-t="S2+0.5">An answer counts as correct when its ROUGE-L overlap with the reference is above 0.5.</div>
+</div>
+
+<!-- ============ S8 FUTURE ============ -->
+<div class="scene" id="s8">
+  <div class="head" data-t="s8+0.1" data-a="left"><div class="n">7</div><div class="t">Future Directions</div></div>
+  <div class="rule" data-t="s8+0.2" data-a="wipe"></div>
+  <div class="abs pill a" style="left:1468px;top:86px;font-size:22px" data-t="s8+0.6">planned · not yet evaluated</div>
+  <div class="abs card fcard" style="left:120px" data-t="S4+1.2" data-a="rise"><span class="pill b">01</span><h3>Multi-layer EigenScore</h3><p>Combine a band of middle layers into one score, instead of one hand-picked layer.</p></div>
+  <div class="abs card fcard" style="left:695px" data-t="S5" data-a="rise"><span class="pill b">02</span><h3>Add token confidence</h3><p>Join the spread score with the model’s own word-level confidence to catch confident mistakes.</p></div>
+  <div class="abs card fcard" style="left:1270px" data-t="S5+2.2" data-a="rise"><span class="pill b">03</span><h3>Adaptive sampling</h3><p>Stop early when the first answers clearly agree: fewer than 10 answers, lower cost.</p></div>
+  <svg id="s8svg" class="abs" style="left:0;top:0" width="1920" height="1080"></svg>
+  <div id="s8lab"></div>
+  <div class="cap" data-t="S4+0.5">Next steps for the system; these ideas have not been tested yet.</div>
+</div>
+
+<!-- ============ S9 THANKS ============ -->
+<div class="scene" id="s9">
+  <div class="abs" style="left:0;top:0;width:1920px;height:16px;background:var(--navy)"></div>
+  <div class="abs" style="left:0;width:1920px;top:190px;text-align:center;font:700 96px var(--serif);color:var(--navy)" data-t="s9+0.2" data-a="rise">Thank you</div>
+  <div class="abs" style="left:0;width:1920px;top:350px;text-align:center;font-size:34px;color:var(--ink)" data-t="s9+0.6">Prapti Chotaliya · Aayaan Ali Khan · Shlok Bhavsar</div>
+  <div class="abs" style="left:0;width:1920px;top:405px;text-align:center;font:26px var(--mono);color:var(--amber)" data-t="s9+0.8">202411030 · 202411001 · 202411018</div>
+  <div class="abs" style="left:760px;top:480px;width:400px;height:3px;background:var(--amber)" data-t="s9+1" data-a="wipe"></div>
+  <div class="abs" style="left:360px;top:540px;width:1200px" data-t="s9+1.3">
+    <div class="lab" style="color:var(--slate);margin-bottom:18px">References</div>
+    <div style="font-size:25px;line-height:1.6;color:var(--muted)">[1] C. Chen et al., “INSIDE: LLMs’ Internal States Retain the Power of Hallucination Detection,” ICLR 2024.<br>[2] S. Reddy, D. Chen, C. D. Manning, “CoQA: A Conversational Question Answering Challenge,” TACL 2019.<br>[3] H. Touvron et al., “Llama 2: Open Foundation and Fine-Tuned Chat Models,” arXiv:2307.09288, 2023.</div>
+  </div>
+  <div class="abs" style="left:0;width:1920px;top:900px;text-align:center;font-size:24px;color:var(--dim)" data-t="s9+1.6">Design Project · Indian Institute of Information Technology Vadodara</div>
+</div>
+
+<div id="footer"><span><b>LLM Hallucination Detection using EigenScore</b></span><span>Design Project · IIIT Vadodara</span></div>
+</div>
+<div id="hud"><i></i></div>
+
+<script>
+// ---------- utilities ----------
+const SVGNS='http://www.w3.org/2000/svg';
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const ease=x=>{x=clamp(x);return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2};
+const lerp=(a,b,p)=>a+(b-a)*p;
+const seg=(t,a,b)=>ease((t-a)/(b-a));
+function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function gauss(R){return Math.sqrt(-2*Math.log(R()+1e-9))*Math.cos(6.2832*R())}
+function hex(c){return[parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),parseInt(c.slice(5,7),16)]}
+function mix(a,b,p){const A=hex(a),B=hex(b);return'rgb('+A.map((v,i)=>Math.round(lerp(v,B[i],clamp(p)))).join(',')+')'}
+function S(tag,attrs,parent){const e=document.createElementNS(SVGNS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
+function H(html,parent){const d=document.createElement('div');d.innerHTML=html.trim();const e=d.firstChild;parent.appendChild(e);return e}
+const C={line:'#D9DEE5',soft:'#F4F6F9',layer:'#D5DCE6',ink:'#1F2A37',navy:'#24405F',slate:'#3B5B7E',muted:'#5A6472',dim:'#7A8390',
+  blue:'#2C5D8F',blueP:'#E4ECF5',blueM:'#9DB6D3',amber:'#C46A1D',amberP:'#F8EBDD',amberM:'#E2B48A'};
+
+// ---------- timeline ----------
+const TL=window.TL, SC={};TL.scenes.forEach(s=>SC[s.id]=s);
+const SCENES=TL.scenes.map(s=>({id:s.id,start:s.start,dur:s.end-s.start,el:document.getElementById(s.id)}));
+const TOTAL=TL.total;
+// time expression: number (global seconds), "P3+1.2" (line start + offset), "s4+0.5" (scene start + offset)
+function T(x){x=String(x).trim();const m=x.match(/^([A-Za-z]\d+)([+-][\d.]+)?$/);
+  if(!m)return +x;const k=m[1],o=m[2]?+m[2]:0;
+  if(TL.lines[k])return TL.lines[k].start+o;if(SC[k])return SC[k].start+o;throw Error('bad cue '+x)}
+const L=k=>TL.lines[k].start, LE=k=>TL.lines[k].end;
+
+// ---------- S3 chips ----------
+(function(){
+  const host=document.getElementById('s3chips');
+  const know=Array(10).fill('1932'),guess=['1932','1928','1936','1941','1930','1925','1932','1939','1928','1934'];
+  const off=[[0,0],[10,-14],[-8,12],[12,6],[-6,-12],[8,14],[-12,-6],[10,12],[-6,-14],[12,-8]];
+  know.forEach((v,i)=>{const r=Math.floor(i/5),c=i%5;H(`<div class="chip b" style="left:${180+c*146}px;top:${400+r*100}px;width:124px;height:62px" data-t="${L('P5')+0.1+i*.1}" data-a="rise">${v}</div>`,host)});
+  guess.forEach((v,i)=>{const r=Math.floor(i/5),c=i%5;H(`<div class="chip a" style="left:${1040+c*150+off[i][0]}px;top:${400+r*100+off[i][1]}px;width:124px;height:62px;transform:rotate(${off[i][0]/3}deg)" data-t="${L('P5')+2.4+i*.12}" data-a="rise">${v}</div>`,host)});
+})();
+
+// ---------- S4: two clouds with ellipse, eigenvectors, eigenvalue bars ----------
+const S4={};
+(function(){
+  const svg=document.getElementById('s4svg'),host=document.getElementById('s4lab');
+  S4.p=[];
+  const cfg=[{ox:120,cx:400,cy:510,s1:50,s2:19,ang:-28,col:C.blue,pale:C.blueP,seed:5,cue:'A2',lab:'low score → trust'},
+             {ox:980,cx:1260,cy:510,s1:120,s2:72,ang:-22,col:C.amber,pale:C.amberP,seed:9,cue:'A3',lab:'high score → flag'}];
+  cfg.forEach((c,side)=>{
+    const R=rng(c.seed),a=c.ang*Math.PI/180,ux=Math.cos(a),uy=Math.sin(a);
+    const g={c,dots:[]};
+    S('rect',{x:c.ox+40,y:270,width:520,height:500,rx:10,fill:C.soft},svg);
+    g.ell=S('ellipse',{cx:c.cx,cy:c.cy,rx:2.1*c.s1,ry:2.1*c.s2,transform:`rotate(${c.ang} ${c.cx} ${c.cy})`,fill:c.pale,stroke:c.col,'stroke-width':2.5,'stroke-dasharray':'8 6'},svg);
+    for(let i=0;i<10;i++){const u=gauss(R)*c.s1*.95,v=gauss(R)*c.s2*.95;const x=c.cx+u*ux-v*uy,y=c.cy+u*uy+v*ux;
+      const sx=c.cx+(R()-.5)*420,sy=c.cy+(R()-.5)*380;g.dots.push({x,y,sx,sy,e:S('circle',{r:11,fill:c.col,stroke:'#fff','stroke-width':2},svg)})}
+    const mk=(len,dx,dy)=>{const p=S('line',{x1:c.cx,y1:c.cy,x2:c.cx+dx*len,y2:c.cy+dy*len,stroke:C.navy,'stroke-width':4,'marker-end':'url(#ah)'},svg);return p};
+    g.v1=mk(2.1*c.s1,ux,uy);g.v2=mk(2.1*c.s2,-uy,ux);g.len1=2.1*c.s1;g.len2=2.1*c.s2;
+    g.l1=H(`<div class="abs" style="font:italic 700 26px var(--serif);color:${C.navy};left:${c.cx+ux*2.1*c.s1+8}px;top:${c.cy+uy*2.1*c.s1-40}px">v₁</div>`,host);
+    g.l2=H(`<div class="abs" style="font:italic 700 26px var(--serif);color:${C.navy};left:${c.cx-uy*2.1*c.s2+6}px;top:${c.cy+ux*2.1*c.s2-6}px">v₂</div>`,host);
+    // eigenvalue bars
+    const bx=c.ox+610,base=740;S('line',{x1:bx-10,x2:bx+170,y1:base,y2:base,stroke:C.dim,'stroke-width':2},svg);
+    const lam=[c.s1*c.s1,c.s2*c.s2],maxH=430/(120*120);
+    g.bars=lam.map((l,k)=>({h:Math.max(6,l*maxH),e:S('rect',{x:bx+k*86,width:64,y:base,height:0,rx:4,fill:c.col},svg)}));
+    g.bl=[0,1].map(k=>H(`<div class="abs" style="left:${bx+k*86}px;top:${base+8}px;width:64px;text-align:center;font:italic 700 24px var(--serif);color:${C.navy}">λ${k?'₂':'₁'}</div>`,host));
+    H(`<div class="abs lab" style="left:${bx-20}px;top:286px;width:210px;text-align:center" data-x="1">eigenvalues</div>`,host);
+    g.score=H(`<div class="abs pill ${side?'a':'b'}" style="left:${c.ox+40}px;top:718px;font-size:24px">${c.lab}</div>`,host);
+    S4.p.push(g);
+  });
+  const defs=S('defs',{},svg),m=S('marker',{id:'ah',viewBox:'0 0 10 10',refX:7,refY:5,markerWidth:5,markerHeight:5,orient:'auto-start-reverse'},defs);S('path',{d:'M0 0 L10 5 L0 10 z',fill:C.navy},m);
+  S4.svg=svg;S4.host=host;
+})();
+function s4(t){
+  const show=seg(t,L('A1')+0.4,L('A1')+1.2);S4.svg.style.opacity=show;S4.host.style.opacity=show;
+  S4.p.forEach((g,side)=>{
+    const conv=seg(t,L('A1')+1.4+side*.3,L('A1')+3.4+side*.3);
+    g.dots.forEach((d,i)=>{d.e.setAttribute('cx',lerp(d.sx,d.x,conv));d.e.setAttribute('cy',lerp(d.sy,d.y,conv));d.e.setAttribute('opacity',seg(t,L('A1')+0.6+i*.06,L('A1')+1+i*.06))});
+    const el=seg(t,L('A1')+3.8+side*.4,L('A1')+5+side*.4);g.ell.setAttribute('opacity',el);
+    const c0=L(g.c.cue)+0.2,a1=seg(t,c0,c0+1),a2=seg(t,c0+.5,c0+1.5);
+    g.v1.setAttribute('opacity',a1>0?1:0);g.v2.setAttribute('opacity',a2>0?1:0);
+    const ux=Math.cos(g.c.ang*Math.PI/180),uy=Math.sin(g.c.ang*Math.PI/180);
+    g.v1.setAttribute('x2',g.c.cx+ux*g.len1*Math.max(a1,.01));g.v1.setAttribute('y2',g.c.cy+uy*g.len1*Math.max(a1,.01));
+    g.v2.setAttribute('x2',g.c.cx-uy*g.len2*Math.max(a2,.01));g.v2.setAttribute('y2',g.c.cy+ux*g.len2*Math.max(a2,.01));
+    g.l1.style.opacity=seg(t,c0+.9,c0+1.3);g.l2.style.opacity=seg(t,c0+1.3,c0+1.7);
+    g.bars.forEach((b,k)=>{const h=b.h*seg(t,c0+1.2+k*.3,c0+2.2+k*.3);b.e.setAttribute('y',740-h);b.e.setAttribute('height',h)});
+    g.bl.forEach(e=>e.style.opacity=seg(t,c0+1.2,c0+1.8));
+    g.score.style.opacity=seg(t,c0+2.4,c0+3);
+  });
+}
+
+// ---------- layer stack (S5) ----------
+const S5={};
+(function(){
+  const svg=document.getElementById('s5svg');S5.bars=[];
+  const y=i=>900-i*19; S5.y=y;
+  for(let i=1;i<=32;i++)S5.bars.push(S('rect',{x:170,y:y(i),width:380,height:14,rx:3,fill:C.layer},svg));
+  S5.l16=S5.bars[15];S5.l31=S5.bars[30];
+  S5.arrow=S('path',{d:`M 556 ${y(16)+7} C 640 ${y(16)+7}, 660 406, 755 406`,stroke:C.blue,'stroke-width':4,fill:'none','marker-end':'url(#ah5)'},svg);
+  const defs=S('defs',{},svg),m=S('marker',{id:'ah5',viewBox:'0 0 10 10',refX:7,refY:5,markerWidth:5,markerHeight:5,orient:'auto'},defs);S('path',{d:'M0 0 L10 5 L0 10 z',fill:C.blue},m);
+  S5.len=S5.arrow.getTotalLength?260:260;S5.arrow.setAttribute('stroke-dasharray',300);
+})();
+function s5(t){
+  S5.bars.forEach((b,i)=>{b.setAttribute('opacity',seg(t,L('A4')+.2+i*.03,L('A4')+.6+i*.03));
+    let col=C.layer;
+    if(i===15){col=mix(C.layer,C.blue,seg(t,L('A4')+2.4,L('A4')+3.2));b.setAttribute('height',14+18*seg(t,L('A4')+2.4,L('A4')+3.2));b.setAttribute('y',S5.y(16)-9*seg(t,L('A4')+2.4,L('A4')+3.2))}
+    if(i===30){const p=seg(t,L('A5')+5.2,L('A5')+5.8);col=mix(C.layer,C.amber,p);b.setAttribute('height',14+14*p);b.setAttribute('y',S5.y(31)-7*p)}
+    b.setAttribute('fill',col)});
+  S5.arrow.setAttribute('stroke-dashoffset',300*(1-seg(t,L('A4')+3.4,L('A4')+4.2)));
+}
+
+// ---------- S6 memory chart ----------
+const S6={};
+(function(){
+  const svg=document.getElementById('s6svg'),host=document.getElementById('s6lab');
+  const X=v=>200+v*52; S6.X=X; // 0..14 GB -> 200..928
+  S6.g=S('g',{},svg);
+  for(let v=0;v<=14;v+=2){S('line',{x1:X(v),x2:X(v),y1:320,y2:780,stroke:C.line,'stroke-width':1.5},S6.g);
+    H(`<div class="abs" style="left:${X(v)-30}px;top:790px;width:60px;text-align:center;font-size:22px;color:${C.dim}" data-s6="1">${v}</div>`,host)}
+  H(`<div class="abs" style="left:200px;top:830px;width:728px;text-align:center;font-size:22px;color:${C.dim}" data-s6="1">gigabytes</div>`,host);
+  S6.lim=S('line',{x1:X(8),x2:X(8),y1:300,y2:790,stroke:C.navy,'stroke-width':3,'stroke-dasharray':'10 7'},svg);
+  S6.limL=H(`<div class="abs" style="left:${X(8)-100}px;top:282px;width:200px;text-align:center;font:700 22px var(--sans);color:${C.navy};background:#fff">GPU limit: 8 GB</div>`,host);
+  S6.b1=S('rect',{x:X(0),y:380,height:90,rx:6,fill:C.amber},svg);
+  S6.b2=S('rect',{x:X(0),y:600,height:90,rx:6,fill:C.blue},svg);
+  S6.t1=H(`<div class="abs" style="left:${X(0)}px;top:340px;font-size:25px;color:${C.ink}"><b>16-bit weights</b>: 13.5 GB, does not fit</div>`,host);
+  S6.t2=H(`<div class="abs" style="left:${X(0)}px;top:560px;font-size:25px;color:${C.ink}"><b>4-bit NF4 weights</b>: 3.9 GB, fits</div>`,host);
+  S6.v1=H(`<div class="abs" style="top:402px;font:700 30px var(--sans);color:#fff">13.5</div>`,host);
+  S6.v2=H(`<div class="abs" style="top:622px;font:700 30px var(--sans);color:${C.blue}">3.9</div>`,host);
+  S6.host=host;
+})();
+function s6(t){
+  const a=seg(t,L('A6')+.2,L('A6')+1);S6.g.setAttribute('opacity',a);S6.host.querySelectorAll('[data-s6]').forEach(e=>e.style.opacity=a);
+  const l=seg(t,L('A6')+.8,L('A6')+1.6);S6.lim.setAttribute('opacity',l);S6.limL.style.opacity=l;
+  const p1=seg(t,L('A6')+2,L('A6')+3.4),p2=seg(t,L('A6')+4.6,L('A6')+6);
+  S6.b1.setAttribute('width',(S6.X(13.5)-S6.X(0))*p1);S6.t1.style.opacity=seg(t,L('A6')+2,L('A6')+2.6);
+  S6.v1.style.left=(S6.X(13.5*p1)-74)+'px';S6.v1.style.opacity=seg(t,L('A6')+3,L('A6')+3.4);
+  S6.b2.setAttribute('width',(S6.X(3.9)-S6.X(0))*p2);S6.t2.style.opacity=seg(t,L('A6')+4.6,L('A6')+5.2);
+  S6.v2.style.left=(S6.X(3.9*p2)+14)+'px';S6.v2.style.opacity=seg(t,L('A6')+5.6,L('A6')+6);
+}
+
+// ---------- S7 results ----------
+const S7={};
+(function(){
+  const svg=document.getElementById('s7svg'),host=document.getElementById('s7lab');
+  const X=v=>860+(v-50)*16.6; S7.X=X; // 50..100 -> 860..1690
+  S7.g=S('g',{},svg);
+  S('rect',{x:X(50),y:560,width:X(100)-X(50),height:22,rx:11,fill:C.soft,stroke:C.line},S7.g);
+  S7.fill=S('rect',{x:X(50),y:560,height:22,rx:11,fill:C.blue},svg);
+  [[50,'random guess: 50%'],[100,'perfect: 100%']].forEach(([v,s])=>{S('line',{x1:X(v),x2:X(v),y1:545,y2:600,stroke:C.dim,'stroke-width':2},S7.g);
+    H(`<div class="abs" style="left:${X(v)-120}px;top:612px;width:240px;text-align:center;font-size:22px;color:${C.dim}" data-s7="1">${s}</div>`,host)});
+  S7.mark=H(`<div class="abs" style="top:486px;width:160px;text-align:center;font:700 26px var(--sans);color:${C.blue}">ours: 83.5%</div>`,host);
+  S7.host=host;
+})();
+function s7(t){
+  const b=seg(t,L('S2')+.3,L('S2')+2.6);const W=1680;
+  document.getElementById('s7c').style.width=(W*92/250*b)+'px';
+  const w=seg(t,L('S2')+2,L('S2')+3.8);const wr=document.getElementById('s7w');wr.style.left=(W*92/250)+'px';wr.style.width=(W*158/250*w)+'px';
+  const n=seg(t,L('S3')+.3,L('S3')+2.3);document.getElementById('s7num').textContent=(83.5*n).toFixed(1)+'%';
+  const a=seg(t,L('S3')+.3,L('S3')+1);S7.g.setAttribute('opacity',a);S7.host.querySelectorAll('[data-s7]').forEach(e=>e.style.opacity=a);
+  const v=50+33.5*seg(t,L('S3')+.6,L('S3')+2.3);S7.fill.setAttribute('width',S7.X(v)-S7.X(50));S7.fill.setAttribute('opacity',a);
+  S7.mark.style.left=(S7.X(v)-80)+'px';S7.mark.style.opacity=seg(t,L('S3')+1.6,L('S3')+2.3);
+}
+
+// ---------- S8 mini diagrams ----------
+const S8={};
+(function(){
+  const svg=document.getElementById('s8svg');S8.items=[];
+  // 1: layer band -> one score
+  const g1=S('g',{},svg);S8.g1=g1;S8.band=[];
+  for(let i=0;i<16;i++){const r=S('rect',{x:170,y:850-i*16,width:250,height:11,rx:2,fill:C.layer},g1);S8.band.push(r)}
+  S8.join=S('path',{d:'M 425 690 C 470 690, 470 720, 520 720 M 425 790 C 470 790, 470 740, 520 730',stroke:C.blue,'stroke-width':3,fill:'none'},g1);
+  S('circle',{cx:545,cy:725,r:22,fill:C.blue},g1);
+  // 2: two signals -> score
+  const g2=S('g',{},svg);S8.g2=g2;
+  S('rect',{x:745,y:640,width:200,height:70,rx:10,fill:C.blueP,stroke:C.blueM},g2);
+  S('rect',{x:745,y:760,width:200,height:70,rx:10,fill:C.amberP,stroke:C.amberM},g2);
+  S('path',{d:'M 945 675 C 1010 675, 1010 735, 1060 735 M 945 795 C 1010 795, 1010 745, 1060 745',stroke:C.navy,'stroke-width':3,fill:'none'},g2);
+  S('circle',{cx:1090,cy:740,r:24,fill:C.navy},g2);
+  // 3: chips, stop early
+  const g3=S('g',{},svg);S8.g3=g3;S8.chips=[];
+  for(let i=0;i<10;i++){const r=S('rect',{x:1320+(i%5)*88,y:660+Math.floor(i/5)*80,width:74,height:56,rx:8,fill:i<3?C.blueP:'#fff',stroke:i<3?C.blueM:C.line,'stroke-width':2,'stroke-dasharray':i<3?'0':'6 5'},g3);S8.chips.push(r)}
+  const host=document.getElementById('s8lab');
+  H(`<div class="abs" style="left:762px;top:660px;width:166px;text-align:center;font:700 22px var(--sans);color:${C.blue}">spread score</div>`,host);
+  H(`<div class="abs" style="left:752px;top:780px;width:186px;text-align:center;font:700 21px var(--sans);color:${C.amber}">token confidence</div>`,host);
+  H(`<div class="abs" style="left:170px;top:870px;width:250px;text-align:center;font-size:20px;color:${C.dim}">middle layers</div>`,host);
+  for(let i=0;i<3;i++)H(`<div class="abs mono" style="left:${1320+i*88}px;top:674px;width:74px;text-align:center;font-size:22px;color:${C.navy};font-weight:700">1932</div>`,host);
+  H(`<div class="abs" style="left:1320px;top:830px;width:420px;font-size:21px;color:${C.dim}">3 agree → stop; remaining answers skipped</div>`,host);
+  S8.host=host;
+})();
+function s8(t){
+  const a1=seg(t,L('S4')+1.6,L('S4')+2.4);S8.g1.setAttribute('opacity',a1);
+  S8.band.forEach((r,i)=>r.setAttribute('fill',mix(C.layer,C.blue,(i>=3&&i<=12)?seg(t,L('S4')+2.6+Math.abs(i-8)*.15,L('S4')+3.2+Math.abs(i-8)*.15):0)));
+  S8.g2.setAttribute('opacity',seg(t,L('S5')+.4,L('S5')+1.2));
+  S8.g3.setAttribute('opacity',seg(t,L('S5')+2.6,L('S5')+3.4));
+  const labs=S8.host.children;
+  for(let i=0;i<labs.length;i++){const e=labs[i];const k=i<2?seg(t,L('S5')+.4,L('S5')+1.2):i===2?a1:seg(t,L('S5')+2.6,L('S5')+3.4);e.style.opacity=k}
+}
+
+const UPD={s4,s5,s6,s7,s8};
+
+// ---------- generic element animation ----------
+for(const s of SCENES){s.items=[...s.el.querySelectorAll('[data-t]')].map(e=>({e,t:T(e.dataset.t),d:+(e.dataset.d||.7),a:e.dataset.a||'fade'}))}
+function applyItem(it,t){
+  const p=ease((t-it.t)/it.d),e=it.e;e.style.opacity=p;
+  switch(it.a){
+    case'rise':e.style.transform=(e.style.transform.replace(/translateY\([^)]*\)/,'')+` translateY(${(1-p)*30}px)`).trim();break;
+    case'scale':e.style.transform=`scale(${.94+.06*p})`;break;
+    case'left':e.style.transform=`translateX(${(1-p)*-40}px)`;break;
+    case'right':e.style.transform=`translateX(${(1-p)*40}px)`;break;
+    case'wipe':e.style.opacity=p>0?1:0;e.style.clipPath=`inset(0 ${(1-p)*100}% 0 0)`;break;
+    case'wipeY':e.style.opacity=p>0?1:0;e.style.clipPath=`inset(0 0 ${(1-p)*100}% 0)`;break;
+  }
+}
+
+// ---------- master render ----------
+const XF=.6;
+const footer=document.getElementById('footer');
+function renderAt(t){
+  for(const s of SCENES){
+    const lt=t-s.start;
+    if(!(lt>-XF&&lt<s.dur+XF)){s.el.style.display='none';continue}
+    s.el.style.display='block';
+    const fin=s===SCENES[0]?1:clamp((lt+XF)/XF),fout=s===SCENES[SCENES.length-1]?1:clamp((s.dur+XF-lt)/XF);
+    // cross-fade centred on the boundary
+    s.el.style.opacity=Math.min(fin,fout);
+    for(const it of s.items)applyItem(it,t);
+    if(UPD[s.id])UPD[s.id](t);
+  }
+  footer.style.opacity=clamp(Math.min((t-SC.s2.start+.3)/.6,(SC.s9.start+.3-t)/.6));
+  document.querySelector('#hud i').style.width=(t/TOTAL*100)+'%';
+}
+window.renderAt=renderAt;window.TOTAL=TOTAL;
+
+// ---------- fit + live playback ----------
+const stage=document.getElementById('stage');
+const RENDER=new URLSearchParams(location.search).has('render');
+function fit(){if(RENDER){stage.style.transform='none';return}const k=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform=`scale(${k})`;stage.style.left=((innerWidth-1920*k)/2)+'px';stage.style.top=((innerHeight-1080*k)/2)+'px'}
+addEventListener('resize',fit);fit();
+if(RENDER){document.getElementById('hud').style.display='none';renderAt(0)}
+else{
+  let t=0,playing=true,last=performance.now();
+  function loop(now){const dt=(now-last)/1000;last=now;if(playing)t=Math.min(TOTAL,t+dt);renderAt(t);requestAnimationFrame(loop)}
+  addEventListener('keydown',e=>{if(e.code==='Space'){playing=!playing;e.preventDefault()}if(e.key==='r')t=0;
+    if(e.key==='ArrowRight')t=Math.min(TOTAL,t+5);if(e.key==='ArrowLeft')t=Math.max(0,t-5)});
+  document.fonts.ready.then(()=>{last=performance.now();requestAnimationFrame(loop)});
+}
+</script>
+</body>
+</html>
