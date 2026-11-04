@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hallucination Detection Poster</title>
+<link rel="stylesheet" href="fonts_formal/fonts.css">
+<style>
+@page { size: 594mm 420mm; margin: 0; }
+:root{ --navy:#0B2A5B; --navy2:#1F4E8C; --ink:#1A1A1A; --text:#2B2B2B; --muted:#5E6470; --rule:#C9CED6; --tint:#F2F5FA; --accent:#B22234; }
+*{ box-sizing:border-box; margin:0; padding:0 }
+html{ -webkit-print-color-adjust:exact; print-color-adjust:exact }
+body{ width:594mm; height:420mm; overflow:hidden; background:#FFFFFF; color:var(--text); font-family:'Lato',Arial,sans-serif; font-size:12.6pt; line-height:1.4; display:flex; flex-direction:column }
+/* ---------- header ---------- */
+header{ padding:8mm 16mm 5.5mm; text-align:center; border-bottom:1.4mm solid var(--navy); position:relative }
+header .course{ font-size:12.5pt; letter-spacing:2.5px; text-transform:uppercase; color:var(--navy2); font-weight:700 }
+header h1{ font-family:'Merriweather',Georgia,serif; font-weight:900; font-size:40pt; color:var(--navy); line-height:1.15; margin:2.5mm 0 2.5mm }
+header .names{ font-size:16pt; color:var(--ink) }
+header .names b{ font-weight:700 }
+header .names .id{ color:var(--muted); font-size:13pt }
+header .names .sep{ color:var(--rule); margin:0 4mm }
+header .inst{ font-size:13.5pt; color:var(--muted); margin-top:1.5mm; font-style:italic }
+header .presented{ font-size:11pt; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-top:3mm; margin-bottom:1mm }
+.thin{ height:.5mm; background:var(--navy2); margin:0 16mm }
+/* ---------- body ---------- */
+main{ flex:1; display:grid; grid-template-columns:1fr 1.12fr 1fr; gap:9mm; padding:6mm 16mm 4mm }
+.col{ display:flex; flex-direction:column; gap:4.5mm }
+.sec h2{ background:var(--navy); color:#fff; font-family:'Merriweather',Georgia,serif; font-weight:700; font-size:15.5pt; padding:2mm 4mm; margin-bottom:3mm; letter-spacing:.3px }
+.sec h2 .n{ opacity:.75; margin-right:2.5mm }
+.sec p{ margin-bottom:2.2mm; text-align:justify; hyphens:auto }
+.sec ul{ padding-left:5.5mm; margin-bottom:2mm } .sec li{ margin-bottom:1.3mm }
+.sec b{ color:var(--ink) }
+h3{ font-family:'Merriweather',Georgia,serif; font-size:13pt; color:var(--navy); margin:2.5mm 0 1.2mm }
+.box{ background:var(--tint); border-left:1.2mm solid var(--navy2); padding:2.8mm 4mm; margin:2mm 0 2.5mm }
+.eq{ font-family:'Merriweather',Georgia,serif; font-size:15pt; text-align:center; color:var(--ink); margin:2.5mm 0 1mm }
+.eqnote{ text-align:center; font-size:11pt; color:var(--muted); margin-bottom:2mm }
+figure{ margin:1.5mm 0 2mm; text-align:center }
+figcaption{ font-size:10.5pt; color:var(--muted); font-style:italic; margin-top:1mm }
+table{ width:100%; border-collapse:collapse; font-size:12.5pt; margin:1mm 0 2.5mm }
+caption{ caption-side:top; text-align:left; font-size:11pt; color:var(--muted); font-style:italic; padding-bottom:1.2mm }
+th{ text-align:left; border-top:.45mm solid var(--ink); border-bottom:.3mm solid var(--ink); padding:1.6mm 2.5mm; color:var(--ink) }
+td{ padding:1.2mm 2.5mm; border-bottom:.2mm solid var(--rule) }
+tr:last-child td{ border-bottom:.45mm solid var(--ink) }
+td.num{ text-align:right; font-variant-numeric:tabular-nums; font-weight:700; color:var(--ink) }
+.key{ display:grid; grid-template-columns:auto 1fr; gap:3mm 5mm; align-items:center; margin:2mm 0 3mm; border:.3mm solid var(--rule); padding:4mm 5mm }
+.key .big{ font-family:'Merriweather',Georgia,serif; font-weight:900; font-size:44pt; color:var(--navy); line-height:1 }
+.key .lab{ font-size:13pt; color:var(--ink); font-weight:700 }
+.key .lab span{ display:block; font-weight:400; color:var(--muted); font-size:11.5pt; margin-top:.8mm }
+.refs{ font-size:10.5pt; color:var(--muted) } .refs p{ text-align:left; margin-bottom:1.2mm }
+footer{ margin-top:auto; padding:3.5mm 16mm; border-top:.5mm solid var(--navy); display:flex; justify-content:space-between; font-size:10.5pt; color:var(--muted) }
+svg text{ font-family:'Lato',Arial,sans-serif }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="course">Design Project</div>
+  <h1>LLM Hallucination Detection using Multi-Layer EigenScore</h1>
+  <div class="presented">Presented by</div>
+  <div class="names"><b>Aayaan Ali Khan</b> <span class="id">(202411001)</span><span class="sep">|</span><b>Shlok Bhavsar</b> <span class="id">(202411018)</span><span class="sep">|</span><b>Prapti Chotaliya</b> <span class="id">(202411030)</span></div>
+  <div class="inst">Indian Institute of Information Technology Vadodara</div>
+</header>
+<div class="thin" style="margin-top:1mm"></div>
+
+<main>
+<!-- ================= column 1 ================= -->
+<div class="col">
+  <div class="sec">
+    <h2><span class="n">1.</span>Introduction</h2>
+    <p>Large Language Models (LLMs) are increasingly used in education, search and decision support. However, they frequently <b>hallucinate</b>: they generate fluent, confident answers that are factually incorrect. Because a hallucinated answer is written in the same tone as a correct one, users cannot tell them apart by reading the output.</p>
+    <p>A reliable way to <b>estimate when a model is likely to be wrong</b> is therefore essential for deploying LLMs safely.</p>
+  </div>
+
+  <div class="sec">
+    <h2><span class="n">2.</span>Problem Statement</h2>
+    <div class="box">Design a system that, for any question posed to an LLM, produces a <b>hallucination score</b> indicating how likely the answer is to be incorrect, <b>without access to the correct answer</b> and <b>without external fact-checking</b>, while running on a <b>consumer GPU with 8 GB of memory</b>.</div>
+    <p>Existing approaches inspect only output word probabilities or the surface text of answers, and discard the rich semantic information that remains inside the model.</p>
+  </div>
+
+  <div class="sec">
+    <h2><span class="n">3.</span>Objectives</h2>
+    <ul>
+      <li>Detect hallucinations using the model’s <b>internal hidden states</b>.</li>
+      <li>Measure <b>semantic consistency</b> across multiple sampled answers.</li>
+      <li>Reduce <b>over-confident</b> generations at inference time.</li>
+      <li>Run a 7-billion-parameter model on an <b>8 GB GPU</b>.</li>
+      <li>Validate the system quantitatively on a question-answering benchmark.</li>
+    </ul>
+  </div>
+
+  <div class="sec">
+    <h2><span class="n">4.</span>Key Idea</h2>
+    <p>If a model knows the answer, repeated answers to the same question are <b>consistent in meaning</b>; if it is guessing, they <b>diverge</b>.</p>
+    <figure>
+      <svg width="100%" viewBox="0 0 440 150">
+        <rect x="1" y="1" width="208" height="112" fill="#F2F5FA" stroke="#C9CED6"/>
+        <rect x="231" y="1" width="208" height="112" fill="#FFFFFF" stroke="#C9CED6"/>
+        <g fill="#0B2A5B"><circle cx="98" cy="52" r="5.5"/><circle cx="108" cy="59" r="5.5"/><circle cx="103" cy="45" r="5.5"/><circle cx="113" cy="50" r="5.5"/><circle cx="94" cy="61" r="5.5"/><circle cx="106" cy="67" r="5.5"/><circle cx="116" cy="60" r="5.5"/><circle cx="99" cy="39" r="5.5"/><circle cx="91" cy="51" r="5.5"/><circle cx="112" cy="40" r="5.5"/></g>
+        <g fill="#B22234"><circle cx="258" cy="24" r="5.5"/><circle cx="396" cy="32" r="5.5"/><circle cx="330" cy="58" r="5.5"/><circle cx="420" cy="88" r="5.5"/><circle cx="252" cy="92" r="5.5"/><circle cx="380" cy="98" r="5.5"/><circle cx="296" cy="42" r="5.5"/><circle cx="424" cy="18" r="5.5"/><circle cx="356" cy="16" r="5.5"/><circle cx="282" cy="80" r="5.5"/></g>
+        <text x="105" y="134" text-anchor="middle" font-size="13" font-weight="700" fill="#0B2A5B">Consistent → low score</text>
+        <text x="335" y="134" text-anchor="middle" font-size="13" font-weight="700" fill="#B22234">Divergent → high score</text>
+      </svg>
+      <figcaption>Fig. 1. Internal representations of 10 sampled answers (2-D projection, illustrative).</figcaption>
+    </figure>
+  </div>
+</div>
+
+<!-- ================= column 2 ================= -->
+<div class="col">
+  <div class="sec">
+    <h2><span class="n">5.</span>Methodology</h2>
+    <figure>
+      <svg width="100%" viewBox="0 0 520 96">
+        <g font-size="12.5" text-anchor="middle">
+          <rect x="1" y="14" width="88" height="60" fill="#F2F5FA" stroke="#0B2A5B" stroke-width="1.4"/><text x="45" y="38" font-weight="700" fill="#0B2A5B">Question</text><text x="45" y="56" fill="#5E6470">input prompt</text>
+          <rect x="108" y="14" width="88" height="60" fill="#F2F5FA" stroke="#0B2A5B" stroke-width="1.4"/><text x="152" y="38" font-weight="700" fill="#0B2A5B">Sampling</text><text x="152" y="56" fill="#5E6470">K = 10 answers</text>
+          <rect x="215" y="14" width="88" height="60" fill="#F2F5FA" stroke="#0B2A5B" stroke-width="1.4"/><text x="259" y="34" font-weight="700" fill="#0B2A5B">Hidden</text><text x="259" y="49" font-weight="700" fill="#0B2A5B">states</text><text x="259" y="65" fill="#5E6470">middle layers</text>
+          <rect x="322" y="14" width="88" height="60" fill="#F2F5FA" stroke="#0B2A5B" stroke-width="1.4"/><text x="366" y="38" font-weight="700" fill="#0B2A5B">Covariance</text><text x="366" y="56" fill="#5E6470">eigenvalues</text>
+          <rect x="429" y="14" width="90" height="60" fill="#0B2A5B"/><text x="474" y="38" font-weight="700" fill="#FFFFFF">EigenScore</text><text x="474" y="56" fill="#DCE4F0">hallucination</text>
+        </g>
+        <g fill="#0B2A5B"><polygon points="92,38 104,44 92,50"/><polygon points="199,38 211,44 199,50"/><polygon points="306,38 318,44 306,50"/><polygon points="413,38 425,44 413,50"/></g>
+      </svg>
+      <figcaption>Fig. 2. Processing pipeline of the proposed detector.</figcaption>
+    </figure>
+
+    <h3>5.1 Semantic consistency score (EigenScore)</h3>
+    <p>For a question, the LLM generates <b>K = 10</b> answers by sampling. For each answer we extract the hidden state of its last token, a 4096-dimensional vector <i>z<sub>i</sub></i>. The covariance matrix Σ of these vectors captures how the answers vary; its eigenvalues λ<sub>i</sub> measure the spread along each direction.</p>
+    <div class="eq">E = (1/K) · log det(Σ + αI) = (1/K) Σ<sub>i</sub> log λ<sub>i</sub></div>
+    <div class="eqnote">α = 10<sup>−3</sup> ensures numerical stability. A higher E indicates a likely hallucination.</div>
+
+    <h3>5.2 Multi-layer aggregation</h3>
+    <p>Rather than relying on a single, hand-picked layer, the score is computed over a <b>band of middle layers</b> (layers 8–24 of 32) and averaged, giving a more stable and model-independent signal:</p>
+    <div class="eq" style="font-size:13.5pt">E<sub>ML</sub> = mean<sub>ℓ ∈ [L/4, 3L/4]</sub> E<sub>ℓ</sub></div>
+
+    <h3>5.3 Test-time feature clipping</h3>
+    <p>A model that is confidently wrong repeats the same answer, so its answers appear consistent. To counter this, each neuron in the penultimate layer is <b>clipped to its 0.2–99.8 percentile range</b>, estimated from a memory bank of the last 3,000 tokens. This suppresses extreme activations that drive over-confident generation.</p>
+  </div>
+
+  <div class="sec">
+    <h2><span class="n">6.</span>System Implementation</h2>
+    <ul>
+      <li><b>Model:</b> Llama-2-7B in <b>4-bit</b> precision (≈3.9 GB instead of 13.5 GB), PyTorch and HuggingFace Transformers.</li>
+      <li><b>Memory-efficient capture:</b> forward hooks store only the required layers instead of all hidden states.</li>
+      <li><b>Feature clipping module:</b> ring-buffer memory bank with per-neuron thresholds, applied during generation.</li>
+      <li><b>Verification:</b> 8 automated unit tests (all passing).</li>
+    </ul>
+  </div>
+  <div class="sec">
+    <h2><span class="n">7.</span>Experimental Setup</h2>
+    <table>
+      <tr><th style="width:42%">Parameter</th><th>Value</th></tr>
+      <tr><td>Dataset</td><td>CoQA (conversational QA), 250 questions</td></tr>
+      <tr><td>Samples per question</td><td>K = 10</td></tr>
+      <tr><td>Sampling</td><td>temperature 0.5, top-p 0.99</td></tr>
+      <tr><td>Correctness label</td><td>ROUGE-L &gt; 0.5 vs. reference</td></tr>
+      <tr><td>Evaluation metric</td><td>AUROC</td></tr>
+      <tr><td>Hardware</td><td>NVIDIA RTX 4060 Laptop, 8 GB</td></tr>
+    </table>
+  </div>
+
+</div>
+
+<!-- ================= column 3 ================= -->
+<div class="col">
+  <div class="sec">
+    <h2><span class="n">8.</span>Results</h2>
+    <div class="key">
+      <div class="big">83.5%</div>
+      <div class="lab">AUROC for hallucination detection<span>Probability that an incorrect answer receives a higher score than a correct one (50% = random).</span></div>
+    </div>
+    <figure>
+      <svg width="100%" viewBox="0 0 440 74">
+        <rect x="0" y="22" width="440" height="16" fill="#EEF1F5" stroke="#C9CED6"/>
+        <rect x="0" y="22" width="295" height="16" fill="#0B2A5B"/>
+        <line x1="0" y1="16" x2="0" y2="44" stroke="#5E6470"/><line x1="440" y1="16" x2="440" y2="44" stroke="#5E6470"/>
+        <g font-size="12" fill="#5E6470"><text x="0" y="60">50% (random)</text><text x="440" y="60" text-anchor="end">100% (perfect)</text></g>
+        <text x="295" y="13" text-anchor="middle" font-size="13" font-weight="700" fill="#0B2A5B">83.5%</text>
+      </svg>
+      <figcaption>Fig. 3. Detection performance on the 50–100% AUROC scale.</figcaption>
+    </figure>
+    <table>
+      <caption>Table 1. Summary of results</caption>
+      <tr><th>Measure</th><th style="text-align:right">Value</th></tr>
+      <tr><td>AUROC (EigenScore)</td><td class="num">83.5%</td></tr>
+      <tr><td>AUROC (with feature clipping)</td><td class="num">82.5%</td></tr>
+      <tr><td>Activations clipped</td><td class="num">0.29%</td></tr>
+      <tr><td>Processing time per question</td><td class="num">≈ 6 s</td></tr>
+      <tr><td>GPU memory for model weights</td><td class="num">≈ 3.9 GB</td></tr>
+      <tr><td>Unit tests passed</td><td class="num">8 / 8</td></tr>
+    </table>
+  </div>
+
+  <div class="sec">
+    <h2><span class="n">9.</span>Conclusion &amp; Future Work</h2>
+    <p>The system detects hallucinated answers from the model’s internal states with an <b>AUROC of 83.5%</b>, needs no reference answers or external tools, and runs entirely on an 8 GB laptop GPU.</p>
+    <p><b>Ongoing:</b> full evaluation of multi-layer aggregation, scale-normalised embeddings and a confidence-aware hybrid score on 1,000 questions each from CoQA, TriviaQA and Natural Questions.</p>
+  </div>
+
+  <div class="sec refs">
+    <h2><span class="n">10.</span>References</h2>
+    <p>[1] C. Chen et al., “INSIDE: LLMs’ Internal States Retain the Power of Hallucination Detection,” ICLR, 2024.</p>
+    <p>[2] S. Reddy, D. Chen, C. D. Manning, “CoQA: A Conversational Question Answering Challenge,” TACL, 2019.</p>
+    <p>[3] H. Touvron et al., “Llama 2: Open Foundation and Fine-Tuned Chat Models,” arXiv:2307.09288, 2023.</p>
+  </div>
+</div>
+</main>
+
+<footer><span>Design Project · Indian Institute of Information Technology Vadodara</span><span>LLM Hallucination Detection using Multi-Layer EigenScore</span></footer>
+</body>
+</html>
