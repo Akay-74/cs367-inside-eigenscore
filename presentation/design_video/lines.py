@@ -37,6 +37,9 @@ def est(text,rate=4.3):
     s=sum(syl(w) for w in words)
     return s/rate+0.22*text.count(",")+0.35*len(re.findall(r"[.!?](?=\s)",text))+0.1
 LEAD={"s1":0.9}
+# Cue moved after the real recordings came in: S4 and S5 are one sentence,
+# so S5 starts right after S4 ends (S4 recording: 104.44 + 4.07 s).
+OVERRIDE={"S5":108.80}
 def timeline(gap=0.6,scene_gap=1.1,lead=0.7,tail=0.6):
     """Return line timings {id:(start,end)} and scene windows {scene:(start,end)}."""
     t=0.0;cur=None;L={};SC={}
@@ -49,6 +52,8 @@ def timeline(gap=0.6,scene_gap=1.1,lead=0.7,tail=0.6):
             cur=sc
         d=est(txt);L[i]=(round(t,2),round(t+d,2));t+=d+gap
     SC[cur]=(SC[cur][0],t+2.0)
+    for k,v in OVERRIDE.items():
+        d=L[k][1]-L[k][0];L[k]=(v,round(v+d,2))
     return L,SC
 if __name__=="__main__":
     tot={}
