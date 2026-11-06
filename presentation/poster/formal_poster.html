@@ -10,7 +10,9 @@
 *{ box-sizing:border-box; margin:0; padding:0 }
 html{ -webkit-print-color-adjust:exact; print-color-adjust:exact }
 body{ width:594mm; height:420mm; overflow:hidden; background:#FFFFFF; color:var(--text); font-family:'Lato',Arial,sans-serif; font-size:12.1pt; line-height:1.36; display:flex; flex-direction:column }
-header{ padding:6mm 16mm 4.5mm; text-align:center; border-bottom:1.4mm solid var(--navy) }
+header{ position:relative; padding:6mm 16mm 4.5mm; text-align:center; border-bottom:1.4mm solid var(--navy) }
+header .logo{ position:absolute; left:16mm; top:50%; transform:translateY(-50%); height:44mm; width:44mm }
+header .guide{ font-size:13pt; color:var(--ink); margin-top:1mm } header .guide b{ font-weight:700 }
 header .course{ font-size:12pt; letter-spacing:2.5px; text-transform:uppercase; color:var(--navy2); font-weight:700 }
 header h1{ font-family:'Merriweather',Georgia,serif; font-weight:900; font-size:38pt; color:var(--navy); line-height:1.15; margin:2mm 0 2mm }
 header .presented{ font-size:10.5pt; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:.8mm }
@@ -64,11 +66,12 @@ svg text{ font-family:'Lato',Arial,sans-serif }
 </head>
 <body>
 <header>
+  <img class="logo" src="figs/iiitv_logo.png" alt="IIIT Vadodara logo">
   <div class="course">Design Project</div>
   <h1>LLM Hallucination Detection using EigenScore</h1>
   <div class="presented">Presented by</div>
   <div class="names"><b>Aayaan Ali Khan</b> <span class="id">(202411001)</span><span class="sep">|</span><b>Shlok Bhavsar</b> <span class="id">(202411018)</span><span class="sep">|</span><b>Prapti Chotaliya</b> <span class="id">(202411030)</span></div>
-  <div class="inst">Indian Institute of Information Technology Vadodara</div>
+  <div class="guide">Under the guidance of <b>Dr. Venkata Phanikrishna</b><span class="sep" style="color:var(--rule);margin:0 4mm">|</span><span style="font-style:italic;color:var(--muted)">Indian Institute of Information Technology Vadodara</span></div>
 </header>
 <div class="thin"></div>
 
