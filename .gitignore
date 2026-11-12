@@ -3,3 +3,6 @@ __pycache__/
 *.log
 *.fls
 *.fdb_latexmk
+source_code/extension/results/*.emb.npy
+source_code/extension/smoke/
+source_code/extension/results/*.log
