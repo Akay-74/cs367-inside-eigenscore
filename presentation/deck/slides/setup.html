@@ -14,7 +14,7 @@
 <tr><td>Correctness</td><td>ROUGE-L and sentence similarity</td><td>ROUGE-L only</td></tr>
 </table>
 <p style="font-size:28px;color:#8C5A0E">So we test whether the <b>ranking</b> of methods reproduces, not the exact numbers.</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS307 · Reproducing INSIDE (ICLR 2024)</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS367 · Reproducing INSIDE (ICLR 2024)</p>
 <p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-size:24px;color:#5F6673">14 / 21</p>
 <aside>[Speaker: Prapti · about 35 s]
 This table compares our setup with the paper's. We kept every method hyperparameter the same: ten samples, temperature 0.5, the same regulariser, and the same clipping percentile and memory-bank size. The differences are forced by hardware. We used Llama-2-7B in 4-bit precision on an 8 GB laptop GPU, and we evaluated 250 CoQA questions rather than all 7,983. We also used only ROUGE-L as the correctness measure. For these reasons, the claim we test is whether the ranking of the methods reproduces, rather than the exact AUROC values. We ran the experiment twice on identical questions with the same seed: once without and once with feature clipping.</aside>

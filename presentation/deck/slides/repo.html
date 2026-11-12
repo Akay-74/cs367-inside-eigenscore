@@ -26,7 +26,7 @@
 <p style="font-size:24px;color:#5F6673">Full list in CHANGES.md and Table 1 of our report. Original files kept as *.orig.</p>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS307 · Reproducing INSIDE (ICLR 2024)</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS367 · Reproducing INSIDE (ICLR 2024)</p>
 <p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-size:24px;color:#5F6673">12 / 21</p>
 <aside>[Speaker: Prapti · about 40 s]
 Thank you, Shlok. We started from the authors' official repository, and the first finding was that it could not be run as released. We identified twelve blocking defects. For example, the entry point imports a module that does not exist, the EigenScore functions use a NumPy type that was removed in version 1.24, and data paths point at the authors' own machine. When we split generation into smaller batches to save memory, we also found that the score was computed inside the batch loop, so only the last two of the ten answers were used. Most importantly, the feature clipping described in Section 3.2 of the paper is not implemented anywhere in the repository.</aside>

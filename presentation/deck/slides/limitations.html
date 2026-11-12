@@ -23,7 +23,7 @@
 </ul>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS307 · Reproducing INSIDE (ICLR 2024)</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS367 · Reproducing INSIDE (ICLR 2024)</p>
 <p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-size:24px;color:#5F6673">18 / 21</p>
 <aside>[Speaker: Shlok · about 40 s]
 Working through the paper in detail showed us several limitations. In the method itself, the embedding is always taken from one hand-chosen layer, the middle one, even though the paper's own ablation shows that performance changes by several points depending on the layer. The method also needs ten to twenty generations per question, which multiplies the cost of answering. Self-consistent hallucinations remain difficult, and the gain from clipping is small. Finally, it requires access to internal states, so it cannot be used with closed APIs. Our own reproduction is limited by its sample size, the quantised Llama-2 model, and the use of ROUGE-L as the only correctness measure.</aside>

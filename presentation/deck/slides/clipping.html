@@ -38,7 +38,7 @@
 </div>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS307 · Reproducing INSIDE (ICLR 2024)</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS367 · Reproducing INSIDE (ICLR 2024)</p>
 <p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-size:24px;color:#5F6673">10 / 21</p>
 <aside>[Speaker: Shlok · about 45 s]
 The authors observe that the penultimate layer of LLaMA contains a small number of extreme activations, shown here in gold, and they hypothesise that these drive overconfident generation. Feature clipping truncates them. For each neuron, a memory bank of the activations from the last three thousand tokens gives a lower and upper threshold at the 0.2 and 99.8 percentiles. Any activation outside that band is clamped to the nearest threshold. Because this happens during decoding, it changes what the model actually generates: an overconfident model is pushed to produce more varied answers, which EigenScore can then detect. I will now hand over to Prapti, who will describe how we implemented this.</aside>

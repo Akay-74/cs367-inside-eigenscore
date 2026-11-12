@@ -24,7 +24,7 @@
 </div>
 </div>
 <p style="font-size:26px;color:#3E4756"><b>Foundation:</b> complete the reproduction at full CoQA scale, with sentence-similarity AUROC and the paper’s top-k = 5.</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS307 · Reproducing INSIDE (ICLR 2024)</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS367 · Reproducing INSIDE (ICLR 2024)</p>
 <p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-size:24px;color:#5F6673">19 / 21</p>
 <aside>[Speaker: Aayaan · about 55 s]
 For the end-semester we plan to go beyond reproduction and improve the method. Our main contribution will be a multi-layer EigenScore. Instead of relying on one hand-picked middle layer, we will combine the score over a band of middle layers and normalise the embeddings, so the detector no longer depends on a layer choice that changes from model to model. Second, we will build a hybrid detector that combines EigenScore with token-level confidence. When all ten answers agree, EigenScore has nothing left to measure, but the model's token confidence may still reveal a self-consistent hallucination. As a stretch goal, we will make the number of samples adaptive: generate answers one at a time and stop as soon as the score is clearly low or clearly high, reducing cost. All of this rests on first completing the reproduction at full scale, with the paper's second correctness measure.</aside>

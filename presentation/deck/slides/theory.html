@@ -20,7 +20,7 @@
 <p style="font-size:28px;line-height:1.5;color:#3E4756">Two answers with different words but the same meaning get similar embeddings; word-overlap metrics would call them different.</p>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS307 · Reproducing INSIDE (ICLR 2024)</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS367 · Reproducing INSIDE (ICLR 2024)</p>
 <p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-size:24px;color:#5F6673">8 / 21</p>
 <aside>[Speaker: Shlok · about 35 s]
 There are three reasons for this choice of score. First, for a Gaussian distribution the log-determinant of the covariance is, up to a constant, its differential entropy, so EigenScore is a measure of semantic uncertainty in embedding space. Second, it is cheap: the matrix is only ten by ten, because we compare the answers with each other rather than the 4096 features. Third, it captures meaning rather than wording: two answers that use different words for the same fact obtain similar embeddings, whereas a word-overlap metric would treat them as different.</aside>
