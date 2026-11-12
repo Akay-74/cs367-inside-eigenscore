@@ -1,0 +1,176 @@
+\documentclass[journal]{IEEEtran}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning}
+\hyphenation{op-tical net-works semi-conduc-tor Eigen-Score}
+
+\input{generated/results.tex}
+
+\begin{document}
+
+\title{Beyond a Single Layer: Multi-Layer and Cross-Depth EigenScore for Training-Free Hallucination Detection}
+
+\author{Aayaan Ali Khan (202411001), Shlok Bhavsar (202411018), and Prapti Chotaliya (202411030)
+\thanks{Course project for CS367, carried out under the guidance of Dr.~Venkata Phanikrishna.}
+\thanks{The authors are with the Indian Institute of Information Technology Vadodara -- International Campus Diu, India.}}
+
+\markboth{CS367 Course Project, November 2026}{Khan \MakeLowercase{\textit{et al.}}: Multi-Layer and Cross-Depth EigenScore}
+
+\maketitle
+
+\begin{abstract}
+Large language models produce fluent answers that are sometimes wrong, and detecting such hallucinations without a reference answer is an open problem. EigenScore, from the INSIDE framework, samples several answers to the same question and measures how widely their hidden-state embeddings spread at one hand-picked middle layer. We first reproduce EigenScore on an 8 GB consumer GPU and then study three training-free extensions on the same samples: averaging the score over a pre-registered band of middle layers, normalising the embeddings before the covariance is formed, and fusing the score with token-level confidence. We also propose cross-depth stability, a new signal that asks whether the arrangement of the sampled answers, rather than their spread, is preserved from one layer to the next. All methods are evaluated with Llama-2-7B on 1,000 questions each from CoQA, TriviaQA and Natural Questions, using paired bootstrap tests that were fixed before any result was computed.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Hallucination detection, internal states, large language models, representational similarity, uncertainty estimation.
+\end{IEEEkeywords}
+
+\IEEEpeerreviewmaketitle
+
+%=====================================================================
+\section{Introduction}
+\IEEEPARstart{L}{arge} language models (LLMs) state wrong facts in the same confident tone as right ones, so a user cannot separate the two from the text alone. Hallucination detectors assign each answer a score without access to the correct answer. They fall into three families:
+\begin{itemize}
+\item \textbf{Token probabilities} of a single answer: perplexity and length-normalised entropy~\cite{malinin2021}.
+\item \textbf{Agreement between several sampled answers}, measured on their text~\cite{manakul2023} or their meaning~\cite{farquhar2024}.
+\item \textbf{The model's internal states}~\cite{chen2024inside,sriramanan2024}.
+\end{itemize}
+
+INSIDE~\cite{chen2024inside} combines the last two. Its \emph{EigenScore} samples $K$ answers, reads the hidden state of each answer's last token at the middle layer, and scores the log-volume of the resulting point cloud. It has two weaknesses that this letter addresses:
+\begin{itemize}
+\item \textbf{It reads one hand-picked layer}, although its own ablation and later work~\cite{sriramanan2024} show that detection quality varies across depth.
+\item \textbf{It measures only how far the answers spread, not how they are arranged}: any permutation or rotation of the samples gives the same score.
+\end{itemize}
+
+\textbf{Contributions.}
+\begin{enumerate}
+\item A working reproduction of INSIDE, whose public code did not run, on an 8~GB laptop GPU.
+\item A pre-registered, paired comparison of three training-free extensions: multi-layer, normalised and hybrid EigenScore.
+\item \emph{Cross-depth stability} (XDS), a new training-free signal that tracks whether the arrangement of the sampled answers survives from layer to layer.
+\end{enumerate}
+
+%=====================================================================
+\section{Existing Work: EigenScore}
+For a question $x$, the model samples $K$ answers. Let $\mathbf{z}_k^{(l)}\in\mathbb{R}^d$ be the hidden state of answer $k$'s last token at layer $l$. With $Z_l=[\mathbf{z}_1^{(l)},\dots,\mathbf{z}_K^{(l)}]$ and the feature-centring matrix $J_d$, the sample covariance is $\Sigma_l = Z_l^\top J_d Z_l/(d-1)\in\mathbb{R}^{K\times K}$, and
+\begin{equation}
+\mathrm{ES}(l)=\frac{1}{K}\sum_{i=1}^{K}\log_{10}\lambda_i\!\left(\Sigma_l+\alpha I\right),
+\label{eq:es}
+\end{equation}
+with $\alpha=10^{-3}$. INSIDE uses $l=L/2$ (index 16 of 32 for Llama-2-7B). For a Gaussian, $\tfrac12\log\det\Sigma$ is the differential entropy up to a constant, so (\ref{eq:es}) estimates the semantic uncertainty of the answer distribution~\cite{chen2024inside}. A low score means the answers agree; a high score flags a likely hallucination.
+
+\textbf{Reproduction.} The released code had twelve blocking defects and lacked the feature-clipping component. After repairing it, we reproduced the paper's method ranking on 250 CoQA questions with Llama-2-7B in 4-bit precision:
+\begin{itemize}
+\item EigenScore 83.5 AUROC, above Lexical Similarity (80.5), LN-Entropy (77.5), Perplexity (72.3) and Energy (54.7).
+\item Feature clipping changed EigenScore's AUROC by $-1.0$ points, with a 95\% CI of $[-4.7,+2.6]$, which is not resolvable at that sample size.
+\end{itemize}
+
+%=====================================================================
+\section{Proposed Extensions}
+All scores are computed offline from the \emph{same} $K=10$ samples per question, so every comparison is paired.
+
+\subsection{M1: Multi-layer EigenScore (MLES)}
+Each $\mathrm{ES}(l)$ is a noisy reading of the same uncertainty at a different processing stage. MLES averages over a band fixed in advance, the middle half of the network:
+\begin{equation}
+\mathrm{MLES}=\frac{1}{|\mathcal{B}|}\sum_{l\in\mathcal{B}}\mathrm{ES}(l),\qquad \mathcal{B}=\{\lfloor L/4\rfloor,\dots,\lfloor 3L/4\rfloor\},
+\end{equation}
+i.e.\ indices 8--24 for $L=32$. Fixing the band removes the layer hyper-parameter, and with it the optimistic bias of choosing the best layer in hindsight. Supervised probes gain from pooling layers~\cite{layermix2026}; MLES tests whether the same holds without training.
+
+\subsection{M2: Normalised EigenScore}
+A few fixed dimensions of LLM hidden states carry activations orders of magnitude larger than the rest~\cite{sun2024massive}, and these can dominate a raw covariance.
+\begin{itemize}
+\item \textbf{M2a} L2-normalises each embedding before (\ref{eq:es}).
+\item \textbf{M2b} standardises each dimension with means and variances estimated from \emph{previous} questions only, so that no information leaks from the current one.
+\end{itemize}
+Both are applied at layer 16 and over $\mathcal{B}$.
+
+\subsection{M3: Confidence-aware hybrid}
+EigenScore reads the spread of internal states, whereas LN-Entropy reads token-level confidence. If their errors are only partly correlated, combining them can beat both. We use the label-free rank average
+\begin{equation}
+\mathrm{HYB}=\tfrac12\left[\mathrm{rank}(\mathrm{MLES})+\mathrm{rank}(\mathrm{LNE})\right].
+\end{equation}
+
+\subsection{XDS: Cross-depth stability (new)}
+By construction, (\ref{eq:es}) is invariant to how the $K$ answers are arranged. XDS keeps that arrangement. At each layer, let $\mathbf{D}_l\in\mathbb{R}^{K(K-1)/2}$ hold the pairwise cosine distances between the (feature-centred) answer embeddings. Representational similarity analysis~\cite{kriegeskorte2008} then compares consecutive layers:
+\begin{equation}
+\mathrm{XDS}=1-\frac{1}{|\mathcal{B}|-1}\sum_{l,\,l+1\in\mathcal{B}}\operatorname{corr}\!\left(\mathbf{D}_l,\mathbf{D}_{l+1}\right).
+\end{equation}
+
+\textbf{Hypothesis.} Factual recall unfolds in stages across depth~\cite{geva2023}.
+\begin{itemize}
+\item When the model knows the answer, its samples share the retrieved content and differ only on the surface, so their arrangement is carried forward unchanged and XDS is low.
+\item When it confabulates, no shared content anchors the samples, so their arrangement is re-formed from layer to layer and XDS is high.
+\end{itemize}
+
+XDS ignores the \emph{size} of the spread, which is all that EigenScore measures, so the two scores can carry complementary information. We also form the rank average of MLES and XDS. Unlike trained cross-layer probes~\cite{zhang2025icr}, XDS uses multiple samples and needs no labels. XDS was pre-registered as exploratory before the full runs were analysed.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[font=\scriptsize, >={Stealth[length=4pt]},
+  box/.style={draw, rounded corners=2pt, align=center, minimum height=0.55cm, inner sep=2pt}]
+\node[box, text width=1.5cm] (q) {Question\\$K{=}10$ samples};
+\node[box, right=0.35cm of q, text width=1.75cm] (h) {Last-token states\\all layers $l$};
+\node[box, right=0.35cm of h, text width=2.1cm, yshift=0.45cm] (v) {Spread per layer\\$\mathrm{ES}(l)\to$ \textbf{M1}};
+\node[box, right=0.35cm of h, text width=2.1cm, yshift=-0.45cm] (a) {Arrangement $\mathbf{D}_l$\\$\operatorname{corr}(\mathbf{D}_l,\mathbf{D}_{l+1})\to$ \textbf{XDS}};
+\draw[->] (q) -- (h); \draw[->] (h.east) -- (v.west); \draw[->] (h.east) -- (a.west);
+\end{tikzpicture}
+\caption{The two signals read from the same samples. EigenScore and M1 measure how far the answers spread; XDS measures whether their arrangement survives from layer to layer.}
+\label{fig:concept}
+\end{figure}
+
+%=====================================================================
+\section{Experimental Setup}
+\begin{itemize}
+\item \textbf{Model and sampling.} Llama-2-7B in 4-bit NF4 on an RTX~4060 laptop GPU (8~GB). $K=10$ samples per question at temperature 0.5, top-$p$ 0.99 and top-$k$ 5, the values used in~\cite{chen2024inside}.
+\item \textbf{Data.} 1,000 random questions each from CoQA (story and previous turns in the prompt), TriviaQA (no context) and NQ-Open (seed 2023).
+\item \textbf{Embeddings.} Hidden states are recomputed by one clean forward pass over the prompt's key-value cache, so the last token is exact. A check against a full forward pass agreed to within $2\times10^{-3}$ relative error.
+\item \textbf{Labels.} A question is a hallucination when its greedy answer has ROUGE-L $\le 0.5$ against every reference.
+\item \textbf{Statistics.} AUROC per method, and paired bootstrap over questions (10,000 resamples). The single pre-registered primary test is M1 vs EigenScore; all other comparisons are secondary.
+\end{itemize}
+
+%=====================================================================
+\section{Results}
+Model accuracy was \accCoqa\% on CoQA, \accTqa\% on TriviaQA and \accNq\% on NQ-Open. Table~\ref{tab:auroc} reports AUROC and Table~\ref{tab:boot} the paired tests.
+
+\tableAUROC
+\tableBoot
+
+\begin{figure}[t]
+\centering
+\IfFileExists{figures/per_layer_auroc.png}{\includegraphics[width=\columnwidth]{figures/per_layer_auroc.png}}{\fbox{\parbox{0.9\columnwidth}{\centering per-layer AUROC figure (generated after the runs)}}}
+\caption{AUROC of single-layer EigenScore at every depth. The shaded region is the pre-registered band $\mathcal{B}$; the dashed line marks the layer used by INSIDE.}
+\label{fig:layers}
+\end{figure}
+
+\textbf{[Results discussion: to be written once the runs finish.]}
+
+%=====================================================================
+\section{Discussion and Limitations}
+\begin{itemize}
+\item \textbf{Labels.} ROUGE-based labels have low precision and inflate the AUROC of sampling-based detectors~\cite{janiak2025}. Our absolute numbers are therefore optimistic. Paired differences between methods share the same labels and are less affected, but not immune.
+\item \textbf{Scope.} The study uses one 7B model in 4-bit precision and 1,000 questions per dataset.
+\item \textbf{XDS is exploratory.} Any gain from XDS needs confirmation on fresh questions.
+\item \textbf{Cost.} Like all sampling-based methods, every extension requires $K$ generations per question.
+\end{itemize}
+
+%=====================================================================
+\section{Conclusion}
+\textbf{[Conclusion: to be written once the runs finish.]}
+
+\begin{thebibliography}{10}
+\bibitem{chen2024inside} C.~Chen, K.~Liu, Z.~Chen, Y.~Gu, Y.~Wu, M.~Tao, Z.~Fu, and J.~Ye, ``INSIDE: LLMs' internal states retain the power of hallucination detection,'' in \emph{Proc. ICLR}, 2024.
+\bibitem{sriramanan2024} G.~Sriramanan, S.~Bharti, V.~S. Sadasivan, S.~Saha, P.~Kattakinda, and S.~Feizi, ``LLM-Check: Investigating detection of hallucinations in large language models,'' in \emph{Proc. NeurIPS}, 2024.
+\bibitem{farquhar2024} S.~Farquhar, J.~Kossen, L.~Kuhn, and Y.~Gal, ``Detecting hallucinations in large language models using semantic entropy,'' \emph{Nature}, vol.~630, pp.~625--630, 2024.
+\bibitem{manakul2023} P.~Manakul, A.~Liusie, and M.~J.~F. Gales, ``SelfCheckGPT: Zero-resource black-box hallucination detection for generative large language models,'' in \emph{Proc. EMNLP}, 2023.
+\bibitem{malinin2021} A.~Malinin and M.~Gales, ``Uncertainty estimation in autoregressive structured prediction,'' in \emph{Proc. ICLR}, 2021.
+\bibitem{sun2024massive} M.~Sun, X.~Chen, J.~Z. Kolter, and Z.~Liu, ``Massive activations in large language models,'' in \emph{Proc. COLM}, 2024.
+\bibitem{kriegeskorte2008} N.~Kriegeskorte, M.~Mur, and P.~Bandettini, ``Representational similarity analysis -- connecting the branches of systems neuroscience,'' \emph{Front. Syst. Neurosci.}, vol.~2, 2008.
+\bibitem{geva2023} M.~Geva, J.~Bastings, K.~Filippova, and A.~Globerson, ``Dissecting recall of factual associations in auto-regressive language models,'' in \emph{Proc. EMNLP}, 2023.
+\bibitem{zhang2025icr} Z.~Zhang \emph{et al.}, ``ICR Probe: Tracking hidden state dynamics for reliable hallucination detection in LLMs,'' in \emph{Proc. ACL}, 2025.
+\bibitem{layermix2026} ``The hallucination signal is a mean shift: Why simple probes suffice,'' arXiv:2608.28930, 2026.
+\bibitem{janiak2025} D.~Janiak, J.~Binkowski, A.~Sawczyn, B.~Gabrys, R.~Shwartz-Ziv, and T.~Kajdanowicz, ``The illusion of progress: Re-evaluating hallucination detection in LLMs,'' arXiv:2508.08285, 2025.
+\end{thebibliography}
+
+\end{document}
