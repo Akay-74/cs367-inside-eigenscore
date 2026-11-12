@@ -53,22 +53,53 @@ def eigenscore_layers(X, alpha=ALPHA):
     return np.log10(np.clip(ev, 1e-300, None)).mean(-1)
 
 
+def cross_depth_instability(X, band):
+    """X1 (exploratory, PLAN_EXPLORATORY.md): 1 - mean RSA correlation between the
+    answer-to-answer distance structure of consecutive layers inside the band.
+
+    At each layer l, D_l holds the K(K-1)/2 cosine distances between the K sampled
+    answers (embeddings feature-centred as in EigenScore). Representational
+    similarity analysis (Kriegeskorte et al., 2008) correlates D_l with D_{l+1}:
+    it asks whether the *arrangement* of the answers (which ones resemble which)
+    is preserved from one layer to the next, independently of how spread out they
+    are, which is what EigenScore measures. A layer where all K answers coincide
+    has no arrangement; that layer pair counts as perfectly stable.
+    """
+    X = X[:, band[0]:band[-1] + 1].astype(np.float64)
+    K = X.shape[0]
+    Xc = X - X.mean(-1, keepdims=True)
+    Xn = Xc / np.maximum(np.linalg.norm(Xc, axis=-1, keepdims=True), 1e-12)
+    iu = np.triu_indices(K, 1)
+    D = 1.0 - np.einsum("kld,jld->lkj", Xn, Xn)[:, iu[0], iu[1]]      # (layers, K(K-1)/2)
+    D = np.maximum(D, 0.0)
+    corr = []
+    for a in range(len(D) - 1):
+        u, v = D[a], D[a + 1]
+        if u.std() < 1e-9 or v.std() < 1e-9:           # no arrangement at one of the layers
+            corr.append(1.0)
+        else:
+            corr.append(np.corrcoef(u, v)[0, 1])
+    return 1.0 - float(np.mean(corr))
+
+
 def embedding_scores(run, band):
     """Per question and layer: ES on raw (M0), L2-normalised (M2a) and
     standardised-with-previous-questions (M2b) embeddings."""
     n, K, L, d = run["n"], *run["emb"].shape[1:]
     raw, l2, std = (np.full((n, L), np.nan) for _ in range(3))
+    xds = np.full(n, np.nan)
     s1 = np.zeros((L, d)); s2 = np.zeros((L, d)); cnt = 0
     for q in range(n):
         X = np.asarray(run["emb"][q], dtype=np.float64)          # (K, L, d)
         raw[q] = eigenscore_layers(X)
+        xds[q] = cross_depth_instability(X, band)
         l2[q] = eigenscore_layers(X / np.linalg.norm(X, axis=-1, keepdims=True))
         if cnt >= M2B_WARMUP:                                     # previous questions only
             mu = s1 / cnt
             sd = np.sqrt(np.maximum(s2 / cnt - mu ** 2, 0)) + 1e-6
             std[q] = eigenscore_layers((X - mu) / sd)
         s1 += X.sum(0); s2 += (X ** 2).sum(0); cnt += K
-    return raw, l2, std
+    return raw, l2, std, xds
 
 
 # ----------------------------------------------------------------------- baselines
@@ -83,6 +114,13 @@ def lexical_similarity(samples):
     return out
 
 
+def depth_slope(raw, band):
+    """X2: least-squares slope of ES(l) against l over the band (one value per question)."""
+    l = np.asarray(band, dtype=float)
+    E = raw[:, band]
+    return ((E - E.mean(1, keepdims=True)) * (l - l.mean())).sum(1) / ((l - l.mean()) ** 2).sum()
+
+
 def fill_nan(x):
     x = np.asarray(x, dtype=float).copy()
     bad = ~np.isfinite(x)
@@ -92,7 +130,7 @@ def fill_nan(x):
 
 
 def all_scores(run, band, ref_layer):
-    raw, l2, std = embedding_scores(run, band)
+    raw, l2, std, xds = embedding_scores(run, band)
     b = list(band)
     with np.errstate(divide="ignore", invalid="ignore"):
         ppl = -run["greedy_lp"] / np.where(run["greedy_len"] > 0, run["greedy_len"], np.nan)
@@ -116,6 +154,10 @@ def all_scores(run, band, ref_layer):
         "M2b std (multi)": std[:, b].mean(1),
         "M3 HYB (MLES+LNE)": (rankdata(mles) + rankdata(lne)) / 2,
         "M3b MLES+PPL": (rankdata(mles) + rankdata(ppl)) / 2,
+        # exploratory, pre-registered in PLAN_EXPLORATORY.md
+        "X1 XDS (cross-depth instability)": xds,
+        "X2 depth slope": depth_slope(raw, b),
+        "X3 MLES+XDS": (rankdata(mles) + rankdata(xds)) / 2,
     }
     return S, raw, lexsim, notes
 
@@ -229,6 +271,10 @@ def analyse(prefixes, out_dir):
         tests = {k: paired_bootstrap(y, S[k], S["EigenScore"])
                  for k in S if k != "EigenScore"}
         tests["M3 HYB vs M1 MLES"] = paired_bootstrap(y, S["M3 HYB (MLES+LNE)"], S["M1 MLES"])
+        tests["X3 MLES+XDS vs M1 MLES"] = paired_bootstrap(y, S["X3 MLES+XDS"], S["M1 MLES"])
+        from scipy.stats import spearmanr
+        overlap = dict(spearman_MLES_XDS=float(spearmanr(S["M1 MLES"], S["X1 XDS (cross-depth instability)"])[0]),
+                       spearman_ES_XDS=float(spearmanr(S["EigenScore"], S["X1 XDS (cross-depth instability)"])[0]))
 
         sc = (y == 1) & (lexsim >= SC_LEXSIM)
         flags = {k: flag_rate_at_fpr(y, v, sc) for k, v in S.items()}
@@ -238,7 +284,7 @@ def analyse(prefixes, out_dir):
             auroc=aucs, tests=tests, per_layer_auroc=layer_auc.tolist(),
             best_layer=dict(index=best, auroc=float(layer_auc[best])),
             self_consistent=dict(n=int(sc.sum()), n_incorrect=int(y.sum()), flag_rate_at_20fpr=flags),
-            notes=notes)
+            notes=notes, xds_overlap=overlap)
 
     (out_dir / "results.json").write_text(json.dumps(report, indent=1))
     names = list(per_layer)
@@ -279,6 +325,11 @@ def write_summary(report, path):
     for d, r in report.items():
         lines.append(f"| {d} | {pc(r['auroc']['M1 MLES'])} | {pc(r['auroc']['EigenScore'])} | "
                      f"{pc(r['best_layer']['auroc'])} (idx {r['best_layer']['index']}) |")
+    lines += ["", "## Exploratory: overlap of XDS with volume-based scores (Spearman)", "",
+              "| dataset | rho(MLES, XDS) | rho(EigenScore, XDS) |", "|---|---|---|"]
+    for d, r in report.items():
+        o = r["xds_overlap"]
+        lines.append(f"| {d} | {o['spearman_MLES_XDS']:.2f} | {o['spearman_ES_XDS']:.2f} |")
     lines += ["", f"## Self-consistent hallucinations (incorrect, mean pairwise ROUGE-L >= {SC_LEXSIM})", "",
               "Fraction flagged at the threshold giving 20% FPR on correct answers.", "",
               "| method | " + " | ".join(f"{d} (n={report[d]['self_consistent']['n']})" for d in names) + " |",
@@ -307,6 +358,15 @@ def selftest(prefix):
     y = rng.integers(0, 2, 300); s = rng.normal(size=300) + y * 0.5; s[:30] = np.round(s[:30])
     a1, a2 = roc_auc_score(y, s), auroc_batch(y[None], s[None])[0]
     print(f"[{'ok' if abs(a1 - a2) < 1e-12 else 'FAIL'}] rank-sum AUROC == sklearn ({a1:.6f} vs {a2:.6f})")
+    rng2 = np.random.default_rng(1)
+    base = rng2.normal(size=(10, 1, 64)) * 3 + rng2.normal(size=(1, 1, 64))
+    same = np.repeat(base, 33, axis=1)                                   # identical geometry at every layer
+    shuf = np.stack([base[rng2.permutation(10), 0] for _ in range(33)], 1)  # samples reshuffled per layer
+    dup = np.repeat(np.repeat(base[:1], 10, 0), 33, 1)                   # all K answers identical
+    b_ = list(range(8, 25))
+    x0, x1, x2 = (cross_depth_instability(z, b_) for z in (same, shuf, dup))
+    ok = abs(x0) < 1e-9 and x1 > 0.2 and x2 == 0.0
+    print(f"[{'ok' if ok else 'FAIL'}] XDS: stable geometry {x0:.1e}, reshuffled {x1:.2f}, all-duplicate {x2:.1f}")
     t = paired_bootstrap(y, s, s)
     print(f"[{'ok' if t['delta'] == 0 and t['lo'] == 0 == t['hi'] else 'FAIL'}] bootstrap of a method vs itself is 0")
 
