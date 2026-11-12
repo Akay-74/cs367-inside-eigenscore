@@ -8,3 +8,4 @@ source_code/extension/smoke/
 source_code/extension/results/*.log
 endsem/deck/png/
 endsem/video/out/
+source_code/extension/analysis_coqa_only/*.png
