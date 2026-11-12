@@ -42,3 +42,34 @@ ROUGE-L, negated). LNE = LN-Entropy.
   one dataset is reported as partial.
 - Nothing in this file may be changed after the TriviaQA/NQ analysis is run. Any further
   idea would need a new held-out set.
+
+## Addendum: H4, consistency-then-confidence
+
+Committed after a second CoQA-only exploration (`explore_mode.py`, `explore_lexi.py`) and
+still **before any TriviaQA/NQ result was computed**.
+
+**Rationale.** AUROC = P(s₁ > s₀) + ½·P(s₁ = s₀). Lexical Similarity, the best single
+signal on CoQA, is exactly tied on 58% of CoQA questions, mostly where all K samples are
+identical. Breaking ties with a secondary signal whose AUROC *within* the tied pairs is a
+leaves every untied pair unchanged and adds exactly (a − ½) × P(tied pos/neg pair).
+
+**CoQA evidence.**
+- Within LexSim ties, LN-Entropy has a = 0.731 while EigenScore has a = 0.590: once the
+  answers agree, token confidence still separates right from wrong, but internal spread
+  barely does.
+- The gain is +0.4 [+0.1, +0.8] over LexSim. That matches the prediction
+  (0.731 − ½) × 1.9% ≈ +0.44.
+
+**Method.**
+- CTC = dense_rank(LexSim) + ½·(rank(LNE) − ½)/n. This orders questions by LexSim and
+  breaks exact ties by LN-Entropy.
+- It is fixed and untuned. LN-Entropy was chosen over perplexity, which performed the
+  same on CoQA (a = 0.731 vs 0.733), because it uses all K samples rather than only the
+  greedy answer.
+
+**H4 (held-out, both datasets, included in the Holm family, which now has 10 tests):**
+- **H4a:** AUROC(CTC) > AUROC(LexSim).
+- **H4b:** AUROC(CTC) > AUROC(ES).
+- **Secondary prediction:** the gain over LexSim is larger on TriviaQA/NQ than on CoQA,
+  because lower accuracy means more tied wrong-vs-right pairs. We report P(tied pair) and
+  the within-tie a for each dataset.
