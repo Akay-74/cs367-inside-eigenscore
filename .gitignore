@@ -6,3 +6,5 @@ __pycache__/
 source_code/extension/results/*.emb.npy
 source_code/extension/smoke/
 source_code/extension/results/*.log
+endsem/deck/png/
+endsem/video/out/
