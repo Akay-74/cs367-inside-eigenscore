@@ -238,8 +238,8 @@ def plot_per_layer(per_layer, band, ref_layer, path):
     labels.sort()
     placed = []
     for yv, name in labels:
-        while placed and yv - placed[-1] < 1.6:
-            yv = placed[-1] + 1.6
+        if placed:
+            yv = max(yv, placed[-1] + 1.6)
         placed.append(yv)
         ax.text(len(auc) - 0.4, yv, name, color=ink2, fontsize=8.5, va="center")
     ax.set_xlim(-0.5, len(auc) + 3.5)
@@ -376,8 +376,16 @@ if __name__ == "__main__":
     ap.add_argument("prefixes", nargs="+")
     ap.add_argument("--out_dir", default="analysis")
     ap.add_argument("--selftest", action="store_true")
+    ap.add_argument("--replot", action="store_true", help="only redraw figure + summary from out_dir/results.json")
     args = ap.parse_args()
-    if args.selftest:
+    if args.replot:                     # rebuild figure + summary from a saved results.json
+        out = Path(args.out_dir); report = json.loads((out / "results.json").read_text())
+        per_layer = {d: np.array(r["per_layer_auroc"]) for d, r in report.items()}
+        first = next(iter(report.values()))
+        plot_per_layer(per_layer, list(range(first["band"][0], first["band"][1] + 1)),
+                       first["ref_layer"], out / "per_layer_auroc.png")
+        write_summary(report, out / "summary.md")
+    elif args.selftest:
         selftest(args.prefixes[0])
     else:
         analyse(args.prefixes, args.out_dir)

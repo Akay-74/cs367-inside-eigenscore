@@ -83,7 +83,7 @@ def main(prefixes, dev=False):
     adj = holm([s[2] for s in sup])
     pc = lambda x: f"{100 * x:.1f}"
     out = ["# Confirmatory results" + (" (DEV DRY RUN on CoQA, not a confirmation)" if dev else ""),
-           "", "Hypotheses frozen in PLAN_CONFIRMATORY.md (H1-H3: commit 4a26da7; H4: addendum) before these data were analysed.", "",
+           "", "Hypotheses frozen in PLAN_CONFIRMATORY.md (H1-H3: commit 4a26da7; H4: 47c60ec; H5: 3fcceb6) before these data were analysed.", "",
            "| dataset | n | accuracy | ES | LexSim | LNE | HYB | **TRI** | **CTC** | **PMF** | tied pairs | within-tie a |",
            "|---|---|---|---|---|---|---|---|---|---|---|---|"]
     for name, n, acc, auc, _, ti in rows:
