@@ -3,8 +3,11 @@
 \usepackage{url}
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning}
+\newtheorem{proposition}{Proposition}
 \hyphenation{op-tical net-works semi-conduc-tor Eigen-Score}
 
 \begin{document}
@@ -67,7 +70,27 @@ For a question, the model samples $K$ answers. Let $\mathbf{z}_k\in\mathbb{R}^d$
 \end{equation}
 For a Gaussian, $\tfrac12\log\det\Sigma$ is the differential entropy up to a constant, so ES estimates the semantic uncertainty of the answers~\cite{chen2024inside}.
 
-\textbf{Reproduction.} The released code had twelve blocking defects and lacked the feature-clipping component. After repairing it, we reproduced the paper's method ranking on 250 CoQA questions with Llama-2-7B in 4-bit precision: EigenScore reached 83.5 AUROC, above Lexical Similarity (80.5), LN-Entropy (77.5), Perplexity (72.3) and Energy (54.7).
+\textbf{Reproduction.} The released code had twelve blocking defects, among them hard-coded paths, an outdated generation API and a missing dataset loader, and it lacked the feature-clipping component described in the paper. After repairing it, we reproduced the paper's method ranking on 250 CoQA questions with Llama-2-7B in 4-bit precision (Table~\ref{tab:repro}). EigenScore was the best of the five detectors, as in the original paper, although the absolute numbers differ because of quantisation and the smaller sample.
+
+\begin{table}[t]
+\centering
+\caption{Reproduction of INSIDE on 250 CoQA questions (Llama-2-7B, 4-bit, 8~GB GPU).}
+\label{tab:repro}
+\footnotesize
+\begin{tabular}{@{}lc@{}}
+\toprule
+Method & AUROC (\%) \\
+\midrule
+Energy & 54.7 \\
+Perplexity & 72.3 \\
+LN-Entropy & 77.5 \\
+Lexical Similarity & 80.5 \\
+\textbf{EigenScore}~\cite{chen2024inside} & \textbf{83.5} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Two blind spots.} The determinant view explains what EigenScore cannot see. First, if all $K$ answers are identical, their embeddings coincide, $\Sigma\approx 0$ and ES reaches its minimum whether the shared answer is right or wrong. Second, ES never reads the token probabilities that the model computes for every generated word, although these are available at no extra cost.
 
 %=====================================================================
 \section{Proposed Method}
@@ -101,20 +124,49 @@ The three scores live on unrelated scales. We therefore fuse their ranks $r(\cdo
 \begin{equation}
 \mathrm{TRI}=\tfrac13\left[r(s_{\mathrm{ES}})+r(s_{\mathrm{AG}})+r(s_{\mathrm{TC}})\right].
 \end{equation}
-The weights are equal and nothing is fitted, so TRI needs no labels.
+The weights are equal and nothing is fitted, so TRI needs no labels. Ranks are computed over a pool of questions. At deployment, a new answer is ranked against an unlabelled reference pool of earlier questions, i.e.\ each $r(\cdot)$ becomes the empirical CDF of that signal on the pool, so no labels are needed there either. Algorithm~\ref{alg:tri} summarises the procedure.
+
+\begin{algorithm}[t]
+\caption{TRI and CTC scoring}
+\label{alg:tri}
+\footnotesize
+\begin{algorithmic}[1]
+\Require questions $q_1,\dots,q_N$; model $f$; $K$
+\For{$n=1$ to $N$}
+  \State sample $a_{n,1},\dots,a_{n,K}\sim f(\cdot\mid q_n)$; keep layer-16 states $\mathbf{z}_{n,k}$ and token log-probs
+  \State $s_{\mathrm{ES}}[n]\gets$ EigenScore of $\{\mathbf{z}_{n,k}\}_k$ \Comment{Eq.~(1)}
+  \State $s_{\mathrm{AG}}[n]\gets -\frac{2}{K(K-1)}\sum_{k<l}\mathrm{ROUGE\text{-}L}(a_{n,k},a_{n,l})$
+  \State $s_{\mathrm{TC}}[n]\gets \frac1K\sum_k \big(-\frac{1}{|a_{n,k}|}\log p(a_{n,k}\mid q_n)\big)$
+\EndFor
+\State $\mathrm{TRI}\gets\frac13[r(s_{\mathrm{ES}})+r(s_{\mathrm{AG}})+r(s_{\mathrm{TC}})]$
+\State $\mathrm{CTC}\gets r_{\text{dense}}(s_{\mathrm{AG}})+\frac{1}{2N}\big(r(s_{\mathrm{TC}})-\tfrac12\big)$
+\State \Return TRI, CTC \Comment{higher = more likely hallucination}
+\end{algorithmic}
+\end{algorithm}
 
 \subsection{CTC: consistency, then confidence}
 Text agreement is exactly tied on many questions, mostly where all $K$ samples are identical. AUROC counts a tied correct/incorrect pair as one half: $\mathrm{AUROC}=P(s_1>s_0)+\tfrac12P(s_1=s_0)$. CTC orders questions by $s_{\mathrm{AG}}$ and breaks exact ties by $s_{\mathrm{TC}}$. Every untied pair keeps its order, so the change in AUROC is exactly
 \begin{equation}
 \Delta\mathrm{AUROC}=(a-\tfrac12)\,P(\text{tied pair}),
 \end{equation}
-where $a$ is the AUROC of $s_{\mathrm{TC}}$ within the tied pairs. CTC thus targets the self-consistent case that EigenScore misses: when every sample agrees, token confidence is the only evidence left.
+where $a$ is the AUROC of $s_{\mathrm{TC}}$ within the tied pairs.
+
+\begin{proposition}
+Let $\mathcal{P}$ be the set of (hallucinated, correct) pairs, $\mathcal{T}\subseteq\mathcal{P}$ the pairs tied under $s_{\mathrm{AG}}$, and $a$ the AUROC of $s_{\mathrm{TC}}$ restricted to $\mathcal{T}$. Then $\mathrm{AUROC}(\mathrm{CTC})-\mathrm{AUROC}(s_{\mathrm{AG}})=(a-\tfrac12)\,|\mathcal{T}|/|\mathcal{P}|$.
+\end{proposition}
+\begin{IEEEproof}
+Dense ranks of distinct values differ by at least 1, while the tie-break term lies in $(0,\tfrac12)$, so CTC preserves the order of every untied pair and those pairs contribute equally to both AUROCs. A tied pair contributes $\tfrac12$ under $s_{\mathrm{AG}}$ and $\mathbb{1}[s_{\mathrm{TC},i}>s_{\mathrm{TC},j}]+\tfrac12\mathbb{1}[s_{\mathrm{TC},i}=s_{\mathrm{TC},j}]$ under CTC. Averaging over $\mathcal{T}$ gives $a$ versus $\tfrac12$; weighting by $|\mathcal{T}|/|\mathcal{P}|$ gives the claim.
+\end{IEEEproof}
+
+CTC therefore can only lose if token confidence is worse than chance within ties, and it gains most when ties are frequent. CTC thus targets the self-consistent case that EigenScore misses: when every sample agrees, token confidence is the only evidence left.
 
 %=====================================================================
 \section{Experimental Protocol}
 \begin{itemize}
 \item \textbf{Model.} Llama-2-7B in 4-bit NF4 on an RTX~4060 laptop GPU (8~GB). $K=10$ samples per question at temperature 0.5, top-$p$ 0.99 and top-$k$ 5~\cite{chen2024inside}.
 \item \textbf{Data.} 1,000 random questions each from CoQA (story and previous turns in the prompt), TriviaQA (no context) and NQ-Open.
+\item \textbf{Feature pass.} Hidden states are read in a second pass that encodes the prompt once and reuses its key--value cache for all $K$ answers, cropping the cache back to the prompt after each answer. Against a full forward pass, the maximum relative difference of the embeddings was $2\times10^{-3}$. All 33 hidden layers are stored as a memory-mapped float16 array, which allows the per-layer analysis below without re-running the model.
+\item \textbf{Prompts.} CoQA uses the story and the previous gold question--answer turns; TriviaQA and NQ-Open use a fixed five-shot prompt. Generation stops at a newline, with at most 32 (CoQA) or 20 new tokens.
 \item \textbf{Labels.} An answer is a hallucination when its greedy answer has ROUGE-L $\le 0.5$ against every reference.
 \item \textbf{Development and held-out split.} All methods were developed on CoQA only. TRI and CTC were then committed to git together with their hypotheses, before any TriviaQA or NQ-Open result was computed.
 \item \textbf{Statistics.} AUROC per method; paired bootstrap over questions (10,000 resamples); Holm correction over all held-out superiority tests. A claim counts as confirmed only if it holds on both held-out datasets.
@@ -166,9 +218,79 @@ Text agreement vs ES & +2.1 [+0.6, +3.5] & $-$0.1 [$-$2.4, +2.2] & partial \\
 
 \textbf{Main result.} Table~\ref{tab:auroc} shows that TRI has the highest mean AUROC, and Table~\ref{tab:held} that it beats EigenScore by 2.7 points on both held-out datasets, significant after Holm correction. On CoQA the gain is 4.5 points (95\% CI $[+2.7,+6.2]$). No single signal is reliable everywhere: text agreement is the strongest signal on CoQA but no better than EigenScore on NQ-Open, where the model answers only 27\% of the questions correctly. There every single signal stays below 77 AUROC, while TRI reaches 79.5.
 
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/roc_curves.png}
+\caption{ROC curves of TRI and its three input signals. The largest separation appears on NQ-Open at low false positive rates, i.e.\ in the region a deployed detector would operate in, where TRI flags noticeably more hallucinations than any single signal.}
+\label{fig:roc}
+\end{figure*}
+
+Fig.~\ref{fig:roc} shows the full ROC curves. On the two held-out datasets TRI lies on or above the best single signal over almost the whole range; on NQ-Open its advantage is largest at false positive rates below 0.2.
+
+\textbf{Detection at a fixed false-alarm rate.} AUROC summarises the whole curve, but a deployed detector runs at a fixed, low false positive rate. Table~\ref{tab:tpr} reports the share of hallucinations flagged when only 5\% or 10\% of correct answers may be flagged by mistake. On NQ-Open at 5\%, TRI catches 39.7\% of hallucinations against 28.7\% for EigenScore, i.e.\ 11 more out of every 100. On TriviaQA the gain at 5\% is 4.6 points.
+
+\begin{table}[t]
+\centering
+\caption{Share of hallucinations flagged (true positive rate, \%) at a fixed false positive rate of 5\% and 10\%.}
+\label{tab:tpr}
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+ & \multicolumn{2}{c}{CoQA} & \multicolumn{2}{c}{TriviaQA} & \multicolumn{2}{c}{NQ-Open} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(l){6-7}
+Method & 5\% & 10\% & 5\% & 10\% & 5\% & 10\% \\
+\midrule
+LN-Entropy & 19.9 & 32.3 & 32.2 & 45.8 & 18.7 & 37.1 \\
+EigenScore & 28.0 & 43.5 & 32.9 & 46.8 & 28.7 & 44.7 \\
+Text agreement & \textbf{34.9} & \textbf{55.9} & 34.2 & 49.2 & 31.9 & 43.9 \\
+\textbf{TRI} (ours) & 34.4 & 54.3 & \textbf{37.5} & \textbf{52.8} & \textbf{39.7} & \textbf{49.9} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{A self-consistent hallucination.} Asked ``Philopobia is the fear of what basic human emotion?'' (TriviaQA), the model answered ``Fear'' in all ten samples; the correct answer is ``Love''. Because the ten embeddings almost coincide, EigenScore placed this answer at the 2nd percentile of hallucination scores, i.e.\ among the most trusted answers in the dataset. Token confidence placed it at the 81st percentile: the model wrote the same word every time, but with low probability. Similarly, for ``W.~G.~Grace \ldots\ also captained England \ldots\ in what other sport?'', all ten samples read ``Association football'' (correct: lawn bowls); EigenScore ranks it at the 8th percentile and token confidence at the 78th. Across TriviaQA, 25 of the 301 hallucinations (8\%) are of this kind, with ten identical samples; on NQ-Open there are 43. Such cases are invisible to any spread-based score and are exactly where TRI and CTC draw on token confidence.
+
 \textbf{CTC.} CTC beats text agreement on both held-out datasets. Its gains match the closed form of Section~III-C: within tied pairs, token confidence reaches $a=0.73$, $0.70$ and $0.65$ on CoQA, TriviaQA and NQ-Open, on 1.9\%, 5.9\% and 3.1\% of all correct/incorrect pairs. On CoQA, EigenScore reaches only $a=0.59$ within the same ties, which confirms that internal spread carries little information once the answers agree.
 
-\textbf{Why fusion helps.} The three signals are only partly correlated: Spearman correlations range from 0.62 (agreement vs confidence on NQ-Open) to 0.90 (EigenScore vs agreement on TriviaQA). Internal spread and text agreement overlap most, and token confidence is the most independent. A post-hoc ablation agrees. On NQ-Open, dropping text agreement or token confidence from TRI costs 1.1--1.2 points (both significant), and dropping EigenScore costs 0.6 points (CI $[-0.3,+1.4]$). On CoQA and TriviaQA, agreement plus confidence alone matches TRI. The dominant effect is therefore the combination of agreement-type evidence with token confidence.
+\textbf{Why fusion helps.} Rank fusion helps only when the signals err on different questions. Table~\ref{tab:rho} shows that they are only partly correlated. Internal spread and text agreement overlap most ($\rho$ up to 0.90), which is expected since both measure disagreement between the samples, while token confidence is the most independent signal.
+
+\begin{table}[t]
+\centering
+\caption{Spearman correlation between the three signals.}
+\label{tab:rho}
+\footnotesize
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Pair & CoQA & TriviaQA & NQ-Open \\
+\midrule
+Internal -- surface & 0.85 & 0.90 & 0.75 \\
+Internal -- token & 0.67 & 0.81 & 0.69 \\
+Surface -- token & 0.67 & 0.77 & 0.62 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Post-hoc ablation: AUROC of TRI minus AUROC of each two-signal fusion (points, 95\% bootstrap CI). Positive values mean the dropped signal helps.}
+\label{tab:ablation}
+\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Dropped signal & CoQA & TriviaQA & NQ-Open \\
+\midrule
+Token & +0.4 [$-$0.7, +1.5] & +1.2 [+0.4, +2.2] & +1.2 [+0.2, +2.2] \\
+Surface & +2.5 [+1.6, +3.5] & +1.2 [+0.6, +1.8] & +1.1 [+0.2, +2.0] \\
+Internal & +0.0 [$-$0.9, +0.9] & $-$0.6 [$-$1.1, $-$0.0] & +0.6 [$-$0.3, +1.4] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The post-hoc ablation in Table~\ref{tab:ablation} agrees. Dropping the surface signal hurts on every dataset, and dropping token confidence hurts on both held-out sets. Dropping the internal signal is neutral on CoQA, slightly helpful on TriviaQA and costs 0.6 points on NQ-Open, where the model is least accurate. The dominant effect is therefore the combination of agreement-type evidence with token confidence; EigenScore adds a small, dataset-dependent contribution, mainly on hard questions. Since this ablation was not pre-registered, we keep the frozen three-signal TRI as our main method.
+
+\textbf{Other pre-registered fusions.} Two further fusions were frozen together with TRI. HYB, the rank sum of a multi-layer EigenScore and token confidence, improved on EigenScore by 1.5 points on both held-out sets, significant on TriviaQA only. PMF, which weighs the samples by their probability and measures the mass that agrees with the greedy answer, reached 83.7 on TriviaQA but did not improve on NQ-Open. Neither is reliable on every dataset, which is why we report TRI and CTC as our methods.
 
 \textbf{Layer choice.} Fig.~\ref{fig:layers} shows single-layer EigenScore at every depth. From layer 5 onward the curve is almost flat, so INSIDE's middle-layer choice is not fragile. Accordingly, averaging EigenScore over layers 8--24 changed AUROC by only $-0.1$ point on every dataset.
 
@@ -192,13 +314,14 @@ These results point the same way as the fusion: the gains come from adding a dif
 \begin{itemize}
 \item \textbf{Labels.} Correctness is judged by ROUGE-L, which has low precision and inflates the AUROC of sampling-based detectors~\cite{janiak2025}. Paired differences share the same labels and are less affected, but an LLM-judge evaluation is needed.
 \item \textbf{Scope.} We study one 7B model in 4-bit precision and 1,000 questions per dataset.
-\item \textbf{Cost.} Like EigenScore, TRI needs $K$ generations per question. The fusion itself is free.
+\item \textbf{Cost.} Like EigenScore, TRI needs $K$ generations per question. The fusion itself is free: ranking $N$ questions costs $O(N\log N)$, negligible next to generation.
+\item \textbf{Reference pool.} Ranks need a pool of questions. A small unlabelled pool from the same domain suffices, but a strong domain shift between pool and deployment questions would distort the ranks.
 \item \textbf{Open-weight models only.} The internal signal requires hidden states. Agreement plus confidence, which carries most of the gain, also works with APIs that expose token log-probabilities.
 \end{itemize}
 
 %=====================================================================
 \section{Conclusion}
-A label-free rank fusion of internal, surface and token evidence, computed from the samples EigenScore already draws, outperforms EigenScore by 2.7 to 4.5 AUROC points on three question-answering datasets. The gains held on two datasets that were frozen out of development. TRI is the only method that significantly improves on EigenScore on every dataset. The main lesson is that confidence and agreement fail on different questions, so a detector should read both. Future work will test a second model family and LLM-judge labels.
+A label-free rank fusion of internal, surface and token evidence, computed from the samples EigenScore already draws, outperforms EigenScore by 2.7 to 4.5 AUROC points on three question-answering datasets. The gains held on two datasets that were frozen out of development. TRI is the only method that significantly improves on EigenScore on every dataset. The main lesson is that confidence and agreement fail on different questions, so a detector should read both. Future work will test a second model family and larger models, replace ROUGE labels with an LLM judge, and study learned but still lightweight fusion weights.
 
 \begin{thebibliography}{10}
 \bibitem{chen2024inside} C.~Chen, K.~Liu, Z.~Chen, Y.~Gu, Y.~Wu, M.~Tao, Z.~Fu, and J.~Ye, ``INSIDE: LLMs' internal states retain the power of hallucination detection,'' in \emph{Proc. ICLR}, 2024.
