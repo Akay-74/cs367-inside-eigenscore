@@ -73,3 +73,28 @@ leaves every untied pair unchanged and adds exactly (a − ½) × P(tied pos/neg
 - **Secondary prediction:** the gain over LexSim is larger on TriviaQA/NQ than on CoQA,
   because lower accuracy means more tied wrong-vs-right pairs. We report P(tied pair) and
   the within-tie a for each dataset.
+
+## Addendum 2: H5, probability-weighted mode mass (PMM)
+
+Committed on 2026-11-13 after a third CoQA-only exploration (`explore_mass.py`), and still
+**before any TriviaQA/NQ result was computed**. NQ generation was still running.
+
+**Rationale.** The greedy answer is correct roughly when the meaning it expresses carries
+most of the model's probability mass. Counting how many of the K samples agree with the
+greedy answer estimates that mass, but only in steps of 1/K. The model also gives the exact
+probability p(s) of every distinct string it produced, so the mass can be estimated from
+those probabilities directly.
+
+**Method.**
+- Take the distinct strings among the greedy answer and the K samples, each with
+  p(s) = exp(sum of its token log-probabilities) at temperature 1.
+- PMM = Σ p(s) over strings that agree with the greedy answer (ROUGE-L > 0.5, greedy
+  included) ÷ Σ p(s) over all distinct strings.
+- **PMF = [rank(1 − PMM) + rank(LexSim)] / 2**, equal weights, untuned.
+
+**CoQA evidence (dev).** PMF 87.1 vs LexSim 85.3 (+1.8 [+0.8, +2.8]), vs CTC +1.4
+[+0.3, +2.4], vs EigenScore 80.1. PMM alone is 85.8.
+
+**H5 (held-out, both datasets, added to the Holm family, which now has 14 tests):**
+- **H5a:** AUROC(PMF) > AUROC(LexSim).
+- **H5b:** AUROC(PMF) > AUROC(ES).
