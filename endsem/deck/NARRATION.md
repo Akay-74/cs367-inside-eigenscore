@@ -1,41 +1,39 @@
-# Video narration (10 slides, target ≈ 9 minutes)
+# Video narration (10 slides, about 8 minutes)
 
-There is one paragraph per slide. Each slide stays on screen exactly as long as its audio
-clip (plus a short pause), so the timing follows the voice.
+There is one paragraph per slide. Each slide stays on screen exactly as long as its audio.
+Numbers are written as words so the voice reads them correctly, and "EigenScore" is written
+"Eigen Score".
 
-Speakers will be assigned after the results are in. When generating with ElevenLabs:
-- Use one take per speaker, with `[long pause]` between that speaker's slides.
-- Numbers are written as words so the voice says them correctly.
-- "EigenScore" is written "Eigen Score".
+Suggested split: Aayaan reads slides 1–3, Shlok reads 4–7, Prapti reads 8–10.
 
 ---
 
-**Slide 1 · Problem statement** (≈ 45 s)
-Large language models often give answers that are fluent, confident, and wrong. In our example, the model states that a bridge opened in nineteen twenty-eight, with complete confidence, even though that is not true. A user cannot tell such an answer apart from a correct one by reading it. And when the model is deployed, there is no answer key to check against. So the problem we address is this: give every answer a hallucination score, using only the model itself, so that unreliable answers can be flagged before they reach the user.
+**Slide 1 · Problem statement**
+Large language models often give answers that are fluent, confident, and wrong. In our example, the model states that a bridge opened in nineteen twenty-eight, with complete confidence, even though that is not true. A reader cannot tell such an answer apart from a correct one. And when the model is deployed, there is no answer key to check against. So the problem we address is this: give every answer a hallucination score, using only the model itself, so that unreliable answers can be flagged before they reach the user.
 
-**Slide 2 · Existing detectors** (≈ 45 s)
-Existing detectors look in one of three places. The first group uses token probabilities, such as perplexity and length-normalised entropy, which measure how unsure the model is about each word. But a model can be confidently wrong. The second group samples several answers and compares their words, for example with lexical similarity. But paraphrases then look like disagreement. The third group, which includes the paper we build on, INSIDE from ICLR twenty twenty-four, compares the sampled answers inside the network, where their meaning is still densely encoded.
+**Slide 2 · Existing detectors**
+Existing detectors look in one of three places. The first group uses token probabilities, such as perplexity and length-normalised entropy, which measure how unsure the model is about each word. The second group samples several answers and compares their words, for example with lexical similarity. The third group, which includes the paper we build on, INSIDE from ICLR twenty twenty-four, compares the sampled answers inside the network, where their meaning is still densely encoded.
 
-**Slide 3 · EigenScore and its blind spots** (≈ 60 s)
-INSIDE's Eigen Score samples ten answers to the same question. For each answer, it reads the hidden state of the last token at the middle layer, layer sixteen of thirty-two. It then measures the volume of that cloud of ten points, using the eigenvalues of their covariance matrix. If the answers agree, the volume collapses and the score is low. If they scatter, the score is high and the answer is flagged. At midsem we repaired the authors' code and reproduced the method on an eight gigabyte laptop GPU: Eigen Score reached eighty-three point five AUROC, the best of five methods. But it has two blind spots. It bets on one hand-picked layer, even though detection quality changes with depth. And it measures only how far the answers spread, not how they are arranged.
+**Slide 3 · EigenScore and what it cannot see**
+INSIDE's Eigen Score samples ten answers to the same question, reads each answer's hidden state at the middle layer, and measures the volume of that cloud of ten points using the eigenvalues of their covariance. At midsem we repaired the authors' code and reproduced the method on an eight gigabyte laptop GPU, where Eigen Score reached eighty-three point five AUROC, the best of five methods. But it relies on a single kind of evidence. If the model repeats the same wrong answer ten times, the spread is zero and Eigen Score trusts it. And it ignores the confidence the model reports for every word it writes.
 
-**Slide 4 · Extension overview** (≈ 50 s)
-Our extension tests four training-free ideas. The first, M1, averages the score over a band of layers. The second, M2, equalises the embedding dimensions before the covariance is formed. The third, M3, fuses the score with word-level confidence. The fourth, cross-depth stability, is a new concept that asks whether the arrangement of the answers survives from one layer to the next. To make the comparison trustworthy, every score is computed from the same ten samples per question, so all comparisons are paired. The layer band and the statistical tests were committed to git before any result existed, and there is a single primary test: M1 against the original Eigen Score.
+**Slide 4 · Our idea**
+Our idea starts from a simple observation. The same ten samples already contain three different kinds of evidence. Internal evidence: how far the answers spread in the hidden states, which is Eigen Score. Surface evidence: how much the ten answers overlap in their words. And token evidence: how confident the model was about each word. If these signals fail on different questions, combining them should beat any one of them, at no extra cost: no new generations and no training.
 
-**Slide 5 · M1, Multi-layer EigenScore** (≈ 50 s)
-M1 is the multi-layer Eigen Score. Instead of reading only layer sixteen, it averages the score over the middle half of the network, layers eight to twenty-four. The band is fixed by a simple rule, a quarter to three quarters of the depth, and it was chosen before we saw any result. The reasoning is that every layer gives a noisy reading of the same underlying uncertainty, and averaging reduces that noise. It also avoids a subtle trap: if you pick the best layer after seeing the results, its performance looks better than it really is. A fixed band avoids that bias.
+**Slide 5 · The TRI method**
+Our method, TRI, is a rank fusion. For every question we rank it by each of the three signals and average the three ranks. We use ranks because the signals live on completely different scales, and ranks make them comparable. The weights are equal, and nothing is fitted to the data, so the method needs no labels at all. We also propose a companion method, consistency then confidence. It ranks by text agreement, and only where two questions tie, often because all ten answers are identical, it uses token confidence to break the tie. Because ties receive only half credit in AUROC, breaking them with an informative signal can only help.
 
-**Slide 6 · M2 and M3** (≈ 50 s)
-M2 addresses a known property of language models: a few fixed dimensions in the hidden states carry values orders of magnitude larger than the rest, and these can dominate the covariance. M2a scales each answer's embedding to unit length. M2b standardises every dimension, using statistics from previous questions only, so that no information leaks from the current one. M3 is a hybrid. Eigen Score reads the spread of internal states, while length-normalised entropy reads word-level confidence. Because they rely on different signals, they can make different mistakes, so we combine their ranks with equal weights, with no tuning and no labels.
+**Slide 6 · Why it works**
+Why does this work? Because the signals make different mistakes. Their rank correlations range from only zero point six two to zero point nine. Token confidence is the most independent, and it sees exactly what Eigen Score misses. Among questions where all ten answers agree, token confidence still separates right from wrong answers, with a within-tie AUC between zero point six five and zero point seven three, while Eigen Score manages only zero point five nine on CoQA. Our ablation shows that on the hardest dataset, all three signals contribute.
 
-**Slide 7 · XDS, the new concept** (≈ 60 s)
-Our new idea is cross-depth stability. At each layer, we record which answers resemble which, through the forty-five pairwise distances between the ten answers. We then measure how strongly that pattern carries over to the next layer, a technique called representational similarity analysis. Our hypothesis is this. When the model knows the answer, its samples are paraphrases of one fact, so their arrangement stays stable through the layers. When it is making something up, nothing anchors the samples, so their arrangement reshuffles from layer to layer. As the picture shows, two clouds can have exactly the same spread but a different arrangement. Eigen Score cannot see that difference. Cross-depth stability can.
+**Slide 7 · Experimental protocol**
+To make sure our improvement is real, we followed a strict protocol. We ran Llama two, seven billion parameters, in four-bit precision on an eight gigabyte laptop GPU, with ten samples for each of one thousand questions per dataset. We developed every idea on CoQA only. Before looking at any other result, we froze our final methods in git. Only then did we test them on two unseen datasets, TriviaQA and Natural Questions, using a paired bootstrap with ten thousand resamples and a correction for multiple comparisons.
 
-**Slide 8 · Experimental protocol** (≈ 45 s)
-We ran Llama two, seven billion parameters, in four-bit precision on an eight gigabyte RTX forty-sixty laptop GPU. We used one thousand questions each from three datasets: CoQA, TriviaQA and Natural Questions. For every question we drew ten samples with the paper's settings. An answer counts as a hallucination when its ROUGE-L overlap with the reference answer is at most zero point five. We report AUROC for every method, and we test each improvement with a paired bootstrap of ten thousand resamples. To fit within eight gigabytes, we recompute the hidden states on the prompt's cached keys and values, and we verified that this matches a full forward pass.
+**Slide 8 · Results**
+Here are the results. Eigen Score averages seventy-nine point one AUROC across the three datasets, and text agreement averages eighty-one point five. Our fusion, TRI, is the strongest on average at eighty-two point four, and it never loses to Eigen Score. The biggest test is Natural Questions, where the model answers only twenty-seven percent of questions correctly. There, every single signal stays below seventy-seven, while TRI reaches seventy-nine point five.
 
-**Slide 9 · Results** (≈ 60 s)
-*Written after the runs finish.*
+**Slide 9 · Held-out confirmation**
+This plot shows the gain over Eigen Score with ninety-five percent confidence intervals. On the two datasets that were never used to design the method, TRI improves on Eigen Score by two point seven points each time, and both gains remain significant after correction. Text agreement alone is not reliable: it fails completely on Natural Questions. And our companion method beats text agreement on both unseen datasets. TRI is the only method that beats Eigen Score on every dataset.
 
-**Slide 10 · Findings and conclusion** (≈ 60 s)
-*Written after the runs finish.*
+**Slide 10 · Conclusion**
+To conclude: a simple, label-free fusion of internal, surface and token signals beats Eigen Score by two point seven to four point five AUROC on three datasets, and the gains held on data frozen out of development. We also found that Eigen Score's choice of layer barely matters, and that averaging layers, normalising embeddings or tracking cross-layer structure did not help. Our study uses one seven billion parameter model and ROUGE-based labels, so the next steps are a second model and labels from an LLM judge. Thank you.

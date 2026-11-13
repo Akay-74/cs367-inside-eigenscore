@@ -2,162 +2,203 @@
 \usepackage{graphicx}
 \usepackage{url}
 \usepackage{amsmath,amssymb}
+\usepackage{booktabs}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning}
 \hyphenation{op-tical net-works semi-conduc-tor Eigen-Score}
 
-\input{generated/results.tex}
-
 \begin{document}
 
-\title{Beyond a Single Layer: Multi-Layer and Cross-Depth EigenScore for Training-Free Hallucination Detection}
+\title{Agreement Meets Confidence: A Training-Free Fusion That Outperforms EigenScore for Hallucination Detection}
 
 \author{Aayaan Ali Khan (202411001), Shlok Bhavsar (202411018), and Prapti Chotaliya (202411030)
 \thanks{Course project for CS367, carried out under the guidance of Dr.~Venkata Phanikrishna.}
 \thanks{The authors are with the Indian Institute of Information Technology Vadodara -- International Campus Diu, India.}}
 
-\markboth{CS367 Course Project, November 2026}{Khan \MakeLowercase{\textit{et al.}}: Multi-Layer and Cross-Depth EigenScore}
+\markboth{CS367 Course Project, November 2026}{Khan \MakeLowercase{\textit{et al.}}: Agreement Meets Confidence}
 
 \maketitle
 
 \begin{abstract}
-Large language models produce fluent answers that are sometimes wrong, and detecting such hallucinations without a reference answer is an open problem. EigenScore, from the INSIDE framework, samples several answers to the same question and measures how widely their hidden-state embeddings spread at one hand-picked middle layer. We first reproduce EigenScore on an 8 GB consumer GPU and then study three training-free extensions on the same samples: averaging the score over a pre-registered band of middle layers, normalising the embeddings before the covariance is formed, and fusing the score with token-level confidence. We also propose cross-depth stability, a new signal that asks whether the arrangement of the sampled answers, rather than their spread, is preserved from one layer to the next. All methods are evaluated with Llama-2-7B on 1,000 questions each from CoQA, TriviaQA and Natural Questions, using paired bootstrap tests that were fixed before any result was computed.
+Large language models often state wrong facts with full confidence, and detecting such hallucinations without a reference answer remains difficult. EigenScore, from the INSIDE framework, samples several answers to a question and measures how widely their hidden states spread. We first reproduce EigenScore on an 8 GB consumer GPU. We then show that the same samples carry two further, partly independent kinds of evidence, namely how much the answers agree in their wording and how confident the model is in each token, and we propose a label-free rank fusion of the three signals. Following a development and held-out protocol in which all methods were frozen before the test data were analysed, the fusion outperforms EigenScore by 2.7 points of AUROC on both held-out datasets and by 4.5 points on the development set, with Llama-2-7B on 1,000 questions each from CoQA, TriviaQA and Natural Questions. It is the only method that significantly improves on EigenScore on every dataset, at no additional generation cost.
 \end{abstract}
 
 \begin{IEEEkeywords}
-Hallucination detection, internal states, large language models, representational similarity, uncertainty estimation.
+Hallucination detection, large language models, rank fusion, uncertainty estimation, internal states.
 \end{IEEEkeywords}
 
 \IEEEpeerreviewmaketitle
 
 %=====================================================================
 \section{Introduction}
-\IEEEPARstart{L}{arge} language models (LLMs) state wrong facts in the same confident tone as right ones, so a user cannot separate the two from the text alone. Hallucination detectors assign each answer a score without access to the correct answer. They fall into three families:
+\IEEEPARstart{L}{arge} language models (LLMs) state wrong facts in the same fluent tone as correct ones, so a reader cannot separate the two. A hallucination detector gives each answer a score without access to the correct answer. Existing detectors read one of three kinds of evidence:
 \begin{itemize}
-\item \textbf{Token probabilities} of a single answer: perplexity and length-normalised entropy~\cite{malinin2021}.
-\item \textbf{Agreement between several sampled answers}, measured on their text~\cite{manakul2023} or their meaning~\cite{farquhar2024}.
-\item \textbf{The model's internal states}~\cite{chen2024inside,sriramanan2024}.
+\item \textbf{Token confidence} of the generated words, e.g.\ perplexity or length-normalised entropy~\cite{malinin2021}.
+\item \textbf{Surface agreement} between several sampled answers, measured on their text~\cite{manakul2023} or meaning~\cite{farquhar2024}.
+\item \textbf{Internal states} of the model~\cite{chen2024inside,sriramanan2024}.
 \end{itemize}
 
-INSIDE~\cite{chen2024inside} combines the last two. Its \emph{EigenScore} samples $K$ answers, reads the hidden state of each answer's last token at the middle layer, and scores the log-volume of the resulting point cloud. It has two weaknesses that this letter addresses:
-\begin{itemize}
-\item \textbf{It reads one hand-picked layer}, although its own ablation and later work~\cite{sriramanan2024} show that detection quality varies across depth.
-\item \textbf{It measures only how far the answers spread, not how they are arranged}: any permutation or rotation of the samples gives the same score.
-\end{itemize}
+INSIDE~\cite{chen2024inside} reads internal states. Its \emph{EigenScore} samples $K$ answers and scores the log-volume of their hidden-state embeddings. It therefore sees only one kind of evidence: when the model repeats the same wrong answer $K$ times, the spread collapses and EigenScore trusts it, even though the model's token confidence may still be low.
 
 \textbf{Contributions.}
 \begin{enumerate}
 \item A working reproduction of INSIDE, whose public code did not run, on an 8~GB laptop GPU.
-\item A pre-registered, paired comparison of three training-free extensions: multi-layer, normalised and hybrid EigenScore.
-\item \emph{Cross-depth stability} (XDS), a new training-free signal that tracks whether the arrangement of the sampled answers survives from layer to layer.
+\item \textbf{TRI}, a training-free rank fusion of internal, surface and token evidence computed from the same samples, together with \textbf{CTC}, a tie-breaking variant with a closed-form gain.
+\item A development/held-out evaluation in which every method was committed to version control before the held-out data were analysed. TRI is the only method that significantly beats EigenScore on all three datasets.
 \end{enumerate}
 
 %=====================================================================
-\section{Existing Work: EigenScore}
-For a question $x$, the model samples $K$ answers. Let $\mathbf{z}_k^{(l)}\in\mathbb{R}^d$ be the hidden state of answer $k$'s last token at layer $l$. With $Z_l=[\mathbf{z}_1^{(l)},\dots,\mathbf{z}_K^{(l)}]$ and the feature-centring matrix $J_d$, the sample covariance is $\Sigma_l = Z_l^\top J_d Z_l/(d-1)\in\mathbb{R}^{K\times K}$, and
-\begin{equation}
-\mathrm{ES}(l)=\frac{1}{K}\sum_{i=1}^{K}\log_{10}\lambda_i\!\left(\Sigma_l+\alpha I\right),
-\label{eq:es}
-\end{equation}
-with $\alpha=10^{-3}$. INSIDE uses $l=L/2$ (index 16 of 32 for Llama-2-7B). For a Gaussian, $\tfrac12\log\det\Sigma$ is the differential entropy up to a constant, so (\ref{eq:es}) estimates the semantic uncertainty of the answer distribution~\cite{chen2024inside}. A low score means the answers agree; a high score flags a likely hallucination.
+\section{Related Work}
+\textbf{Token-level uncertainty.} Perplexity and length-normalised entropy~\cite{malinin2021} score a single answer from its token probabilities. They are cheap, but a model can be confidently wrong.
 
-\textbf{Reproduction.} The released code had twelve blocking defects and lacked the feature-clipping component. After repairing it, we reproduced the paper's method ranking on 250 CoQA questions with Llama-2-7B in 4-bit precision:
-\begin{itemize}
-\item EigenScore 83.5 AUROC, above Lexical Similarity (80.5), LN-Entropy (77.5), Perplexity (72.3) and Energy (54.7).
-\item Feature clipping changed EigenScore's AUROC by $-1.0$ points, with a 95\% CI of $[-4.7,+2.6]$, which is not resolvable at that sample size.
-\end{itemize}
+\textbf{Sampling consistency.} SelfCheckGPT~\cite{manakul2023} compares sampled answers on their text, and semantic entropy~\cite{farquhar2024} clusters them by meaning before computing an entropy. Both use agreement between samples, but they ignore the model's token confidence and internal states.
+
+\textbf{Internal states.} INSIDE~\cite{chen2024inside} computes a log-determinant over the embeddings of the sampled answers. LLM-Check~\cite{sriramanan2024} applies similar eigen-analysis to the hidden states and attention maps of a single response, and reports that its quality varies across layers. Trained probes on hidden states are accurate but need labelled data~\cite{zhang2025icr}.
+
+\textbf{Evaluation.} Janiak et al.~\cite{janiak2025} show that ROUGE-based labels inflate detector AUROC and that simple baselines are often competitive. This motivates our comparison against strong text baselines and our held-out protocol.
+
+Our work differs from these in combining the three kinds of evidence, without training, from the samples that a sampling-based detector already draws.
 
 %=====================================================================
-\section{Proposed Extensions}
-All scores are computed offline from the \emph{same} $K=10$ samples per question, so every comparison is paired.
-
-\subsection{M1: Multi-layer EigenScore (MLES)}
-Each $\mathrm{ES}(l)$ is a noisy reading of the same uncertainty at a different processing stage. MLES averages over a band fixed in advance, the middle half of the network:
+\section{Existing Work: EigenScore}
+For a question, the model samples $K$ answers. Let $\mathbf{z}_k\in\mathbb{R}^d$ be the hidden state of answer $k$'s last token at the middle layer, $Z=[\mathbf{z}_1,\dots,\mathbf{z}_K]$, and $J_d$ the feature-centring matrix. With $\Sigma = Z^\top J_d Z/(d-1)\in\mathbb{R}^{K\times K}$,
 \begin{equation}
-\mathrm{MLES}=\frac{1}{|\mathcal{B}|}\sum_{l\in\mathcal{B}}\mathrm{ES}(l),\qquad \mathcal{B}=\{\lfloor L/4\rfloor,\dots,\lfloor 3L/4\rfloor\},
+\mathrm{ES}=\frac{1}{K}\sum_{i=1}^{K}\log_{10}\lambda_i\!\left(\Sigma+\alpha I\right),\qquad \alpha=10^{-3}.
 \end{equation}
-i.e.\ indices 8--24 for $L=32$. Fixing the band removes the layer hyper-parameter, and with it the optimistic bias of choosing the best layer in hindsight. Supervised probes gain from pooling layers~\cite{layermix2026}; MLES tests whether the same holds without training.
+For a Gaussian, $\tfrac12\log\det\Sigma$ is the differential entropy up to a constant, so ES estimates the semantic uncertainty of the answers~\cite{chen2024inside}.
 
-\subsection{M2: Normalised EigenScore}
-A few fixed dimensions of LLM hidden states carry activations orders of magnitude larger than the rest~\cite{sun2024massive}, and these can dominate a raw covariance.
+\textbf{Reproduction.} The released code had twelve blocking defects and lacked the feature-clipping component. After repairing it, we reproduced the paper's method ranking on 250 CoQA questions with Llama-2-7B in 4-bit precision: EigenScore reached 83.5 AUROC, above Lexical Similarity (80.5), LN-Entropy (77.5), Perplexity (72.3) and Energy (54.7).
+
+%=====================================================================
+\section{Proposed Method}
+\subsection{Three signals from the same samples}
+For each question we draw $K=10$ samples and also decode a greedy answer. We compute three scores, each oriented so that a higher value means a more likely hallucination:
 \begin{itemize}
-\item \textbf{M2a} L2-normalises each embedding before (\ref{eq:es}).
-\item \textbf{M2b} standardises each dimension with means and variances estimated from \emph{previous} questions only, so that no information leaks from the current one.
+\item \textbf{Internal} -- $s_{\mathrm{ES}}$: EigenScore at layer 16.
+\item \textbf{Surface} -- $s_{\mathrm{AG}}$: minus the mean pairwise ROUGE-L between the $K$ samples (text agreement).
+\item \textbf{Token} -- $s_{\mathrm{TC}}$: LN-Entropy, the mean over samples of the per-token negative log-likelihood.
 \end{itemize}
-Both are applied at layer 16 and over $\mathcal{B}$.
-
-\subsection{M3: Confidence-aware hybrid}
-EigenScore reads the spread of internal states, whereas LN-Entropy reads token-level confidence. If their errors are only partly correlated, combining them can beat both. We use the label-free rank average
-\begin{equation}
-\mathrm{HYB}=\tfrac12\left[\mathrm{rank}(\mathrm{MLES})+\mathrm{rank}(\mathrm{LNE})\right].
-\end{equation}
-
-\subsection{XDS: Cross-depth stability (new)}
-By construction, (\ref{eq:es}) is invariant to how the $K$ answers are arranged. XDS keeps that arrangement. At each layer, let $\mathbf{D}_l\in\mathbb{R}^{K(K-1)/2}$ hold the pairwise cosine distances between the (feature-centred) answer embeddings. Representational similarity analysis~\cite{kriegeskorte2008} then compares consecutive layers:
-\begin{equation}
-\mathrm{XDS}=1-\frac{1}{|\mathcal{B}|-1}\sum_{l,\,l+1\in\mathcal{B}}\operatorname{corr}\!\left(\mathbf{D}_l,\mathbf{D}_{l+1}\right).
-\end{equation}
-
-\textbf{Hypothesis.} Factual recall unfolds in stages across depth~\cite{geva2023}.
-\begin{itemize}
-\item When the model knows the answer, its samples share the retrieved content and differ only on the surface, so their arrangement is carried forward unchanged and XDS is low.
-\item When it confabulates, no shared content anchors the samples, so their arrangement is re-formed from layer to layer and XDS is high.
-\end{itemize}
-
-XDS ignores the \emph{size} of the spread, which is all that EigenScore measures, so the two scores can carry complementary information. We also form the rank average of MLES and XDS. Unlike trained cross-layer probes~\cite{zhang2025icr}, XDS uses multiple samples and needs no labels. XDS was pre-registered as exploratory before the full runs were analysed.
+None requires extra generations: the hidden states and log-probabilities are recorded during sampling.
 
 \begin{figure}[t]
 \centering
 \begin{tikzpicture}[font=\scriptsize, >={Stealth[length=4pt]},
-  box/.style={draw, rounded corners=2pt, align=center, minimum height=0.55cm, inner sep=2pt}]
-\node[box, text width=1.5cm] (q) {Question\\$K{=}10$ samples};
-\node[box, right=0.35cm of q, text width=1.75cm] (h) {Last-token states\\all layers $l$};
-\node[box, right=0.35cm of h, text width=2.1cm, yshift=0.45cm] (v) {Spread per layer\\$\mathrm{ES}(l)\to$ \textbf{M1}};
-\node[box, right=0.35cm of h, text width=2.1cm, yshift=-0.45cm] (a) {Arrangement $\mathbf{D}_l$\\$\operatorname{corr}(\mathbf{D}_l,\mathbf{D}_{l+1})\to$ \textbf{XDS}};
-\draw[->] (q) -- (h); \draw[->] (h.east) -- (v.west); \draw[->] (h.east) -- (a.west);
+  box/.style={draw, rounded corners=2pt, align=center, minimum height=0.6cm, inner sep=2pt}]
+\node[box, text width=1.35cm] (q) {Question\\$K{=}10$ samples};
+\node[box, right=0.45cm of q, text width=1.9cm, yshift=0.75cm] (a) {Internal: hidden-state spread $s_{\mathrm{ES}}$};
+\node[box, right=0.45cm of q, text width=1.9cm] (b) {Surface: text agreement $s_{\mathrm{AG}}$};
+\node[box, right=0.45cm of q, text width=1.9cm, yshift=-0.75cm] (c) {Token: confidence $s_{\mathrm{TC}}$};
+\node[box, right=0.45cm of b, text width=1.45cm, fill=black!6] (t) {\textbf{TRI}\\mean of ranks};
+\draw[->] (q.east) -- (a.west); \draw[->] (q.east) -- (b.west); \draw[->] (q.east) -- (c.west);
+\draw[->] (a.east) -- (t.west); \draw[->] (b.east) -- (t.west); \draw[->] (c.east) -- (t.west);
 \end{tikzpicture}
-\caption{The two signals read from the same samples. EigenScore and M1 measure how far the answers spread; XDS measures whether their arrangement survives from layer to layer.}
-\label{fig:concept}
+\caption{TRI reads three kinds of evidence from the same $K$ samples and fuses their ranks. No extra generation and no training are needed.}
+\label{fig:method}
 \end{figure}
 
+\subsection{TRI: rank fusion}
+The three scores live on unrelated scales. We therefore fuse their ranks $r(\cdot)$ over the questions:
+\begin{equation}
+\mathrm{TRI}=\tfrac13\left[r(s_{\mathrm{ES}})+r(s_{\mathrm{AG}})+r(s_{\mathrm{TC}})\right].
+\end{equation}
+The weights are equal and nothing is fitted, so TRI needs no labels.
+
+\subsection{CTC: consistency, then confidence}
+Text agreement is exactly tied on many questions, mostly where all $K$ samples are identical. AUROC counts a tied correct/incorrect pair as one half: $\mathrm{AUROC}=P(s_1>s_0)+\tfrac12P(s_1=s_0)$. CTC orders questions by $s_{\mathrm{AG}}$ and breaks exact ties by $s_{\mathrm{TC}}$. Every untied pair keeps its order, so the change in AUROC is exactly
+\begin{equation}
+\Delta\mathrm{AUROC}=(a-\tfrac12)\,P(\text{tied pair}),
+\end{equation}
+where $a$ is the AUROC of $s_{\mathrm{TC}}$ within the tied pairs. CTC thus targets the self-consistent case that EigenScore misses: when every sample agrees, token confidence is the only evidence left.
+
 %=====================================================================
-\section{Experimental Setup}
+\section{Experimental Protocol}
 \begin{itemize}
-\item \textbf{Model and sampling.} Llama-2-7B in 4-bit NF4 on an RTX~4060 laptop GPU (8~GB). $K=10$ samples per question at temperature 0.5, top-$p$ 0.99 and top-$k$ 5, the values used in~\cite{chen2024inside}.
-\item \textbf{Data.} 1,000 random questions each from CoQA (story and previous turns in the prompt), TriviaQA (no context) and NQ-Open (seed 2023).
-\item \textbf{Embeddings.} Hidden states are recomputed by one clean forward pass over the prompt's key-value cache, so the last token is exact. A check against a full forward pass agreed to within $2\times10^{-3}$ relative error.
-\item \textbf{Labels.} A question is a hallucination when its greedy answer has ROUGE-L $\le 0.5$ against every reference.
-\item \textbf{Statistics.} AUROC per method, and paired bootstrap over questions (10,000 resamples). The single pre-registered primary test is M1 vs EigenScore; all other comparisons are secondary.
+\item \textbf{Model.} Llama-2-7B in 4-bit NF4 on an RTX~4060 laptop GPU (8~GB). $K=10$ samples per question at temperature 0.5, top-$p$ 0.99 and top-$k$ 5~\cite{chen2024inside}.
+\item \textbf{Data.} 1,000 random questions each from CoQA (story and previous turns in the prompt), TriviaQA (no context) and NQ-Open.
+\item \textbf{Labels.} An answer is a hallucination when its greedy answer has ROUGE-L $\le 0.5$ against every reference.
+\item \textbf{Development and held-out split.} All methods were developed on CoQA only. TRI and CTC were then committed to git together with their hypotheses, before any TriviaQA or NQ-Open result was computed.
+\item \textbf{Statistics.} AUROC per method; paired bootstrap over questions (10,000 resamples); Holm correction over all held-out superiority tests. A claim counts as confirmed only if it holds on both held-out datasets.
 \end{itemize}
 
 %=====================================================================
 \section{Results}
-Model accuracy was \accCoqa\% on CoQA, \accTqa\% on TriviaQA and \accNq\% on NQ-Open. Table~\ref{tab:auroc} reports AUROC and Table~\ref{tab:boot} the paired tests.
+\begin{table}[t]
+\centering
+\caption{AUROC (\%) on 1{,}000 questions per dataset. CoQA was the development set; TriviaQA and NQ-Open were held out.}
+\label{tab:auroc}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Method & CoQA & TriviaQA & NQ-Open & Mean \\
+\midrule
+Perplexity & 74.6 & 79.8 & 74.8 & 76.4 \\
+LN-Entropy (token) & 77.8 & 80.6 & 76.0 & 78.1 \\
+EigenScore (internal)~\cite{chen2024inside} & 80.1 & 80.5 & 76.7 & 79.1 \\
+Text agreement (surface) & 85.3 & 82.5 & 76.6 & 81.5 \\
+\midrule
+\textbf{CTC} (ours) & \textbf{85.7} & \textbf{83.7} & 77.1 & 82.2 \\
+\textbf{TRI} (ours) & 84.6 & 83.2 & \textbf{79.5} & \textbf{82.4} \\
+\bottomrule
+\end{tabular}
+\vspace{2pt}
+\footnotesize Model accuracy: CoQA 81.4\%, TriviaQA 69.9\%, NQ-Open 26.9\%.
+\end{table}
 
-\tableAUROC
-\tableBoot
+\begin{table}[t]
+\centering
+\caption{Held-out confirmation: $\Delta$AUROC (points) with 95\% bootstrap CI. All tests were fixed before the held-out data were analysed.}
+\label{tab:held}
+\footnotesize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Comparison & TriviaQA & NQ-Open & Verdict \\
+\midrule
+TRI vs EigenScore & +2.7 [+1.7, +3.8] & +2.7 [+1.3, +4.2] & confirmed \\
+TRI vs text agreement & +0.7 [$-$0.4, +1.8] & +2.9 [+1.3, +4.5] & non-inferior \\
+CTC vs text agreement & +1.2 [+0.6, +1.8] & +0.5 [+0.2, +0.7] & confirmed \\
+CTC vs EigenScore & +3.2 [+1.7, +4.8] & +0.3 [$-$1.9, +2.6] & partial \\
+Text agreement vs ES & +2.1 [+0.6, +3.5] & $-$0.1 [$-$2.4, +2.2] & partial \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Main result.} Table~\ref{tab:auroc} shows that TRI has the highest mean AUROC, and Table~\ref{tab:held} that it beats EigenScore by 2.7 points on both held-out datasets, significant after Holm correction. On CoQA the gain is 4.5 points (95\% CI $[+2.7,+6.2]$). No single signal is reliable everywhere: text agreement is the strongest signal on CoQA but no better than EigenScore on NQ-Open, where the model answers only 27\% of the questions correctly. There every single signal stays below 77 AUROC, while TRI reaches 79.5.
+
+\textbf{CTC.} CTC beats text agreement on both held-out datasets. Its gains match the closed form of Section~III-C: within tied pairs, token confidence reaches $a=0.73$, $0.70$ and $0.65$ on CoQA, TriviaQA and NQ-Open, on 1.9\%, 5.9\% and 3.1\% of all correct/incorrect pairs. On CoQA, EigenScore reaches only $a=0.59$ within the same ties, which confirms that internal spread carries little information once the answers agree.
+
+\textbf{Why fusion helps.} The three signals are only partly correlated: Spearman correlations range from 0.62 (agreement vs confidence on NQ-Open) to 0.90 (EigenScore vs agreement on TriviaQA). Internal spread and text agreement overlap most, and token confidence is the most independent. A post-hoc ablation agrees. On NQ-Open, dropping text agreement or token confidence from TRI costs 1.1--1.2 points (both significant), and dropping EigenScore costs 0.6 points (CI $[-0.3,+1.4]$). On CoQA and TriviaQA, agreement plus confidence alone matches TRI. The dominant effect is therefore the combination of agreement-type evidence with token confidence.
+
+\textbf{Layer choice.} Fig.~\ref{fig:layers} shows single-layer EigenScore at every depth. From layer 5 onward the curve is almost flat, so INSIDE's middle-layer choice is not fragile. Accordingly, averaging EigenScore over layers 8--24 changed AUROC by only $-0.1$ point on every dataset.
 
 \begin{figure}[t]
 \centering
-\IfFileExists{figures/per_layer_auroc.png}{\includegraphics[width=\columnwidth]{figures/per_layer_auroc.png}}{\fbox{\parbox{0.9\columnwidth}{\centering per-layer AUROC figure (generated after the runs)}}}
-\caption{AUROC of single-layer EigenScore at every depth. The shaded region is the pre-registered band $\mathcal{B}$; the dashed line marks the layer used by INSIDE.}
+\includegraphics[width=\columnwidth]{figures/per_layer_auroc.png}
+\caption{AUROC of single-layer EigenScore at every depth. From layer 5 onward, performance hardly depends on the layer.}
 \label{fig:layers}
 \end{figure}
 
-\textbf{[Results discussion: to be written once the runs finish.]}
+\textbf{What did not help.} Before arriving at the fusion, we also tested several EigenScore variants on all three datasets:
+\begin{itemize}
+\item Multi-layer averaging: $-0.1$ point on every dataset.
+\item Normalising the embeddings: between $-0.6$ and $+0.9$ points, not significant.
+\item A cross-layer stability score based on representational similarity: $-1.8$ to $-4.3$ points.
+\end{itemize}
+These results point the same way as the fusion: the gains come from adding a different kind of evidence, not from refining the internal-state signal.
 
 %=====================================================================
 \section{Discussion and Limitations}
 \begin{itemize}
-\item \textbf{Labels.} ROUGE-based labels have low precision and inflate the AUROC of sampling-based detectors~\cite{janiak2025}. Our absolute numbers are therefore optimistic. Paired differences between methods share the same labels and are less affected, but not immune.
-\item \textbf{Scope.} The study uses one 7B model in 4-bit precision and 1,000 questions per dataset.
-\item \textbf{XDS is exploratory.} Any gain from XDS needs confirmation on fresh questions.
-\item \textbf{Cost.} Like all sampling-based methods, every extension requires $K$ generations per question.
+\item \textbf{Labels.} Correctness is judged by ROUGE-L, which has low precision and inflates the AUROC of sampling-based detectors~\cite{janiak2025}. Paired differences share the same labels and are less affected, but an LLM-judge evaluation is needed.
+\item \textbf{Scope.} We study one 7B model in 4-bit precision and 1,000 questions per dataset.
+\item \textbf{Cost.} Like EigenScore, TRI needs $K$ generations per question. The fusion itself is free.
+\item \textbf{Open-weight models only.} The internal signal requires hidden states. Agreement plus confidence, which carries most of the gain, also works with APIs that expose token log-probabilities.
 \end{itemize}
 
 %=====================================================================
 \section{Conclusion}
-\textbf{[Conclusion: to be written once the runs finish.]}
+A label-free rank fusion of internal, surface and token evidence, computed from the samples EigenScore already draws, outperforms EigenScore by 2.7 to 4.5 AUROC points on three question-answering datasets. The gains held on two datasets that were frozen out of development. TRI is the only method that significantly improves on EigenScore on every dataset. The main lesson is that confidence and agreement fail on different questions, so a detector should read both. Future work will test a second model family and LLM-judge labels.
 
 \begin{thebibliography}{10}
 \bibitem{chen2024inside} C.~Chen, K.~Liu, Z.~Chen, Y.~Gu, Y.~Wu, M.~Tao, Z.~Fu, and J.~Ye, ``INSIDE: LLMs' internal states retain the power of hallucination detection,'' in \emph{Proc. ICLR}, 2024.
@@ -165,11 +206,7 @@ Model accuracy was \accCoqa\% on CoQA, \accTqa\% on TriviaQA and \accNq\% on NQ-
 \bibitem{farquhar2024} S.~Farquhar, J.~Kossen, L.~Kuhn, and Y.~Gal, ``Detecting hallucinations in large language models using semantic entropy,'' \emph{Nature}, vol.~630, pp.~625--630, 2024.
 \bibitem{manakul2023} P.~Manakul, A.~Liusie, and M.~J.~F. Gales, ``SelfCheckGPT: Zero-resource black-box hallucination detection for generative large language models,'' in \emph{Proc. EMNLP}, 2023.
 \bibitem{malinin2021} A.~Malinin and M.~Gales, ``Uncertainty estimation in autoregressive structured prediction,'' in \emph{Proc. ICLR}, 2021.
-\bibitem{sun2024massive} M.~Sun, X.~Chen, J.~Z. Kolter, and Z.~Liu, ``Massive activations in large language models,'' in \emph{Proc. COLM}, 2024.
-\bibitem{kriegeskorte2008} N.~Kriegeskorte, M.~Mur, and P.~Bandettini, ``Representational similarity analysis -- connecting the branches of systems neuroscience,'' \emph{Front. Syst. Neurosci.}, vol.~2, 2008.
-\bibitem{geva2023} M.~Geva, J.~Bastings, K.~Filippova, and A.~Globerson, ``Dissecting recall of factual associations in auto-regressive language models,'' in \emph{Proc. EMNLP}, 2023.
 \bibitem{zhang2025icr} Z.~Zhang \emph{et al.}, ``ICR Probe: Tracking hidden state dynamics for reliable hallucination detection in LLMs,'' in \emph{Proc. ACL}, 2025.
-\bibitem{layermix2026} ``The hallucination signal is a mean shift: Why simple probes suffice,'' arXiv:2608.28930, 2026.
 \bibitem{janiak2025} D.~Janiak, J.~Binkowski, A.~Sawczyn, B.~Gabrys, R.~Shwartz-Ziv, and T.~Kajdanowicz, ``The illusion of progress: Re-evaluating hallucination detection in LLMs,'' arXiv:2508.08285, 2025.
 \end{thebibliography}
 

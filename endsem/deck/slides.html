@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Multi-Layer and Cross-Depth EigenScore</title>
+<title>Agreement Meets Confidence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
 <style>
@@ -54,11 +54,10 @@
 </style>
 </head>
 <body>
-
 <!-- 1 · Problem statement (existing work part, 1/3) -->
 <section class="slide" data-n="1">
   <div class="kicker">Problem statement</div>
-  <h1>Beyond a Single Layer: Multi-Layer and Cross-Depth EigenScore for Hallucination Detection</h1>
+  <h1>Agreement Meets Confidence: A Training-Free Fusion That Outperforms EigenScore</h1>
   <div class="grid2" style="flex:0 0 auto; margin-bottom: 40px;">
     <div class="card">
       <h2>LLMs hallucinate confidently</h2>
@@ -79,7 +78,7 @@
     <div><b>Prapti Chotaliya</b>202411030</div>
     <div style="margin-left:auto; text-align:right"><b>CS367 · Guide: Dr. Venkata Phanikrishna</b>IIIT Vadodara – International Campus Diu</div>
   </div>
-  <div class="footer"><span>CS367 · Multi-Layer and Cross-Depth EigenScore</span><span>1 / 10</span></div>
+  <div class="footer"><span>CS367 · Agreement Meets Confidence</span><span>1 / 10</span></div>
 </section>
 
 <!-- 2 · Existing detectors (2/3) -->
@@ -100,195 +99,203 @@
       <p>Compare the sampled answers inside the network, where meaning is still dense.</p>
       <p class="note">Chen et al., ICLR 2024: the work we build on.</p></div>
   </div>
-  <div class="footer"><span>CS367 · Multi-Layer and Cross-Depth EigenScore</span><span>2 / 10</span></div>
+  <div class="footer"><span>CS367 · Agreement Meets Confidence</span><span>2 / 10</span></div>
 </section>
 
-<!-- 3 · EigenScore + reproduction + weaknesses (3/3) -->
+
+<!-- 3 · EigenScore + reproduction + blind spots -->
 <section class="slide" data-n="3">
   <div class="kicker">Existing work</div>
-  <h1>EigenScore, our reproduction, and its two blind spots</h1>
+  <h1>EigenScore, our reproduction, and what it cannot see</h1>
   <div class="grid2">
     <div>
-      <p>Sample <b>K = 10</b> answers, read each answer's last-token state at the <b>middle layer</b> (16 of 32), and score the log-volume of the cloud:</p>
+      <p>Sample <b>K = 10</b> answers, read each answer's last-token state at the <b>middle layer</b>, and score the log-volume of the cloud:</p>
       <div class="eq">ES = (1/K) · Σ log λᵢ(Σ + αI)</div>
-      <p>Agreeing answers give a low score; scattered answers flag a hallucination.</p>
-      <p style="margin-top:22px"><b>Midsem reproduction</b> (250 CoQA questions, 8 GB GPU): EigenScore <b>83.5</b> AUROC, best of five methods, matching the paper's ranking.</p>
+      <p><b>Midsem reproduction</b> (250 CoQA questions, 8 GB GPU): EigenScore <b>83.5</b> AUROC, best of five methods, matching the paper.</p>
     </div>
     <div class="card amber">
       <div class="tag amber">Problem we address</div>
       <ul>
-        <li><b>One hand-picked layer.</b> Detection quality changes with depth, and the paper's own ablation shows it.</li>
-        <li><b>Spread only.</b> The score ignores <i>how</i> the answers are arranged: shuffling or rotating them gives the same number.</li>
+        <li><b>One kind of evidence.</b> It only measures how far the answers spread inside the network.</li>
+        <li><b>Blind to repeated mistakes.</b> If the model gives the same wrong answer ten times, the spread is zero and EigenScore trusts it.</li>
+        <li><b>Ignores confidence</b> that the model reports for every word it writes.</li>
       </ul>
     </div>
   </div>
-  <div class="footer"><span>CS367 · Multi-Layer and Cross-Depth EigenScore</span><span>3 / 10</span></div>
+  <div class="footer"><span>CS367 · Agreement Meets Confidence</span><span>3 / 10</span></div>
 </section>
 
-<!-- 4 · Extension overview (1/7) -->
+<!-- 4 · Idea -->
 <section class="slide" data-n="4">
-  <div class="kicker ext">Proposed extension</div>
-  <h1>Four training-free extensions, tested on the same samples</h1>
-  <div class="grid2" style="grid-template-columns: 1.1fr 1fr">
-    <div>
-      <ul>
-        <li><b>M1 · Multi-layer EigenScore</b>: average over a fixed band of layers</li>
-        <li><b>M2 · Normalised EigenScore</b>: equalise dimensions before the covariance</li>
-        <li><b>M3 · Hybrid</b>: fuse with token-level confidence</li>
-        <li><b>XDS · Cross-depth stability</b>: <i>new</i>, does the answers' arrangement survive across layers?</li>
-      </ul>
-    </div>
-    <div class="card blue">
-      <h2>Designed to be trustworthy</h2>
-      <ul>
-        <li>Every score is computed from the <b>same 10 samples</b>, so all comparisons are paired</li>
-        <li>Layer band and tests <b>pre-registered</b> in git before any result</li>
-        <li>One primary test: <b>M1 vs EigenScore</b></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer"><span>CS367 · Multi-Layer and Cross-Depth EigenScore</span><span>4 / 10</span></div>
-</section>
-
-<!-- 5 · M1 (2/7) -->
-<section class="slide" data-n="5">
-  <div class="kicker ext">Proposed extension · M1</div>
-  <h1>Multi-layer EigenScore: stop betting on one layer</h1>
-  <div class="grid2">
-    <div>
-      <div class="eq">MLES = mean ES(l),  l ∈ 8 … 24</div>
-      <ul>
-        <li>The band is the <b>middle half</b> of the network, ⌊L/4⌋ to ⌊3L/4⌋, fixed before any result</li>
-        <li>Each layer gives a noisy reading of the same uncertainty, and averaging reduces the noise</li>
-        <li>Choosing the best layer <i>after</i> seeing results inflates it; a fixed band avoids that bias</li>
-      </ul>
-    </div>
-    <svg viewBox="0 0 760 520" width="760" height="520">
-      <rect x="40" y="40" width="680" height="400" fill="#fff" stroke="#dcdad3"/>
-      <rect x="210" y="40" width="340" height="400" fill="#fbf1dc"/>
-      <text x="380" y="80" text-anchor="middle" font-size="24" fill="#3f3e3b">band 8–24, averaged</text>
-      <line x1="380" y1="95" x2="380" y2="440" stroke="#7a7873" stroke-dasharray="8 6" stroke-width="2"/>
-      <text x="392" y="425" font-size="21" fill="#3f3e3b">single layer 16</text>
-      <polyline fill="none" stroke="#2a78d6" stroke-width="5" points="60,400 100,300 140,240 180,210 220,200 260,215 300,190 340,205 380,198 420,185 460,200 500,180 540,192 580,215 620,240 660,232 700,250"/>
-      <text x="380" y="490" text-anchor="middle" font-size="22" fill="#7a7873">layer (depth) →</text>
-    </svg>
-  </div>
-  <div class="footer"><span>CS367 · Multi-Layer and Cross-Depth EigenScore</span><span>5 / 10</span></div>
-</section>
-
-<!-- 6 · M2 + M3 (3/7) -->
-<section class="slide" data-n="6">
-  <div class="kicker ext">Proposed extension · M2 and M3</div>
-  <h1>Normalised and hybrid EigenScore</h1>
-  <div class="grid2">
-    <div class="card">
-      <div class="tag">M2 · Normalisation</div>
-      <p>A few fixed dimensions in LLM hidden states are orders of magnitude larger than the rest ("massive activations", Sun et al. 2024) and can dominate the covariance.</p>
-      <ul>
-        <li><b>M2a</b>: scale each answer embedding to unit length</li>
-        <li><b>M2b</b>: standardise each dimension using <i>previous</i> questions only</li>
-      </ul>
-    </div>
-    <div class="card">
-      <div class="tag">M3 · Hybrid</div>
-      <p>EigenScore reads the spread of internal states; LN-Entropy reads word-level confidence. Different signals can make different mistakes.</p>
-      <div class="eq" style="font-size:28px">HYB = ½ [rank(MLES) + rank(LNE)]</div>
-      <p class="note">Label-free and untuned: equal weights.</p>
-    </div>
-  </div>
-  <div class="footer"><span>CS367 · Multi-Layer and Cross-Depth EigenScore</span><span>6 / 10</span></div>
-</section>
-
-<!-- 7 · XDS (4/7) -->
-<section class="slide" data-n="7">
-  <div class="kicker ext">Proposed extension · new concept</div>
-  <h1>Cross-depth stability: is the answers' arrangement preserved?</h1>
-  <div class="grid2" style="grid-template-columns: 1fr 1.05fr">
-    <div>
-      <ul>
-        <li>At each layer, record <b>which answers resemble which</b>: their 45 pairwise distances</li>
-        <li>Correlate that pattern between consecutive layers (representational similarity analysis)</li>
-      </ul>
-      <div class="eq" style="font-size:28px">XDS = 1 − mean corr(D<sub>l</sub>, D<sub>l+1</sub>)</div>
-      <ul>
-        <li><b>Knows the answer</b>: samples are paraphrases of one fact, so the arrangement is stable and XDS is low</li>
-        <li><b>Confabulating</b>: nothing anchors the samples, so the arrangement reshuffles and XDS is high</li>
-      </ul>
-    </div>
-    <svg viewBox="0 0 820 600" width="820" height="600">
-      <text x="200" y="40" text-anchor="middle" font-size="24" fill="#1d2b45" font-weight="600">layer l</text>
-      <text x="610" y="40" text-anchor="middle" font-size="24" fill="#1d2b45" font-weight="600">layer l + 1</text>
-      <text x="20" y="130" font-size="22" fill="#3f3e3b">stable</text>
-      <g fill="#2a78d6"><circle cx="150" cy="110" r="13"/><circle cx="190" cy="95" r="13"/><circle cx="260" cy="150" r="13"/><circle cx="235" cy="185" r="13"/></g>
-      <g fill="#2a78d6"><circle cx="560" cy="110" r="13"/><circle cx="600" cy="95" r="13"/><circle cx="670" cy="150" r="13"/><circle cx="645" cy="185" r="13"/></g>
-      <text x="410" y="145" text-anchor="middle" font-size="40" fill="#7a7873">→</text>
-      <text x="20" y="390" font-size="22" fill="#3f3e3b">reshuffled</text>
-      <g fill="#b87900"><circle cx="150" cy="360" r="13"/><circle cx="190" cy="345" r="13"/><circle cx="260" cy="400" r="13"/><circle cx="235" cy="435" r="13"/></g>
-      <g fill="#b87900"><circle cx="560" cy="430" r="13"/><circle cx="680" cy="345" r="13"/><circle cx="600" cy="400" r="13"/><circle cx="700" cy="440" r="13"/></g>
-      <text x="410" y="395" text-anchor="middle" font-size="40" fill="#7a7873">→</text>
-      <text x="410" y="540" text-anchor="middle" font-size="22" fill="#3f3e3b">Same spread, different arrangement:</text>
-      <text x="410" y="572" text-anchor="middle" font-size="22" fill="#3f3e3b">EigenScore cannot see the difference; XDS can.</text>
-    </svg>
-  </div>
-  <div class="footer"><span>CS367 · Multi-Layer and Cross-Depth EigenScore</span><span>7 / 10</span></div>
-</section>
-
-<!-- 8 · Setup (5/7) -->
-<section class="slide" data-n="8">
-  <div class="kicker ext">Experimental protocol</div>
-  <h1>3 datasets × 1,000 questions on an 8 GB laptop GPU</h1>
+  <div class="kicker ext">Our idea</div>
+  <h1>Three kinds of evidence, already inside the same 10 samples</h1>
   <div class="grid3">
-    <div class="card"><h2>Model</h2>
-      <ul><li>Llama-2-7B, 4-bit NF4</li><li>RTX 4060 laptop, 8 GB</li><li>K = 10 samples, T = 0.5, top-p 0.99, top-k 5</li></ul></div>
-    <div class="card"><h2>Data and labels</h2>
-      <ul><li>CoQA, TriviaQA, NQ-Open</li><li>1,000 questions each</li><li>Hallucination: ROUGE-L ≤ 0.5 vs reference</li></ul></div>
-    <div class="card"><h2>Statistics</h2>
-      <ul><li>AUROC per method</li><li>Paired bootstrap, 10,000 resamples</li><li>Plan committed to git before results</li></ul></div>
+    <div class="card blue"><div class="tag">Internal</div><h2>EigenScore</h2>
+      <p>How far the answers spread in the network's hidden states.</p></div>
+    <div class="card"><div class="tag">Surface</div><h2>Text agreement</h2>
+      <p>How much the 10 answers overlap in their words (mean pairwise ROUGE-L).</p></div>
+    <div class="card amber"><div class="tag amber">Token</div><h2>Token confidence</h2>
+      <p>How sure the model was of each word, averaged per answer (LN-Entropy).</p></div>
   </div>
-  <p class="note" style="font-size:24px">Engineering: hidden states recomputed on the prompt's key-value cache (≈ 5 GB peak, verified against a full forward pass).</p>
-  <div class="footer"><span>CS367 · Multi-Layer and Cross-Depth EigenScore</span><span>8 / 10</span></div>
+  <p style="margin-top:36px"><b>Key question:</b> do these signals fail on <i>different</i> questions? If so, combining them should beat any one of them, at no extra cost: no new generations and no training.</p>
+  <div class="footer"><span>CS367 · Agreement Meets Confidence</span><span>4 / 10</span></div>
 </section>
 
-<!-- 9 · Results table (6/7) -->
-<section class="slide" data-n="9">
+<!-- 5 · Method -->
+<section class="slide" data-n="5">
+  <div class="kicker ext">Proposed method</div>
+  <h1>TRI: rank fusion of the three signals</h1>
+  <div class="grid2">
+    <div>
+      <div class="eq">TRI = ⅓ [ rank(ES) + rank(Agreement) + rank(Confidence) ]</div>
+      <ul>
+        <li><b>Ranks, not raw values:</b> the three scores live on different scales, ranks make them comparable</li>
+        <li><b>Equal weights, no tuning, no labels</b>: nothing is fitted to the data</li>
+        <li>Higher TRI = more likely a hallucination</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="tag">Companion method · CTC</div>
+      <p><b>Consistency-then-confidence:</b> rank by text agreement, and only where it ties (often all 10 answers identical) rank by token confidence.</p>
+      <p class="note">Ties get half credit in AUROC, so breaking them with an informative signal can only help.</p>
+    </div>
+  </div>
+  <div class="footer"><span>CS367 · Agreement Meets Confidence</span><span>5 / 10</span></div>
+</section>
+
+<!-- 6 · Why it works -->
+<section class="slide" data-n="6">
+  <div class="kicker ext">Why it works</div>
+  <h1>The signals make different mistakes</h1>
+  <div class="grid2">
+    <div class="card">
+      <h2>Only partly correlated</h2>
+      <p>Rank correlation between signals: <b>0.62 – 0.90</b>. Internal spread and text agreement overlap most; token confidence is the most independent.</p>
+    </div>
+    <div class="card amber">
+      <h2>Confidence sees repeated mistakes</h2>
+      <p>Among questions where all answers agree, token confidence still separates right from wrong (within-tie AUC <b>0.65 – 0.73</b> across datasets; EigenScore only <b>0.59</b> on CoQA).</p>
+    </div>
+  </div>
+  <p style="margin-top:34px">Ablation on the hardest dataset (NQ-Open, model accuracy 27%): dropping text agreement or token confidence costs TRI over 1 point; dropping EigenScore costs 0.6. On CoQA and TriviaQA, agreement plus confidence alone does as well as TRI.</p>
+  <div class="footer"><span>CS367 · Agreement Meets Confidence</span><span>6 / 10</span></div>
+</section>
+
+<!-- 7 · Protocol -->
+<section class="slide" data-n="7">
+  <div class="kicker ext">Experimental protocol</div>
+  <h1>Develop on one dataset, confirm on two unseen ones</h1>
+  <div class="grid3">
+    <div class="card"><h2>Setup</h2>
+      <ul><li>Llama-2-7B, 4-bit, RTX 4060 (8 GB)</li><li>10 samples per question</li><li>1,000 questions per dataset</li></ul></div>
+    <div class="card blue"><h2>Development</h2>
+      <ul><li><b>CoQA</b> only</li><li>Ideas explored here</li><li>Final methods frozen in git</li></ul></div>
+    <div class="card amber"><h2>Held-out test</h2>
+      <ul><li><b>TriviaQA, NQ-Open</b></li><li>Analysed only after freezing</li><li>Paired bootstrap, 10,000 resamples, Holm correction</li></ul></div>
+  </div>
+  <p class="note" style="font-size:24px">Label: an answer is a hallucination when its ROUGE-L with the reference is at most 0.5.</p>
+  <div class="footer"><span>CS367 · Agreement Meets Confidence</span><span>7 / 10</span></div>
+</section>
+
+<!-- 8 · Results table -->
+<section class="slide" data-n="8">
   <div class="kicker ext">Results</div>
-  <h1 id="res-title">Detection performance (AUROC %)</h1>
-  <div class="grid2" style="grid-template-columns: 1.25fr 1fr">
-    <div id="res-table"></div>
-    <div class="card blue" id="res-primary"></div>
-  </div>
-  <div class="footer"><span>CS367 · Multi-Layer and Cross-Depth EigenScore</span><span>9 / 10</span></div>
+  <h1>TRI is the strongest on average and never loses to EigenScore</h1>
+  <table style="max-width:1500px">
+    <tr><th>Method (AUROC %)</th><th>CoQA (dev)</th><th>TriviaQA</th><th>NQ-Open</th><th>Mean</th></tr>
+    <tr><td>Token confidence (LN-Entropy)</td><td>77.8</td><td>80.6</td><td>76.0</td><td>78.1</td></tr>
+    <tr><td>EigenScore (INSIDE)</td><td>80.1</td><td>80.5</td><td>76.7</td><td>79.1</td></tr>
+    <tr><td>Text agreement (Lexical Similarity)</td><td>85.3</td><td>82.5</td><td>76.6</td><td>81.5</td></tr>
+    <tr class="prop"><td>CTC (ours)</td><td>85.7</td><td>83.7</td><td>77.1</td><td>82.2</td></tr>
+    <tr class="prop"><td>TRI (ours)</td><td>84.6</td><td>83.2</td><td><b>79.5</b></td><td><b>82.4</b></td></tr>
+  </table>
+  <p class="note" style="font-size:24px; margin-top:20px">Model accuracy: CoQA 81%, TriviaQA 70%, NQ-Open 27%. TriviaQA and NQ-Open were never used to design the methods.</p>
+  <div class="footer"><span>CS367 · Agreement Meets Confidence</span><span>8 / 10</span></div>
 </section>
 
-<!-- 10 · Layers + conclusion (7/7) -->
+<!-- 9 · Held-out gains -->
+<section class="slide" data-n="9">
+  <div class="kicker ext">Held-out confirmation</div>
+  <h1>Only TRI beats EigenScore on every dataset</h1>
+  <div class="grid2" style="grid-template-columns: 1.15fr 1fr">
+    <svg viewBox="0 0 900 600" width="900" height="600">
+<line x1="291" y1="30" x2="291" y2="490" stroke="#e1e0d9" stroke-width="2"/>
+<text x="291" y="525" text-anchor="middle" font-size="22" fill="#7a7873">-2</text>
+<line x1="373" y1="30" x2="373" y2="490" stroke="#e1e0d9" stroke-width="2"/>
+<text x="373" y="525" text-anchor="middle" font-size="22" fill="#7a7873">+0</text>
+<line x1="455" y1="30" x2="455" y2="490" stroke="#e1e0d9" stroke-width="2"/>
+<text x="455" y="525" text-anchor="middle" font-size="22" fill="#7a7873">+2</text>
+<line x1="536" y1="30" x2="536" y2="490" stroke="#e1e0d9" stroke-width="2"/>
+<text x="536" y="525" text-anchor="middle" font-size="22" fill="#7a7873">+4</text>
+<line x1="618" y1="30" x2="618" y2="490" stroke="#e1e0d9" stroke-width="2"/>
+<text x="618" y="525" text-anchor="middle" font-size="22" fill="#7a7873">+6</text>
+<line x1="700" y1="30" x2="700" y2="490" stroke="#e1e0d9" stroke-width="2"/>
+<text x="700" y="525" text-anchor="middle" font-size="22" fill="#7a7873">+8</text>
+<line x1="373" y1="30" x2="373" y2="490" stroke="#3f3e3b" stroke-width="3"/>
+<text x="475" y="570" text-anchor="middle" font-size="22" fill="#3f3e3b">Gain over EigenScore (AUROC points, 95% CI)</text>
+<circle cx="730" cy="20" r="9" fill="#9a988f"/><text x="746" y="27" font-size="20" fill="#3f3e3b">Text agreement</text>
+<circle cx="730" cy="50" r="9" fill="#b87900"/><text x="746" y="57" font-size="20" fill="#3f3e3b">TRI (ours)</text>
+<text x="0" y="128" font-size="23" fill="#0b0b0b" font-weight="600">CoQA (dev)</text>
+<line x1="487" y1="100" x2="680" y2="100" stroke="#9a988f" stroke-width="5" stroke-linecap="round"/>
+<circle cx="581" cy="100" r="11" fill="#9a988f" stroke="#fcfcfb" stroke-width="3"/>
+<text x="730" y="108" font-size="22" fill="#52514e" font-weight="400">+5.1</text>
+<line x1="483" y1="144" x2="626" y2="144" stroke="#b87900" stroke-width="5" stroke-linecap="round"/>
+<circle cx="557" cy="144" r="11" fill="#b87900" stroke="#fcfcfb" stroke-width="3"/>
+<text x="730" y="152" font-size="22" fill="#0b0b0b" font-weight="600">+4.5</text>
+<text x="0" y="273" font-size="23" fill="#0b0b0b" font-weight="600">TriviaQA (held-out)</text>
+<line x1="397" y1="245" x2="516" y2="245" stroke="#9a988f" stroke-width="5" stroke-linecap="round"/>
+<circle cx="459" cy="245" r="11" fill="#9a988f" stroke="#fcfcfb" stroke-width="3"/>
+<text x="730" y="253" font-size="22" fill="#52514e" font-weight="400">+2.1</text>
+<line x1="442" y1="289" x2="528" y2="289" stroke="#b87900" stroke-width="5" stroke-linecap="round"/>
+<circle cx="483" cy="289" r="11" fill="#b87900" stroke="#fcfcfb" stroke-width="3"/>
+<text x="730" y="297" font-size="22" fill="#0b0b0b" font-weight="600">+2.7</text>
+<text x="0" y="418" font-size="23" fill="#0b0b0b" font-weight="600">NQ-Open (held-out)</text>
+<line x1="275" y1="390" x2="463" y2="390" stroke="#9a988f" stroke-width="5" stroke-linecap="round"/>
+<circle cx="369" cy="390" r="11" fill="#9a988f" stroke="#fcfcfb" stroke-width="3"/>
+<text x="730" y="398" font-size="22" fill="#52514e" font-weight="400">-0.1</text>
+<line x1="426" y1="434" x2="545" y2="434" stroke="#b87900" stroke-width="5" stroke-linecap="round"/>
+<circle cx="483" cy="434" r="11" fill="#b87900" stroke="#fcfcfb" stroke-width="3"/>
+<text x="730" y="442" font-size="22" fill="#0b0b0b" font-weight="600">+2.7</text>
+</svg>
+    <div class="card amber">
+      <div class="tag amber">Confirmed on unseen data</div>
+      <ul>
+        <li><b>TRI vs EigenScore:</b> +2.7 on TriviaQA and +2.7 on NQ-Open, both significant after correction</li>
+        <li><b>Text agreement alone</b> fails on NQ-Open (−0.1)</li>
+        <li><b>CTC</b> beats text agreement on both held-out sets (+1.2, +0.5)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer"><span>CS367 · Agreement Meets Confidence</span><span>9 / 10</span></div>
+</section>
+
+<!-- 10 · Conclusion -->
 <section class="slide" data-n="10">
-  <div class="kicker ext">Results and conclusion</div>
-  <h1 id="concl-title">What we found</h1>
-  <div class="grid2" style="grid-template-columns: 1.1fr 1fr">
-    <div><img id="layer-fig" src="per_layer_auroc.png" style="width:100%; border:1px solid #dcdad3; border-radius:10px"></div>
-    <div id="concl"></div>
+  <div class="kicker ext">Conclusion</div>
+  <h1>Combine agreement with confidence</h1>
+  <div class="grid2">
+    <div>
+      <ul>
+        <li>A label-free fusion of internal, surface and token signals beats EigenScore by <b>2.7 – 4.5 AUROC</b> on three datasets</li>
+        <li>Gains held on two datasets frozen out of development</li>
+        <li>EigenScore's layer choice barely matters, and averaging layers, normalising embeddings or tracking cross-layer structure did not help</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Limitations and next steps</h2>
+      <ul>
+        <li>One 7B model, 4-bit; ROUGE labels can be noisy</li>
+        <li>Next: a second model and LLM-judge labels</li>
+      </ul>
+    </div>
   </div>
-  <div class="footer"><span>CS367 · Multi-Layer and Cross-Depth EigenScore</span><span>10 / 10</span></div>
+  <div class="footer"><span>CS367 · Agreement Meets Confidence</span><span>10 / 10</span></div>
 </section>
 
-<script src="results.js"></script>
 <script>
-  const q = new URLSearchParams(location.search);
-  const n = q.get("s");
+  const n = new URLSearchParams(location.search).get("s");
   if (n) document.querySelector(`.slide[data-n="${n}"]`).classList.add("on");
   else document.body.classList.add("all");
-  const R = window.RESULTS;
-  if (R) {
-    const ds = R.datasets, f = v => (v == null || isNaN(v)) ? "–" : (100 * v).toFixed(1);
-    const rows = R.rows.map(r => `<tr class="${r.prop ? "prop" : ""}"><td>${r.label}</td>` +
-      ds.map(d => `<td>${f(r.auc[d])}</td>`).join("") + "</tr>").join("");
-    document.getElementById("res-table").innerHTML =
-      `<table><tr><th>Method</th>${ds.map(d => `<th>${R.names[d]}</th>`).join("")}</tr>${rows}</table>`;
-    document.getElementById("res-primary").innerHTML = R.primaryHTML;
-    document.getElementById("concl").innerHTML = R.conclusionHTML;
-    if (R.resultsTitle) document.getElementById("res-title").textContent = R.resultsTitle;
-    if (R.conclusionTitle) document.getElementById("concl-title").textContent = R.conclusionTitle;
-  }
 </script>
 </body>
 </html>
