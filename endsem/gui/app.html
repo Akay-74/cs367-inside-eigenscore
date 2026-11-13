@@ -355,7 +355,8 @@ function renderDetail() {
 
 function renderAll() { renderDash(); renderList(); }
 renderAll();
-if (location.hash) { document.querySelector(`nav button[data-tab="${location.hash.slice(1)}"]`)?.click(); setTimeout(() => window.scrollTo(0, 0), 0); }
+const startTab = new URLSearchParams(location.search).get("tab");
+if (startTab) document.querySelector(`nav button[data-tab="${startTab}"]`)?.click();
 </script>
 </body>
 </html>
