@@ -1,6 +1,6 @@
 # Mid-semester presentation video: plan
 
-Course: **CS307 (Artificial Intelligence)**
+Course: **CS367 (Artificial Intelligence)**
 Group: Aayaan Ali Khan (202411001), Shlok Bhavsar (202411018), Prapti Chotaliya (202411030)
 Paper: Chen et al., *INSIDE: LLMs' Internal States Retain the Power of Hallucination Detection*, ICLR 2024
 
@@ -73,4 +73,4 @@ Names are spoken once, on the title slide. Roll numbers are shown on screen only
 ## 5. Decisions for the group
 
 - **End-semester direction.** The draft proposes a multi-layer, normalised EigenScore as the main contribution, a hybrid EigenScore + LN-Entropy detector as the second, and adaptive K as a stretch goal. Choose one main idea before recording, because the video commits us to it.
-- **Course code.** The repository and report say CS367, while the course is CS307. The slides use CS307. Fix the report before final submission.
+- **Course code.** The repository and report say CS367, while the course is CS367. The slides use CS367. Fix the report before final submission.

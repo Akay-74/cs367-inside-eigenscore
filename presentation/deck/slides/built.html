@@ -21,7 +21,7 @@
 <p style="font-size:26px;line-height:1.45;color:#3E4756">Thresholds match numpy.percentile; low-memory path identical to the full path; pooled score equals the original.</p>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS307 · Reproducing INSIDE (ICLR 2024)</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS367 · Reproducing INSIDE (ICLR 2024)</p>
 <p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-size:24px;color:#5F6673">13 / 21</p>
 <aside>[Speaker: Prapti · about 50 s]
 Our implementation has four parts. First, we repaired all twelve defects and pooled the embeddings across batches, so the pipeline runs end to end with one command for generation and one for evaluation. Second, we implemented feature clipping from the paper's description. A FeatureClipper class keeps a ring buffer of recent token activations, computes per-neuron percentile thresholds, and is attached as a forward hook on the penultimate layer, so the clipping affects generation as the paper intends. Third, we made a 7-billion-parameter model run on an 8 GB laptop GPU, using 4-bit weights, smaller generation passes, and a hook that keeps only the one layer EigenScore needs. Fourth, we wrote eight automated tests; for example, the clipping thresholds agree with NumPy's percentile function, and the low-memory path gives exactly the same scores as the original.

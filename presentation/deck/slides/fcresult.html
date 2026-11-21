@@ -32,7 +32,7 @@
 <p style="font-size:26px;line-height:1.4;color:#3E4756">A 1-point effect needs far more than 250 questions.</p>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS307 · Reproducing INSIDE (ICLR 2024)</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS367 · Reproducing INSIDE (ICLR 2024)</p>
 <p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-size:24px;color:#5F6673">17 / 21</p>
 <aside>[Speaker: Prapti · about 45 s]
 The second claim, that feature clipping improves EigenScore, did not reproduce at our scale. The paper reports a gain of 1.1 points on CoQA. We measured a change of minus 1.0, but the 95 percent confidence interval runs from minus 4.7 to plus 2.6. That interval contains both zero and the paper's plus 1.1, so our experiment neither confirms nor contradicts the claim: it simply lacks the resolution. We verified that the clipping is actually operating: 0.29 percent of activations were clipped, which matches the expected rate for a 0.2 percent threshold on each tail. Detecting a one-point effect requires many more questions; the paper used almost eight thousand. I will now hand over to Shlok for the limitations.</aside>

@@ -34,7 +34,7 @@
 </div>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS307 · Reproducing INSIDE (ICLR 2024)</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1200px;font-size:24px;color:#5F6673">CS367 · Reproducing INSIDE (ICLR 2024)</p>
 <p style="position:absolute;right:128px;bottom:64px;width:200px;text-align:right;font-size:24px;color:#5F6673">7 / 21</p>
 <aside>[Speaker: Shlok · about 45 s]
 Formally, we stack the K embeddings as the columns of a matrix Z, centre them, and form the K-by-K covariance matrix sigma. The EigenScore is one over K times the log-determinant of sigma plus a small multiple of the identity, which equals the average log-eigenvalue. Each eigenvalue is the variance of the answers along one direction. On the left, the model is confident: the ten embeddings almost coincide, so nearly all eigenvalues fall to the floor set by alpha, and the score is low. On the right, the model is guessing: the embeddings spread out in several directions, the eigenvalues stay large, and the score is high.

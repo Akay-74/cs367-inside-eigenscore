@@ -120,7 +120,7 @@ svg text{ font-family:'Lato',Arial,sans-serif }
 <tr><td>Paper selection</td><td>Chose INSIDE (ICLR 2024) on LLM hallucination detection</td><td><span class="status done">DONE</span></td></tr>
 <tr><td>Implementation</td><td>Repaired code, added feature clipping, 8 GB GPU support, tests</td><td><span class="status done">DONE</span></td></tr>
 <tr><td>Experiment</td><td>250 CoQA questions, with and without clipping, on an RTX 4060 laptop</td><td><span class="status done">DONE</span></td></tr>
-<tr><td>Mid-semester (CS307)</td><td>IEEE-format report, explainer video with 3 voices, viva</td><td><span class="status done">DONE</span></td></tr>
+<tr><td>Mid-semester (CS367)</td><td>IEEE-format report, explainer video with 3 voices, viva</td><td><span class="status done">DONE</span></td></tr>
 <tr><td>Design-project poster</td><td>Formal A2 landscape poster, results verified</td><td><span class="status done">DONE</span></td></tr>
 <tr><td>Extension</td><td>Multi-layer EigenScore + normalisation + hybrid; plan and script ready</td><td><span class="status todo">TO RUN</span></td></tr>
 </table>
@@ -431,7 +431,7 @@ python -m func.evalFunc data/output/llama2-7b-hf_coqa_10/0.pkl --correctness rou
 <h3>7.2 Main result</h3>
 <div class="box"><span class="t">Headline</span><b>EigenScore AUROC = 83.5%</b>. If you take one wrong and one correct answer at random, our score is higher for the wrong one in 83.5% of cases (50% would be random guessing). With feature clipping switched on: <b>82.5%</b>.</div>
 <h3>7.3 All detectors (AUROC, %)</h3>
-<p>These numbers are for internal understanding and the CS307 course, where comparing with the paper was the point. <b>The design-project poster shows only our own numbers.</b></p>
+<p>These numbers are for internal understanding and the CS367 course, where comparing with the paper was the point. <b>The design-project poster shows only our own numbers.</b></p>
 <table>
 <tr><th>Method</th><th class="num">Paper (LLaMA-7B)</th><th class="num">Ours</th><th class="num">Ours + clipping</th></tr>
 <tr class="hl"><td>EigenScore</td><td class="num">80.8</td><td class="num">83.5</td><td class="num">82.5</td></tr>
@@ -465,7 +465,7 @@ python -m func.evalFunc data/output/llama2-7b-hf_coqa_10/0.pkl --correctness rou
 <p>The project is used for <b>two courses</b>, and they frame it differently:</p>
 <table>
 <tr><th style="width:22%">Course</th><th>Framing</th><th style="width:36%">Delivered</th></tr>
-<tr><td><b>CS307</b> (AI course, research paper)</td><td>Implement and reproduce a recent AI paper by mid-sem; propose an improvement for end-sem. Comparing with the paper is expected.</td><td>IEEE report, explainer video with voiceover, viva preparation guide</td></tr>
+<tr><td><b>CS367</b> (AI course, research paper)</td><td>Implement and reproduce a recent AI paper by mid-sem; propose an improvement for end-sem. Comparing with the paper is expected.</td><td>IEEE report, explainer video with voiceover, viva preparation guide</td></tr>
 <tr><td><b>Design Project</b></td><td>Presented as <b>our system</b>: problem → our solution → our results. Single-layer EigenScore only; no paper comparison; the method is credited in References.</td><td>Formal A2 landscape poster for the poster session</td></tr>
 </table>
 <h3>8.1 Files</h3>
